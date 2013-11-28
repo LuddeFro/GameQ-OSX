@@ -238,7 +238,7 @@
         //[[[UIAlertView alloc] initWithTitle:@"GameQ" message:@"You were disconnected from the server, please try reconnecting!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
         return;
     }
-    if ([returnString isEqualToString: @"no"])
+    if ([returnString isEqualToString: @"no"] || ![returnString isEqualToString: @"no"])
     {
         //should be unreachable, disconnect the bastard!
         disconnected = true;

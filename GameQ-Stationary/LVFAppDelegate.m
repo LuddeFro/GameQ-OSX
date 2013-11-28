@@ -521,7 +521,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 // end toggle  ---------------------------------------------
 
 - (void) startTimer {
-    countdownTimer = [NSTimer timerWithTimeInterval:15 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+    countdownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:countdownTimer forMode:NSDefaultRunLoopMode];
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
@@ -634,6 +634,14 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
     
     
     // ---------------- HON handler ----------------------
+    
+    if (honCPack > 0) {
+        // user is online
+        [self online:kHEROES_OF_NEWERTH];
+        [countdownTimer invalidate];
+        countdownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+        [[NSRunLoop currentRunLoop] addTimer:countdownTimer forMode:NSDefaultRunLoopMode];
+    }
     if (honQPack > 1) {
         // user is in game
         [self inGame:kHEROES_OF_NEWERTH];

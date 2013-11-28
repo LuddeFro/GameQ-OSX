@@ -85,16 +85,9 @@
 }
 - (NSString *) getPass
 {
-    NSError *error;
-    NSArray *objects = [_context executeFetchRequest:_request error:&error];
-    if (objects == Nil) {
-        NSLog(@"Storage files not found");
-    }
-    for (NSManagedObject *oneObject in objects) {
-        return [oneObject valueForKey:@"pass"];
-    }
-    return nil;
-    
+    MCSMGenericKeychainItem *genericKeychainItem = [MCSMGenericKeychainItem genericKeychainItemForService:kAPPID account:@"" attributes:nil];
+    NSString *password = genericKeychainItem.password;
+    return password;
 }
 - (void) setDeviceID:(NSString *)devID
 {
@@ -102,7 +95,19 @@
 }
 - (void) setPass:(NSString *)pass
 {
-    [self setSomething:pass forField:@"pass"];
+    MCSMGenericKeychainItem *genericKeychainItem = nil;
+    genericKeychainItem = [MCSMGenericKeychainItem genericKeychainItemForService:kAPPID account:@"" attributes:nil];
+    if(genericKeychainItem)
+    {
+        [genericKeychainItem removeFromKeychain];
+    }
+    if ([pass isEqualToString:@""]) {
+        [genericKeychainItem removeFromKeychain];
+    }
+    [MCSMGenericKeychainItem genericKeychainItemWithService:kAPPID
+                                                    account:@""
+                                                 attributes:nil
+                                                   password:pass];
 }
 - (void) setToken:(NSString *)token
 {
@@ -141,4 +146,9 @@
     [_context save:&error];
     
 }
+    
+    /*
+     - (id)initWithIdentifier: (NSString *)identifier accessGroup:(NSString *) accessGroup;
+     - (void)setObject:(id)inObject forKey:(id)key;
+     - (id)objectForKey:(id)key;*/
 @end

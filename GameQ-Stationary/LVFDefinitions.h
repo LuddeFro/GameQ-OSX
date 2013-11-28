@@ -18,7 +18,8 @@
 //#define updateURL kGameQServerURL@"updateDraw.php";
 //#define getSecretURL kGameQServerURL@"getSecret.php";
 //#define checkSecretURL kGameQServerURL@"chkSecret.php";
-#define updateTokenURL kGameQServerURL@"upPcToken.php"
+#define updateTokenURL kGameQServerURL@"upMacToken.php"
+#define kAPPID @"GameQ"
 
 #define URL_ABOUT @"https://www.gameQ.com/about"
 

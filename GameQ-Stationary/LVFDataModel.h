@@ -7,7 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Security/Security.h>
 #import "LVFAppDelegate.h"
+#import "LVFDefinitions.h"
+#import "MCSMKeychainItem.h"
+
 
 @class LVFAppDelegate;
 
