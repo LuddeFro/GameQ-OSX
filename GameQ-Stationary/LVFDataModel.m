@@ -85,9 +85,12 @@
 }
 - (NSString *) getPass
 {
-    MCSMGenericKeychainItem *genericKeychainItem = [MCSMGenericKeychainItem genericKeychainItemForService:kAPPID account:@"" attributes:nil];
-    NSString *password = genericKeychainItem.password;
-    return password;
+    
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kAPPID] encoding:NSUTF8StringEncoding];
+    return  string;
+    
+    //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
+    //return [keyChain getPassword];
 }
 - (void) setDeviceID:(NSString *)devID
 {
@@ -95,19 +98,11 @@
 }
 - (void) setPass:(NSString *)pass
 {
-    MCSMGenericKeychainItem *genericKeychainItem = nil;
-    genericKeychainItem = [MCSMGenericKeychainItem genericKeychainItemForService:kAPPID account:@"" attributes:nil];
-    if(genericKeychainItem)
-    {
-        [genericKeychainItem removeFromKeychain];
-    }
-    if ([pass isEqualToString:@""]) {
-        [genericKeychainItem removeFromKeychain];
-    }
-    [MCSMGenericKeychainItem genericKeychainItemWithService:kAPPID
-                                                    account:@""
-                                                 attributes:nil
-                                                   password:pass];
+    [SSKeychain setPassword:pass forService:kAPPID account:kAPPID];
+    
+    //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
+    //[keyChain setPassword:pass];
+    
 }
 - (void) setToken:(NSString *)token
 {

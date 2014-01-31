@@ -56,7 +56,7 @@
     else
     {
         
-        [[NSAlert alertWithMessageText:@"GameQ could not establish a connection" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please check you network connections and try again!"] runModal];
+        [self connectionAlert:@"conErr1"];
         NSLog(@"login connection failed");
     }
     NSLog(@"postNow method has finished executing");
@@ -232,13 +232,13 @@
         [appDel setDisconnected];
        
         //stationary alert
-        [[NSAlert alertWithMessageText:@"GameQ Disconnected" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"You have been disconnected from the GameQ servers, please try reconnecting!"] runModal];
+        [self connectionAlert:@"badSession"];
         
         // mobile alert
         //[[[UIAlertView alloc] initWithTitle:@"GameQ" message:@"You were disconnected from the server, please try reconnecting!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
         return;
     }
-    if ([returnString isEqualToString: @"no"] || ![returnString isEqualToString: @"no"])
+    if ([returnString isEqualToString: @"no"])
     {
         //should be unreachable, disconnect the bastard!
         disconnected = true;
@@ -246,11 +246,18 @@
         [appDel setDisconnected];
         
         //statioanry alert
-        [[NSAlert alertWithMessageText:@"GameQ Connection Error" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Connection error, please try again in a minute!"] runModal];
+        [self connectionAlert:@"&no"];
         
         // mobile alert
         //[[[UIAlertView alloc] initWithTitle:@"GameQ" message:@"Connection error, please try again in a minute" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+    } else {
+        [self connectionAlert:@"666"];
     }
+}
+
+- (void) connectionAlert:(NSString*)code
+{
+    [[NSAlert alertWithMessageText:@"GameQ Connection Error" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Error Code: %@", code] runModal];
 }
 
 @end

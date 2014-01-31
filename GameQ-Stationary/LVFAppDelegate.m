@@ -13,9 +13,11 @@
 #define kDOTA2 2
 #define kCS_GO 3
 #define REGISTER_URL @"https://www.gameq.com/register"
-#define kOFFLINE 0
-#define kONLINE 1
-#define kINGAME 2
+#define kOFFLINE 0 //app running, but no game
+#define kONLINE 1 //game running
+#define kINGAME 2 //game running and in match
+
+#define kNUMBER_OF_GAMES 4 //kNOGAME counts as 1
 
 
 void * reftoself;
@@ -32,13 +34,15 @@ void * reftoself;
 
 @synthesize mainMenu;
 @synthesize statusBar;
-@synthesize countdownTimer;
 @synthesize countdownQuickTimer;
-@synthesize honCPack;
+@synthesize countdownSlowTimer;
 @synthesize honQPack;
+@synthesize dotaQPack;
+@synthesize dotaCPack;
+@synthesize csgoQPack;
 @synthesize bolFirstTick;
-@synthesize bolInGame;
-@synthesize bolOnline;
+@synthesize bolInGameArray;
+@synthesize bolOnlineArray;
 @synthesize btnLog;
 @synthesize btnQuitApp;
 @synthesize btnToggleActive;
@@ -49,6 +53,7 @@ void * reftoself;
 @synthesize btnSignUp;
 @synthesize btnLogin;
 @synthesize bolIsActive;
+@synthesize dotaQBuffer;
 
 
 
@@ -115,14 +120,15 @@ struct sniff_tcp {
 };
 
 
-// UDP header's structure
 struct sniff_udp {
     u_short uh_sport;               /* source port */
     u_short uh_dport;               /* destination port */
-    u_short uh_len;
-    u_short uh_sum;
+    u_short uh_ulen;                /* udp length */
+    u_short uh_sum;                 /* udp checksum */
     
 };
+
+#define SIZE_UDP        8               /* length of UDP header */
 // total udp header length: 8 bytes (=64 bits)
 
 
@@ -144,7 +150,7 @@ pcap_t *handle;		/* Session handle */
 const char *dev;		/* Device to sniff on */
 char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
 struct bpf_program fp;		/* The compiled filter expression */
-char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp dst portrange 27015-28999";	/* The filter expression */
+char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";	/* The filter expression */
 bpf_u_int32 mask;		/* The netmask of our sniffing device */
 bpf_u_int32 net;		/* The IP of our sniffing device */
 //  struct pcap_pkthdr header;	/* The header that pcap gives us */
@@ -220,7 +226,9 @@ int num_packets = 0; /* the number of packets to be caught*/
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    NSLog(@"init delegate");
+    
+    
+    
     //first init
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
     NSLog(@"%@", [_dataHandler getDeviceID]);
@@ -229,21 +237,55 @@ int num_packets = 0; /* the number of packets to be caught*/
     }
     NSLog(@"%@", [_dataHandler getDeviceID]);
     
+    
+    
     //initailizing state
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:(NSRemoteNotificationTypeAlert | NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound)];
     _connectionsHandler = [[LVFConnections alloc] init];
+    _windowHandler = [[LVFWindowHandler alloc] init];
     bolIsActive = false;
     bolFirstTick = true;
-    bolInGame = false;
-    bolOnline = false;
+    bolInGameArray = [[NSMutableArray alloc] init];
+    bolOnlineArray = [[NSMutableArray alloc] init];
+    for (int j = 0; j<kNUMBER_OF_GAMES ; j++) {
+        [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+    }
     if ([_dataHandler getBolIsLoggedIn]) {
         [_connectionsHandler loginWithUser:[_dataHandler getEmail] andPass:[_dataHandler getPass]];
     }
     NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword: like I would tell you :P \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], [_dataHandler getDeviceID]);
     
+    
+    
     //pCap vars
     struct ifaddrs* interfaces = NULL;
     struct ifaddrs* temp_addr = NULL;
+    
+    
+    
+    // creating statusbar item
+    self.statusBar = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    
+    NSColor *color = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithString:self.statusBar.title];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
+    [self.statusBar setAttributedTitle: colorTitle];
+    self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
+    [self.statusBar setHighlightMode:YES];
+    [self.statusBar setAlternateImage:[NSImage imageNamed:@"Qwhite.png"]];
+    self.statusBar.menu = self.mainMenu;
+    self.statusBar.highlightMode = TRUE;
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+    
+    
+    dotaQBuffer = [[LVFBuffer alloc] init];
+    NSLog(@"init delegate");
+    
+    
+    
+    
     
     
     
@@ -253,10 +295,17 @@ int num_packets = 0; /* the number of packets to be caught*/
     loginWindow = [[NSWindow alloc] initWithContentRect:winFrame styleMask:stylemask backing:NSBackingStoreBuffered defer:YES];
     [loginWindow setReleasedWhenClosed:NO];
     [loginWindow center];
-    NSRect mailFrame = NSRectFromCGRect(CGRectMake(78, 95, 217, 25));
-    NSRect passFrame = NSRectFromCGRect(CGRectMake(78, 65, 217, 25));
-    NSRect loginFrame = NSRectFromCGRect(CGRectMake(136.5, 30, 100, 25));
-    NSRect regFrame = NSRectFromCGRect(CGRectMake(100, 10, 173, 17));
+    NSRect mailFrame = NSRectFromCGRect(CGRectMake(78, 105, 217, 25));
+    NSRect passFrame = NSRectFromCGRect(CGRectMake(78, 75, 217, 25));
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(136.5, 40, 100, 25));
+    NSRect regFrame = NSRectFromCGRect(CGRectMake(136.5, 12, 100, 25));
+    
+    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(78, 195, 217, 25));
+    NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(78, 165, 217, 25));
+    NSRect yobFrame = NSRectFromCGRect(CGRectMake(78, 135, 217, 25));
+    NSRect genderFrame = NSRectFromCGRect(CGRectMake(149.5, 55, 140, 60));
+    NSRect countryFrame = NSRectFromCGRect(CGRectMake(136.5, 105, 100, 25));
+    
     txtPassword = [[NSSecureTextField alloc] initWithFrame:passFrame];
     txtEmail = [[NSTextField alloc] initWithFrame:mailFrame];
     btnSignUp = [[NSButton alloc] initWithFrame:regFrame];
@@ -264,23 +313,48 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[txtPassword cell] setPlaceholderString:@"Password"];
     [[txtEmail cell] setPlaceholderString:@"E-Mail"];
     [btnLogin setTitle:@"Log In"];
-    [btnSignUp setTitle:@"Don't have an account yet?"];
+    [btnSignUp setTitle:@"Register"];
     [btnLogin setBezelStyle:NSRoundedBezelStyle];
     [btnLogin setTarget:self];
     [btnLogin setAction:@selector(attemptLogin)];
     [btnSignUp setTarget:self];
     [btnSignUp setAction:@selector(goToRegistration)];
-    [btnSignUp setButtonType:NSMomentaryPushInButton];
-    [loginWindow.contentView addTrackingRect:btnSignUp.frame owner:self userData:@"signup" assumeInside:NO];
+    [btnSignUp setButtonType:NSMomentaryLight];
     [btnLogin setButtonType:NSMomentaryLight];
-    [btnSignUp setBordered:NO];
+    [btnSignUp setBordered:YES];
+    [btnSignUp setBezelStyle:NSRoundedBezelStyle];
     [btnLogin setBordered:YES];
+    
+    _txtFirstName = [[NSTextField alloc] initWithFrame:firstNameFrame];
+    _txtLastName = [[NSTextField alloc] initWithFrame:lastNameFrame];
+    _txtYOB = [[NSTextField alloc] initWithFrame:yobFrame];
+    _rolloverCountry = [[NSPopUpButton alloc] initWithFrame:countryFrame pullsDown:YES];
+    _segSex = [[NSSegmentedControl alloc] initWithFrame:genderFrame];
+    
+    [_segSex setSegmentCount:2];
+    [_segSex setImage:[NSImage imageNamed:@"i5woman.png"] forSegment:0];
+    [_segSex setImage:[NSImage imageNamed:@"i5man.png"] forSegment:1];
+    [_segSex setSegmentStyle:NSSegmentStyleCapsule];
+    
+    [[_txtYOB cell] setPlaceholderString:@"Year of Birth"];
+    [[_txtFirstName cell] setPlaceholderString:@"First Name"];
+    [[_txtLastName cell] setPlaceholderString:@"Last Name"];
+    
+    
+    [loginWindow.contentView addSubview:_txtFirstName];
+    [loginWindow.contentView addSubview:_txtLastName];
+    [loginWindow.contentView addSubview:_txtYOB];
+    [loginWindow.contentView addSubview:_segSex];
+    [loginWindow.contentView addSubview:_rolloverCountry];
     [loginWindow.contentView addSubview:txtPassword];
     [loginWindow.contentView addSubview:txtEmail];
     [loginWindow.contentView addSubview:btnSignUp];
     [loginWindow.contentView addSubview:btnLogin];
     [[loginWindow contentView] setAutoresizesSubviews:YES];
     [btnLogin setKeyEquivalent:@"\r"];
+    [loginWindow setDelegate:_windowHandler];
+    
+    
     
     
     
@@ -340,20 +414,36 @@ int num_packets = 0; /* the number of packets to be caught*/
         fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
         return;
     }
-    // creating statusbar item
-    self.statusBar = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     
-    self.statusBar.title = @"GQ";
-    NSColor *color = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
-    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithString:self.statusBar.title];
-    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
-    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
-    [self.statusBar setAttributedTitle: colorTitle];
-    //self.statusBar.image = ;
-    self.statusBar.menu = self.mainMenu;
-    self.statusBar.highlightMode = TRUE;
 }
 
+    
+-(void) setupRegister{
+    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 373, 343));
+    NSRect mailFrame = NSRectFromCGRect(CGRectMake(78, 255, 217, 25));
+    NSRect passFrame = NSRectFromCGRect(CGRectMake(78, 225, 217, 25));
+    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(78, 195, 217, 25));
+    NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(78, 165, 217, 25));
+    NSRect yobFrame = NSRectFromCGRect(CGRectMake(78, 135, 217, 25));
+    NSRect genderFrame = NSRectFromCGRect(CGRectMake(149.5, 55, 140, 60));
+    NSRect countryFrame = NSRectFromCGRect(CGRectMake(136.5, 105, 100, 25));
+    
+    [loginWindow setFrame:winFrame display:YES];
+    [txtEmail setFrame:mailFrame];
+    [txtPassword setFrame:passFrame];
+    [_txtFirstName setFrame:firstNameFrame];
+    [_txtLastName setFrame:lastNameFrame];
+    [_txtYOB setFrame:yobFrame];
+    [_segSex setFrame:genderFrame];
+    [_rolloverCountry setFrame:countryFrame];
+    
+    
+    
+}
+
+-(void) setupLogin{
+    
+}
 
 
 static void got_packet(id self, const struct pcap_pkthdr *header,
@@ -368,12 +458,20 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 	const struct sniff_ip *ip;              /* The IP header */
 	const struct sniff_tcp *tcp;            /* The TCP header */
     const struct sniff_udp *udp;
-	//const char *payload;                    /* Packet payload */
+	u_char *payload;                    /* Packet payload */
+    
+    /* UDP header */
+    
+    
+    
+    
+    
+    
     
 	int size_ip;
 	int size_tcp;
     int size_udp;
-    //	int size_payload;
+    int size_payload;
 	
 	printf("\nPacket number %d:\n", count);
 	count++;
@@ -404,7 +502,8 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             //--
             
             udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + size_ip);
-            size_udp = ntohs(udp->uh_len);
+            size_udp = ntohs(udp->uh_ulen);
+            
             if (size_udp < 8) {
                 printf("   * Invalid UDP header length: %u bytes\n", size_udp);
             }
@@ -413,18 +512,66 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             
             printf("   Src port: %d\n", ntohs(udp->uh_sport));
             printf("   Dst port: %d\n", ntohs(udp->uh_dport));
+        
+        
             
             int dport = ntohs(udp->uh_dport);
+            int sport = ntohs(udp->uh_sport);
             if (dport <= 11335 && dport >= 11235) {
+                
                 NSLog(@"Hon Packet");
                 [self incrementHonQPack];
                 NSLog(@"%d",[self honQPack]);
             }
-            if (dport <= 27015 && dport >= 28999) {
-                NSLog(@"Dota Packet");
-                [self incrementHonQPack];
-                NSLog(@"%d",[self honQPack]);
+            
+            if (sport >= 27015 && sport <= 27019 && ntohs(ip->ip_len) <= 686 && ntohs(ip->ip_len) >= 586) {
+                NSLog(@"Dota Q Packet");
+                [self incrementDotaQPack];
+                NSLog(@"%d",[self dotaQPack]);
+                
             }
+            
+            if (dport == 27005) {
+                [self incrementDotaCPack];
+                NSLog(@"Dota C Packet");
+                NSLog(@"%d",[self dotaCPack]);
+            }
+            
+            
+            
+            /*
+             *  OK, this packet is UDP.
+             */
+            
+            /* define/compute tcp header offset */
+            udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + SIZE_UDP);
+            
+            printf("   Src port: %d\n", ntohs(udp->uh_sport));
+            printf("   Dst port: %d\n", ntohs(udp->uh_dport));
+            
+            /* define/compute udp payload (segment) offset */
+            payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + SIZE_UDP);
+            
+            /* compute udp payload (segment) size */
+            size_payload = ntohs(ip->ip_len) - (size_ip + SIZE_UDP);
+            if (size_payload > ntohs(udp->uh_ulen))
+                size_payload = ntohs(udp->uh_ulen);
+            
+            /*
+             * Print payload data; it might be binary, so don't just
+             * treat it as a string.
+             */
+            if (size_payload > 0) {
+                printf("   Payload (%d bytes):\n", size_payload);
+                print_payload(payload, size_payload);
+            }
+            
+            
+            
+            
+            
+            
+            
             
             
             //--
@@ -451,14 +598,21 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 		printf("   * Invalid TCP header length: %u bytes\n", size_tcp);
 		return;
 	}
+    
+    printf("Header length: %u bytes\n", size_tcp);
+    
+    /*
     int dport = ntohs(tcp->th_dport);
-	if (dport == 11031) {
+	
+     //Hon chat server packets
+     
+     if (dport == 11031) {
         NSLog(@"Hon ChatPacket");
         [self incrementHonCPack];
         NSLog(@"%i",[self honCPack]);
         
         
-    }
+    }*/
 	printf("   Src port: %d\n", ntohs(tcp->th_sport));
 	printf("   Dst port: %d\n", ntohs(tcp->th_dport));
     
@@ -466,6 +620,122 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
     
     return;
 }
+
+/*
+ * print packet payload data (avoid printing binary data)
+ */
+void
+print_payload(const u_char *payload, int len)
+{
+    
+	int len_rem = len;
+	int line_width = 16;			/* number of bytes per line */
+	int line_len;
+	int offset = 0;					/* zero-based offset counter */
+	const u_char *ch = payload;
+    
+	if (len <= 0)
+		return;
+    
+	/* data fits on one line */
+	if (len <= line_width) {
+		print_hex_ascii_line(ch, len, offset);
+		return;
+	}
+    
+	/* data spans multiple lines */
+	for ( ;; ) {
+		/* compute current line length */
+		line_len = line_width % len_rem;
+		/* print line */
+		print_hex_ascii_line(ch, line_len, offset);
+		/* compute total remaining */
+		len_rem = len_rem - line_len;
+		/* shift pointer to remaining bytes to print */
+		ch = ch + line_len;
+		/* add offset */
+		offset = offset + line_width;
+		/* check if we have line width chars or less */
+		if (len_rem <= line_width) {
+			/* print last line and get out */
+			print_hex_ascii_line(ch, len_rem, offset);
+			break;
+		}
+	}
+    
+    return;
+}
+
+
+/*
+ * print data in rows of 16 bytes: offset   hex   ascii
+ *
+ * 00000   47 45 54 20 2f 20 48 54  54 50 2f 31 2e 31 0d 0a   GET / HTTP/1.1..
+ */
+void
+print_hex_ascii_line(const u_char *payload, int len, int offset)
+{
+    
+	int i;
+	int gap;
+	const u_char *ch;
+    
+	/* offset */
+	printf("%05d   ", offset);
+	
+	/* hex */
+	ch = payload;
+	for(i = 0; i < len; i++) {
+		printf("%02x ", *ch);
+		ch++;
+		/* print extra space after 8th byte for visual aid */
+		if (i == 7)
+			printf(" ");
+	}
+	/* print space to handle line less than 8 bytes */
+	if (len < 8)
+		printf(" ");
+	
+	/* fill hex gap with spaces if not full line */
+	if (len < 16) {
+		gap = 16 - len;
+		for (i = 0; i < gap; i++) {
+			printf("   ");
+		}
+	}
+	printf("   ");
+	
+	/* ascii (if printable) */
+	ch = payload;
+	for(i = 0; i < len; i++) {
+		if (isprint(*ch))
+			printf("%c", *ch);
+		else
+			printf(".");
+		ch++;
+	}
+    
+	printf("\n");
+    
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -497,7 +767,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
     NSRange titleRange = NSMakeRange(0, [colorTitle length]);
     [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
     [self.statusBar setAttributedTitle: colorTitle];
-    //addfeature statusbar icon image change
+    self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
     
 }
 
@@ -515,20 +785,19 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
     [btnToggleActive setTitle:@"Stop Monitoring"];
     printf("\nCapture started.\n");
     pcap_loop(handle, num_packets, got_packet, self);
-    
-    //addfeature statusbar icon image change
+    self.statusBar.image = [NSImage imageNamed:@"Qblue.png"];
 }
 // end toggle  ---------------------------------------------
 
 - (void) startTimer {
-    countdownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:countdownTimer forMode:NSDefaultRunLoopMode];
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    //countdownSlowTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+    //[[NSRunLoop currentRunLoop] addTimer:countdownSlowTimer forMode:NSDefaultRunLoopMode];
 }
 - (void) stopTimer {
-    [countdownTimer invalidate];
     [countdownQuickTimer invalidate];
+    //[countdownSlowTimer invalidate];
 }
 
 // reg / login button is selected from the GQ toolbar menu
@@ -540,16 +809,20 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
         
     } else {
         [loginWindow close];
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-        NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 373, 173));
-        [loginWindow setFrame:winFrame display:YES];
+        [self setupLogin];
         [loginWindow center];
         [loginWindow makeKeyAndOrderFront:self];
         NSLog(@"showing window");
+        
+        
     }
 }
 - (void)logIn
 {
+    
+    
     
     [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
     
@@ -608,69 +881,115 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 	pcap_close(handle);
     [NSApp terminate:self];
 }
-//what happens on tick? (slow timer)
-- (IBAction)tick:(id)sender {
+
+//what happens on tack? (quick timer)
+- (IBAction)tack:(id)sender {
     NSLog(@"tick");
+    // get processes
+    NSString *output = [NSString string];
+    for (NSRunningApplication *app in
+         [[NSWorkspace sharedWorkspace] runningApplications]) {
+        output = [output stringByAppendingFormat:@"%@\n",
+                  [app localizedName] /*absoluteString*/];
+    }
+    
+    //NSLog(@"%@", output);
+    
+    
+    //NSLog(@"<<<processes checked>>>");
+    
+    //-------------------check processes------------------
+    BOOL honRunning = false;
+    BOOL dotaRunning = false;
+    BOOL csgoRunning = false;
+    if ([output rangeOfString:@"Heroes"].location == NSNotFound || [output rangeOfString:@"Newerth"].location == NSNotFound) {
+        honRunning = false;
+        //NSLog(@"hon not running, false alarm");
+    } else {
+        honRunning = true;
+        //NSLog(@"hon running, probably true alarm");
+    }
+    if ([output rangeOfString:@"dota"].location == NSNotFound) {
+        dotaRunning = false;
+        //NSLog(@"dota not running, false alarm");
+    } else {
+        dotaRunning = true;
+        //NSLog(@"dota running, probably true alarm");
+    }
+    if ([output rangeOfString:@"csgo"].location == NSNotFound) {
+        csgoRunning = false;
+        //NSLog(@"csgo not running, false alarm");
+    } else {
+        csgoRunning = true;
+        //NSLog(@"csgo running, probably true alarm");
+    }
+
+
     
     // ---------------- HON handler ----------------------
-    if (honCPack > 0) {
-        // user is online
+    
+    if (honQPack > 1 && honRunning) {
+        // user is in game
+        [self inGame:kHEROES_OF_NEWERTH];
+    } else if (honRunning){
         [self online:kHEROES_OF_NEWERTH];
+        //got no packets but it's on
     } else {
-        // user is offline
+        // user is not in game
         [self offline:kHEROES_OF_NEWERTH];
     }
     // -------------- HON handler end --------------------
     
     
-    
-    honCPack = 0;
-    
-    NSLog(@"tock");
-}
-//what happens on tack? (quick timer)
-- (IBAction)tack:(id)sender {
-    NSLog(@"tack");
-    
-    
-    // ---------------- HON handler ----------------------
-    
-    if (honCPack > 0) {
-        // user is online
-        [self online:kHEROES_OF_NEWERTH];
-        [countdownTimer invalidate];
-        countdownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
-        [[NSRunLoop currentRunLoop] addTimer:countdownTimer forMode:NSDefaultRunLoopMode];
+    // ---------------- DOTA handler ----------------------
+    [dotaQBuffer increment:dotaQPack];
+    NSLog(@"buffer: %i", dotaQBuffer.bufferValue);
+    NSLog(@"%i", dotaRunning);
+    if (dotaQBuffer.bufferValue > 1 && dotaRunning) {
+        [self inGame:kDOTA2]; //potentially sends notification
     }
-    if (honQPack > 1) {
+    if (dotaCPack > 1 && dotaRunning) {
         // user is in game
-        [self inGame:kHEROES_OF_NEWERTH];
-    } else if (honQPack == 1) {
-        // user logged on
-        [self online:kHEROES_OF_NEWERTH];
+        bolFirstTick = 1; //tricks the app in to not sending a notification
+        [self inGame:kDOTA2];
+    } else if (dotaRunning){
+        [self online:kDOTA2];
+        
     } else {
         // user is not in game
-        [self outGame:kHEROES_OF_NEWERTH];
+        [self offline:kDOTA2];
     }
-    // -------------- HON handler end --------------------
+    // -------------- DOTA handler end --------------------
     
     
     
+    dotaCPack = 0;
+    dotaQPack = 0;
     honQPack = 0;
     bolFirstTick = 0;
-    NSLog(@"tuck");
+    //NSLog(@"");
 }
+
+// slow buffer timer
+- (IBAction)tick:(id)sender {
+    
+}
+
+
+
+
+
 // handles offline state
 - (IBAction)offline:(int)game {
     
     NSLog(@"called method \"offline\"");
-    if (!bolOnline) {
+    if (![[bolOnlineArray objectAtIndex:game] boolValue]) {
         // do nothing if status already offline, (initialized to offline)
     } else {
         
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE]];
     }
-    bolOnline = 0;
+    [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
     
 }
 
@@ -678,31 +997,34 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 - (IBAction)online:(int)game {
     
     NSLog(@"called method \"online\"");
-    if (bolOnline) {
+    if ([[bolOnlineArray objectAtIndex:game] boolValue]) {
         // do nothing if status already online, (initialized to offline)
     } else {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE]];
     }
-    bolOnline = 1;
+    [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
 }
 
 //executes every quick timer user is in a match
 - (IBAction)inGame:(int)game {
+    NSLog(@"called method \"ingame\"");
     // if its the first tick
     if (bolFirstTick) {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME]];
         
-    } else if(!bolFirstTick && bolInGame){
+    } else if(!bolFirstTick && [[bolInGameArray objectAtIndex:game] boolValue]){
         //do nothing
         
-    } else if(!bolFirstTick && !bolInGame) {
+    } else if(!bolFirstTick && ![[bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game]];
     }
-    bolInGame = 1;
+    [bolInGameArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
     
 }
 
-//executes every quick timer user is not in a match
+
+/* What the fuck does this method do? this was active while offline:(int)game was inactive.... it was wrong!?!?
+//executes every quick timer user has not launched a game
 - (IBAction)outGame:(int)game {
     if (bolFirstTick) {
         //do nothing, bolInGame initialized to false
@@ -714,7 +1036,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
         //do nothing
     }
     bolInGame = 0;
-}
+}*/
 
 
 
@@ -723,10 +1045,14 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 - (IBAction)incrementHonQPack {
     honQPack++;
 }
-- (IBAction)incrementHonCPack {
-    honCPack++;
+
+- (IBAction)incrementDotaQPack {
+    dotaQPack++;
 }
 
+- (IBAction)incrementDotaCPack {
+    dotaCPack++;
+}
 
 
 

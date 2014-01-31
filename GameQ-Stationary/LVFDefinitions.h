@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define kGameQServerURL @"http://www-student.it.uts.edu.au/~lfroberg/servTest/"
+#define kGameQServerURL @"http://185.2.155.237/GameQ_Server_Code/"
 #define ServerURL kGameQServerURL;
 #define loginURL kGameQServerURL@"signing.php";
 //#define registerURL kGameQServerURL@"regging.php";

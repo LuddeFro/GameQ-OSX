@@ -10,7 +10,8 @@
 #import <Security/Security.h>
 #import "LVFAppDelegate.h"
 #import "LVFDefinitions.h"
-#import "MCSMKeychainItem.h"
+#import "LVFKeyChain.h"
+#import "SSKeychain.h"
 
 
 @class LVFAppDelegate;

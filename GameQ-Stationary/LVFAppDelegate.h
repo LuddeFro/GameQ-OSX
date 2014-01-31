@@ -16,6 +16,10 @@
 #import "LVFConnections.h"
 #import "LVFDefinitions.h"
 #import "LVFDataModel.h"
+#import "LVFBuffer.h"
+#import "LVFWindowHandler.h"
+
+@class LVFBuffer;
 @class LVFConnections;
 @class LVFDataModel;
 
@@ -33,7 +37,7 @@
 
 
 
-
+@property (strong) LVFWindowHandler *windowHandler;
 @property (weak) IBOutlet NSMenu *mainMenu;
 @property (strong, nonatomic) NSStatusItem *statusBar;
 @property (weak) IBOutlet NSMenuItem *btnStatus;
@@ -41,12 +45,17 @@
 @property (weak) IBOutlet NSMenuItem *btnToggleActive;
 @property (weak) IBOutlet NSMenuItem *btnLog;
 @property (weak) IBOutlet NSMenuItem *btnQuitApp;
-@property (strong, nonatomic) NSTimer *countdownTimer;
 @property (strong, nonatomic) NSTimer *countdownQuickTimer;
+@property (strong, nonatomic) NSTimer *countdownSlowTimer;
 @property int honQPack;
-@property int honCPack;
-@property BOOL bolInGame;
-@property BOOL bolOnline;
+@property int dotaQPack;
+@property int dotaCPack;
+@property int csgoQPack;
+
+@property NSMutableArray *bolInGameArray;
+@property NSMutableArray *bolOnlineArray;
+
+
 @property BOOL bolFirstTick;
 @property LVFConnections *connectionsHandler;
 @property (strong, nonatomic) NSWindow *loginWindow;
@@ -57,6 +66,15 @@
 @property bool bolLoggedIn;
 @property BOOL bolIsActive;
 @property (strong, nonatomic) LVFDataModel *dataHandler;
+@property NSTextField *txtFirstName;
+@property NSTextField *txtLastName;
+@property NSTextField *txtYOB;
+@property NSSegmentedControl *segSex;
+@property NSPopUpButton *rolloverCountry;
+    
+
+
+@property LVFBuffer *dotaQBuffer;
 
 
 

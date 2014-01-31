@@ -19,4 +19,5 @@
 
 - (void)postNow:(NSString *)toPost to:(NSString *)link;
 - (id) initWithDelegate:(LVFConnections *)del;
+- (void) connectionAlert:(NSString*)code;
 @end
