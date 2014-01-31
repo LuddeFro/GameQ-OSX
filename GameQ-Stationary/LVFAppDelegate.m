@@ -189,11 +189,12 @@ int num_packets = 0; /* the number of packets to be caught*/
     
 }
 // pressed button that they dont have an account, link them to signup page!
--(void)goToRegistration
+    /*
+-(void)linkmethod
 {
     NSURL *registerURL = [[NSURL alloc] initWithString:REGISTER_URL];
     [[NSWorkspace sharedWorkspace] openURL:registerURL];
-}
+}*/
 
 - (void)application:(NSApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
@@ -287,27 +288,36 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     
     
-    
+
     
     //setup the login window
-    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 373, 173));
+    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 573, 473));
     NSUInteger stylemask = NSTexturedBackgroundWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSTitledWindowMask|NSResizableWindowMask;
     loginWindow = [[NSWindow alloc] initWithContentRect:winFrame styleMask:stylemask backing:NSBackingStoreBuffered defer:YES];
     [loginWindow setReleasedWhenClosed:NO];
     [loginWindow center];
-    NSRect mailFrame = NSRectFromCGRect(CGRectMake(78, 105, 217, 25));
-    NSRect passFrame = NSRectFromCGRect(CGRectMake(78, 75, 217, 25));
-    NSRect loginFrame = NSRectFromCGRect(CGRectMake(136.5, 40, 100, 25));
-    NSRect regFrame = NSRectFromCGRect(CGRectMake(136.5, 12, 100, 25));
+    NSRect mailFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-233.5, winFrame.size.height-80, 217, 25));
+    NSRect passFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, mailFrame.origin.y-30, 217, 25));
     
-    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(78, 195, 217, 25));
-    NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(78, 165, 217, 25));
-    NSRect yobFrame = NSRectFromCGRect(CGRectMake(78, 135, 217, 25));
-    NSRect genderFrame = NSRectFromCGRect(CGRectMake(149.5, 55, 140, 60));
-    NSRect countryFrame = NSRectFromCGRect(CGRectMake(136.5, 105, 100, 25));
+    NSRect regFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-50, 12, 100, 25));
+    
+    
+    
+    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, passFrame.origin.y-30, 217, 25));
+    NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, firstNameFrame.origin.y-30, 217, 25));
+    NSRect yobFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, lastNameFrame.origin.y-30, 217, 25));
+    NSRect questionFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, yobFrame.origin.y-30, 217, 25));
+    NSRect answerFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, questionFrame.origin.y-30, 217, 25));
+
+    
+    NSRect countryFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, answerFrame.origin.y-30, 100, 25));
+    NSRect genderFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x+3, countryFrame.origin.y-45, 140, 60));
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
+    
     
     txtPassword = [[NSSecureTextField alloc] initWithFrame:passFrame];
     txtEmail = [[NSTextField alloc] initWithFrame:mailFrame];
+    
     btnSignUp = [[NSButton alloc] initWithFrame:regFrame];
     btnLogin = [[NSButton alloc] initWithFrame:loginFrame];
     [[txtPassword cell] setPlaceholderString:@"Password"];
@@ -318,18 +328,26 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnLogin setTarget:self];
     [btnLogin setAction:@selector(attemptLogin)];
     [btnSignUp setTarget:self];
-    [btnSignUp setAction:@selector(goToRegistration)];
+    [btnSignUp setAction:@selector(setupRegister)];
     [btnSignUp setButtonType:NSMomentaryLight];
     [btnLogin setButtonType:NSMomentaryLight];
     [btnSignUp setBordered:YES];
     [btnSignUp setBezelStyle:NSRoundedBezelStyle];
     [btnLogin setBordered:YES];
+    [_btnQuestion setTitle:@"Forgot Password"];
+    [_btnQuestion setBezelStyle:NSRoundedBezelStyle];
+    [_btnQuestion setTarget:self];
+    [_btnQuestion setAction:@selector(setupQuestion)];
+    [_btnQuestion setButtonType:NSMomentaryLight];
+    [_btnQuestion setBordered:YES];
     
     _txtFirstName = [[NSTextField alloc] initWithFrame:firstNameFrame];
     _txtLastName = [[NSTextField alloc] initWithFrame:lastNameFrame];
     _txtYOB = [[NSTextField alloc] initWithFrame:yobFrame];
     _rolloverCountry = [[NSPopUpButton alloc] initWithFrame:countryFrame pullsDown:YES];
     _segSex = [[NSSegmentedControl alloc] initWithFrame:genderFrame];
+    _txtQuestion = [[NSTextField alloc] initWithFrame:questionFrame];
+    _txtAnswer = [[NSTextField alloc] initWithFrame:answerFrame];
     
     [_segSex setSegmentCount:2];
     [_segSex setImage:[NSImage imageNamed:@"i5woman.png"] forSegment:0];
@@ -339,6 +357,8 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtYOB cell] setPlaceholderString:@"Year of Birth"];
     [[_txtFirstName cell] setPlaceholderString:@"First Name"];
     [[_txtLastName cell] setPlaceholderString:@"Last Name"];
+    [[_txtQuestion cell] setPlaceholderString:@"Secret Question"];
+    [[_txtAnswer cell] setPlaceholderString:@"Secret Answer"];
     
     
     [loginWindow.contentView addSubview:_txtFirstName];
@@ -346,14 +366,29 @@ int num_packets = 0; /* the number of packets to be caught*/
     [loginWindow.contentView addSubview:_txtYOB];
     [loginWindow.contentView addSubview:_segSex];
     [loginWindow.contentView addSubview:_rolloverCountry];
+    [loginWindow.contentView addSubview:_txtAnswer];
+    [loginWindow.contentView addSubview:_txtQuestion];
+    [loginWindow.contentView addSubview:btnLogin];
     [loginWindow.contentView addSubview:txtPassword];
     [loginWindow.contentView addSubview:txtEmail];
     [loginWindow.contentView addSubview:btnSignUp];
-    [loginWindow.contentView addSubview:btnLogin];
     [[loginWindow contentView] setAutoresizesSubviews:YES];
     [btnLogin setKeyEquivalent:@"\r"];
     [loginWindow setDelegate:_windowHandler];
-    
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [_txtAnswer setAlphaValue:0];
+    [_txtQuestion setAlphaValue:0];
+    [_txtFirstName setAlphaValue:0];
+    [_txtLastName setAlphaValue:0];
+    [_txtYOB setAlphaValue:0];
+    [_segSex setAlphaValue:0];
+    [_rolloverCountry setAlphaValue:0];
     
     
     
@@ -418,30 +453,73 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
 
     
+-(void) attemptRegister{
+    
+}
+    
 -(void) setupRegister{
-    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 373, 343));
-    NSRect mailFrame = NSRectFromCGRect(CGRectMake(78, 255, 217, 25));
-    NSRect passFrame = NSRectFromCGRect(CGRectMake(78, 225, 217, 25));
-    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(78, 195, 217, 25));
-    NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(78, 165, 217, 25));
-    NSRect yobFrame = NSRectFromCGRect(CGRectMake(78, 135, 217, 25));
-    NSRect genderFrame = NSRectFromCGRect(CGRectMake(149.5, 55, 140, 60));
-    NSRect countryFrame = NSRectFromCGRect(CGRectMake(136.5, 105, 100, 25));
-    
-    [loginWindow setFrame:winFrame display:YES];
-    [txtEmail setFrame:mailFrame];
-    [txtPassword setFrame:passFrame];
-    [_txtFirstName setFrame:firstNameFrame];
-    [_txtLastName setFrame:lastNameFrame];
-    [_txtYOB setFrame:yobFrame];
-    [_segSex setFrame:genderFrame];
-    [_rolloverCountry setFrame:countryFrame];
     
     
+    
+    [btnLogin setAction:@selector(attemptRegister)];
+    [btnSignUp setAction:@selector(setupLogin)];
+    [btnSignUp setTitle:@"Cancel"];
+    [btnLogin setTitle:@"Register"];
+    
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, _rolloverCountry.frame.origin.y-2, 100, 25));
+    
+    
+    
+    [[btnLogin animator]setFrame:loginFrame];
+    [[_txtFirstName animator]setAlphaValue:1];
+    [[_txtFirstName animator]setEnabled:YES];
+    [[_txtLastName animator]setAlphaValue:1];
+    [[_txtLastName animator]setEnabled:YES];
+    [[_txtYOB animator]setAlphaValue:1];
+    [[_txtYOB animator]setEnabled:YES];
+    [[_segSex animator]setAlphaValue:1];
+    [[_segSex animator]setEnabled:YES];
+    [[_rolloverCountry animator]setAlphaValue:1];
+    [[_rolloverCountry animator]setEnabled:YES];
+    [[_txtQuestion animator]setEnabled:YES];
+    [[_txtAnswer animator]setEnabled:YES];
+    [[_txtAnswer animator]setAlphaValue:1];
+    [[_txtQuestion animator]setAlphaValue:1];
     
 }
 
 -(void) setupLogin{
+    
+    [btnLogin setAction:@selector(attemptLogin)];
+    [btnSignUp setAction:@selector(setupRegister)];
+    [btnSignUp setTitle:@"Register"];
+    [btnLogin setTitle:@"Log In"];
+    
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtPassword.frame.origin.y-35, 100, 25));
+    
+    [[btnLogin animator] setFrame:loginFrame];
+    
+    
+    [[btnLogin animator] setFrame:loginFrame];
+    [[_txtFirstName animator] setAlphaValue:0];
+    [[_txtLastName animator] setAlphaValue:0];
+    [[_txtYOB animator] setAlphaValue:0];
+    [[_segSex animator] setAlphaValue:0];
+    [[_rolloverCountry animator] setAlphaValue:0];
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    
+    
+}
+    
+-(void) setupQuestion {
     
 }
 

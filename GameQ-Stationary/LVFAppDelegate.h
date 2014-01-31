@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CoreGraphics.h>
 #include "LVFpCap.h"
 #include "netinet/in.h"
 #include <stdio.h>
@@ -26,6 +27,8 @@
 @interface LVFAppDelegate : NSObject <NSApplicationDelegate>
 
 
+    
+    
 @property (assign) IBOutlet NSWindow *window;
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
@@ -69,8 +72,11 @@
 @property NSTextField *txtFirstName;
 @property NSTextField *txtLastName;
 @property NSTextField *txtYOB;
+@property NSTextField *txtQuestion;
+@property NSTextField *txtAnswer;
 @property NSSegmentedControl *segSex;
 @property NSPopUpButton *rolloverCountry;
+    @property NSButton *btnQuestion;
     
 
 

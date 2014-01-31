@@ -63,6 +63,8 @@
 		9CE2280B189BAAE4008C6DDB /* i6woman.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE22809189BAAE4008C6DDB /* i6woman.png */; };
 		9CE2280E189BB2E6008C6DDB /* i5man.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE2280C189BB2E6008C6DDB /* i5man.png */; };
 		9CE2280F189BB2E6008C6DDB /* i5woman.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE2280D189BB2E6008C6DDB /* i5woman.png */; };
+		9CE22811189BEA15008C6DDB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CE22810189BEA15008C6DDB /* CoreGraphics.framework */; };
+		9CE22813189C003E008C6DDB /* GQLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE22812189C003E008C6DDB /* GQLogo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -150,6 +152,8 @@
 		9CE22809189BAAE4008C6DDB /* i6woman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = i6woman.png; sourceTree = "<group>"; };
 		9CE2280C189BB2E6008C6DDB /* i5man.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = i5man.png; sourceTree = "<group>"; };
 		9CE2280D189BB2E6008C6DDB /* i5woman.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = i5woman.png; sourceTree = "<group>"; };
+		9CE22810189BEA15008C6DDB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		9CE22812189C003E008C6DDB /* GQLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GQLogo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +161,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CE22811189BEA15008C6DDB /* CoreGraphics.framework in Frameworks */,
 				8311E3FE184927FA0011212C /* Security.framework in Frameworks */,
 				837423E81818B2CF000FCC76 /* libpcap.dylib in Frameworks */,
 				837423B11818B25D000FCC76 /* Cocoa.framework in Frameworks */,
@@ -278,6 +283,7 @@
 		837423AF1818B25D000FCC76 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9CE22810189BEA15008C6DDB /* CoreGraphics.framework */,
 				8311E3FD184927FA0011212C /* Security.framework */,
 				837423E71818B2CF000FCC76 /* libpcap.dylib */,
 				837423B01818B25D000FCC76 /* Cocoa.framework */,
@@ -340,6 +346,7 @@
 				9CE2280D189BB2E6008C6DDB /* i5woman.png */,
 				9CE22808189BAAE4008C6DDB /* i6man.png */,
 				9CE22809189BAAE4008C6DDB /* i6woman.png */,
+				9CE22812189C003E008C6DDB /* GQLogo.png */,
 				837423B91818B25D000FCC76 /* InfoPlist.strings */,
 				837423BC1818B25D000FCC76 /* main.m */,
 				837423BE1818B25D000FCC76 /* GameQ-Stationary-Prefix.pch */,
@@ -450,6 +457,7 @@
 				9CE22802189B9961008C6DDB /* Qwhite.png in Resources */,
 				837423CC1818B25D000FCC76 /* Images.xcassets in Resources */,
 				9CE22801189B9961008C6DDB /* Qblack.png in Resources */,
+				9CE22813189C003E008C6DDB /* GQLogo.png in Resources */,
 				837423C11818B25D000FCC76 /* Credits.rtf in Resources */,
 				837423C71818B25D000FCC76 /* MainMenu.xib in Resources */,
 				9CE22804189B9BAC008C6DDB /* Qblue.png in Resources */,
