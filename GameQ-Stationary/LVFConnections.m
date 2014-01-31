@@ -38,16 +38,19 @@
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"login posted");
 }
-/** if registering in app ever happens
-- (void)registerWithEmail:(NSString*)email andPass:(NSString*)losenord andSecretQuestion:(NSString*)secretQuestion andSecret:(NSString*)secret
+    
+
+ // register
+- (void)registerWithEmail:(NSString*)email andPass:(NSString*)losenord andSecretQuestion:(NSString*)secretQuestion andSecret:(NSString*)secret andFirsName:(NSString*)firstname andLastName:(NSString*)lastname andGender:(int)gender andYOB:(NSString*)yob andCountry:(NSString*)country
 {
     losenord = [losenord MD5];
-    NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@&secretq=%@&secret=%@",email, losenord, secretQuestion, secret];
+    secret = [secret MD5];
+    NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@&secretq=%@&secret=%@&firstname=%@&lastname=%@&gender=%d&yob=%@&country=%@",email, losenord, secretQuestion, secret, firstname, lastname, gender, yob, country];
     NSString *postUrl = registerURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"signup posted");
 }
-*/
+
 
 //softPush a status update from a game to 
 - (void)UpdateStatusWithGame:(NSNumber *)game andStatus:(NSNumber *)status
@@ -87,9 +90,8 @@
 
 
 
-/*
-   following methods used if support is added in-app for forgotten passwords
-    also see connectionDidFinishLoading method in Connect.m for commented out if statements
+
+
  
 - (void) getSecretPost:(NSString*)email
 {
@@ -101,12 +103,18 @@
 
  - (void) chkSecretForEmail:(NSString*)email withSecret:(NSString*)secret andSecretQuestion:(NSString*)secretq
 {
+    
+    secret = [secret MD5];
     NSString *postString = [NSString stringWithFormat:@"secret=%@&secretQ=%@&email=%@", secret, secretq, email];
     NSString *postUrl = checkSecretURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"check secret posted");
 }
-*/
+
+    
+- (void) registerWithEmailmmmOSV{
+    
+}
 
 
 

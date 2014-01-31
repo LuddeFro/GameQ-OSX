@@ -313,6 +313,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect countryFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, answerFrame.origin.y-30, 100, 25));
     NSRect genderFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x+3, countryFrame.origin.y-45, 140, 60));
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, passFrame.origin.y-35, 100, 25));
+    
+    
     
     
     txtPassword = [[NSSecureTextField alloc] initWithFrame:passFrame];
@@ -320,6 +323,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     btnSignUp = [[NSButton alloc] initWithFrame:regFrame];
     btnLogin = [[NSButton alloc] initWithFrame:loginFrame];
+    _btnQuestion = [[NSButton alloc] initWithFrame:questionBtnFrame];
     [[txtPassword cell] setPlaceholderString:@"Password"];
     [[txtEmail cell] setPlaceholderString:@"E-Mail"];
     [btnLogin setTitle:@"Log In"];
@@ -340,6 +344,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_btnQuestion setAction:@selector(setupQuestion)];
     [_btnQuestion setButtonType:NSMomentaryLight];
     [_btnQuestion setBordered:YES];
+    
     
     _txtFirstName = [[NSTextField alloc] initWithFrame:firstNameFrame];
     _txtLastName = [[NSTextField alloc] initWithFrame:lastNameFrame];
@@ -372,6 +377,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [loginWindow.contentView addSubview:txtPassword];
     [loginWindow.contentView addSubview:txtEmail];
     [loginWindow.contentView addSubview:btnSignUp];
+    [loginWindow.contentView addSubview:_btnQuestion];
     [[loginWindow contentView] setAutoresizesSubviews:YES];
     [btnLogin setKeyEquivalent:@"\r"];
     [loginWindow setDelegate:_windowHandler];
@@ -484,6 +490,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtQuestion animator]setEnabled:YES];
     [[_txtAnswer animator]setEnabled:YES];
     [[_txtAnswer animator]setAlphaValue:1];
+    [[_btnQuestion animator] setAlphaValue:0];
     [[_txtQuestion animator]setAlphaValue:1];
     
 }
@@ -494,12 +501,13 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnSignUp setAction:@selector(setupRegister)];
     [btnSignUp setTitle:@"Register"];
     [btnLogin setTitle:@"Log In"];
-    
+    [_btnQuestion setTitle:@"Forgot Password"];
+    [_btnQuestion setAction:@selector(setupQuestion)];
+    [txtEmail.cell setPlaceholderString:@"E-Mail"];
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtPassword.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
     
-    [[btnLogin animator] setFrame:loginFrame];
-    
-    
+    [[_btnQuestion animator] setFrame:questionBtnFrame];
     [[btnLogin animator] setFrame:loginFrame];
     [[_txtFirstName animator] setAlphaValue:0];
     [[_txtLastName animator] setAlphaValue:0];
@@ -520,7 +528,53 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
     
 -(void) setupQuestion {
+    [_btnQuestion setTitle:@"cancel"];
+    [btnLogin setTitle:@"OK"];
+    [_btnQuestion setAction:@selector(setupLogin)];
+    [btnLogin setAction:@selector(checkQuestion)];
     
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtEmail.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    
+    [[_btnQuestion animator]setFrame:questionBtnFrame];
+    [[btnLogin animator]setFrame:loginFrame];
+    [[_txtFirstName animator]setAlphaValue:0];
+    [[_txtFirstName animator]setEnabled:NO];
+    [[_txtLastName animator]setAlphaValue:0];
+    [[_txtLastName animator]setEnabled:NO];
+    [[_txtYOB animator]setAlphaValue:0];
+    [[_txtYOB animator]setEnabled:NO];
+    [[_segSex animator]setAlphaValue:0];
+    [[_segSex animator]setEnabled:NO];
+    [[_rolloverCountry animator]setAlphaValue:0];
+    [[_rolloverCountry animator]setEnabled:NO];
+    [[_txtQuestion animator]setEnabled:NO];
+    [[_txtAnswer animator]setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    
+    
+    
+    
+   
+    
+}
+    
+-(void) checkQuestion{
+    [_connectionsHandler getSecretPost:txtEmail.value];
+    _strQuestionMail = [[NSString alloc] initWithFormat:@"%@", txtEmail.value];
+    
+}
+-(void) setupAnswerWithQuestion:(NSString*)question {
+    _strQuestion = [[NSString alloc] initWithString:question];
+    [txtEmail.cell setPlaceholderString:question];
+    [btnLogin setTitle:@"OK"];
+    [btnLogin setAction:@selector(validateQuestion)];
+}
+    
+-(void) validateQuestion{
+    [_connectionsHandler chkSecretForEmail:_strQuestionMail withSecret:txtEmail.value andSecretQuestion:_strQuestion];
 }
 
 

@@ -90,61 +90,36 @@
     NSLog(@"return string above");
     
     
-    /* following statements used if support is added in-app for forgotten passwords
-     also see getSecret and chkSecret methods in LVFConnections.m
+    
      
     //secret question has been retrieved, response syntax "secQ%@", secretQuestion
-    if ([[returnString substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"secQ"])
-    {
-        
-        txtSecretQ.text = [returnString substringFromIndex:4];
-        if (btnInvis.enabled == true)
+    if (returnString.length >= 4) {
+        if ([[returnString substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"secQ"])
         {
-     
+            [appDel setupAnswerWithQuestion:[returnString substringFromIndex:4]];
         }
-        else
-        {
-     
-        }
-        btnForget.enabled = true;
-        
     }
+    
      
     if ([returnString isEqualToString:@"wronguser"])
     {
-        [[[UIAlertView alloc] initWithTitle:@"Free Lottery" message:@"Invalid e-mail address" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-        btnForget.enabled = true;
+        [self connectionAlert:@"No such user exists!"];
         return;
     }
     if ([returnString isEqualToString:@"wrongsecret"])
     {
-        [[[UIAlertView alloc] initWithTitle:@"Free Lottery" message:@"Wrong secret" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-        btnSave.enabled = true;
+        [self connectionAlert:@"The answer you supplied is incorrect!"];
         return;
     }
     
-     
+    
     if ([returnString isEqualToString:@"pwdreset"])
     {
-        [self loginRight];
-        [self secRight];
-        if (btnInvis.enabled == true)
-        {
-            [self completeAnimationsDelayed];
-            [self rollRightDelayed];
-            [self toggleKeyboard:btnInvis];
-        }
-        else
-        {
-            [self completeAnimations];
-            [self rollRight];
-            [self toggleKeyboard:btnInvis];
-        }
-        [[[UIAlertView alloc] initWithTitle:@"Free Lottery" message:@"Your password has been  reset, a temporary password has been sent to your e-mail address" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-        btnSave.enabled = true;
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Congratulations on signing up for GameQ! Please check your E-mail address for a temporary password that is required the first time you log in!"] runModal];
+        [appDel setupLogin];
         return;
     }
-     */
+    
     
     if ([returnString isEqualToString:@"postedDevice"])
     {

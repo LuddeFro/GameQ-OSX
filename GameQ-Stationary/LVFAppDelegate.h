@@ -77,6 +77,8 @@
 @property NSSegmentedControl *segSex;
 @property NSPopUpButton *rolloverCountry;
     @property NSButton *btnQuestion;
+    @property NSString *strQuestionMail;
+    @property NSString *strQuestion;
     
 
 
@@ -91,5 +93,7 @@ static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *
 - (IBAction) quit:(id)sender;
 - (void) setConnected;
 - (void) setDisconnected;
+- (void) setupLogin;
+- (void) setupAnswerWithQuestion:(NSString*)question;
 
 @end

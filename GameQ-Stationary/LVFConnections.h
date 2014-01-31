@@ -20,6 +20,9 @@
 - (void)logoutPost;
 - (void)loginWithUser:(NSString*)username andPass:(NSString*)losenord;
 - (void)pushNotificationForGame:(NSNumber *)game;
+- (void) getSecretPost:(NSString*)email;
+- (void) chkSecretForEmail:(NSString*)email withSecret:(NSString*)secret andSecretQuestion:(NSString*)secretq;
+- (void)registerWithEmail:(NSString*)email andPass:(NSString*)losenord andSecretQuestion:(NSString*)secretQuestion andSecret:(NSString*)secret andFirsName:(NSString*)firstname andLastName:(NSString*)lastname andGender:(int)gender andYOB:(NSString*)yob andCountry:(NSString*)country;
 
 // mobile method
 //- (void)upAppPost;
