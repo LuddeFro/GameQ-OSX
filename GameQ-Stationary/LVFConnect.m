@@ -116,7 +116,6 @@
     if ([returnString isEqualToString:@"pwdreset"])
     {
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Congratulations on signing up for GameQ! Please check your E-mail address for a temporary password that is required the first time you log in!"] runModal];
-        [appDel setupLogin];
         return;
     }
     
@@ -163,7 +162,7 @@
             disconnected = false;
         }
     }
-    /* if forgotten password support is added in-app
+    /* historic profile edit from lottery
     if ([returnString isEqualToString:@"updated me"])
     {
         if (btnInvis.enabled == true)
@@ -180,30 +179,27 @@
     }
      */
      
-    /*
-     If registering is enabled from client
+    if ([returnString isEqualToString:@"yes"])
+    {
+        return;
+    }
     if ([returnString isEqualToString:@"signing up"])
     {
-        if (btnInvis.enabled == true)
-            [self signupFinTransitDelayed];
-        else
-            [self signupFinTransit];
-        [self goTutorial:btnTutorial];
-        btnSave.enabled = true;
+        [appDel setupLogin];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Registration was successful! A temporary password has been sent to your e-mail account for your first log in!"] runModal];
         return;
     }
     if ([returnString isEqualToString:@"duplicate"])
     {
-        [[[UIAlertView alloc] initWithTitle:@"Free Lottery" message:@"An account with that e-mail address already exists" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-        btnSave.enabled = true;
+        [self connectionAlert:@"An account with that e-mail address already exists!"];
         return;
     }
-     */
+    
     if ([returnString isEqualToString:@"badsession"])
     {
         //attempt to reconnect? or record disconnection and logout
         disconnected = true;
-        [delegate logoutPost];
+        [delegate logoutPostFromToken:[appDel.dataHandler getToken]];
         [appDel setDisconnected];
        
         //stationary alert
@@ -217,7 +213,7 @@
     {
         //should be unreachable, disconnect the bastard!
         disconnected = true;
-        [delegate logoutPost];
+        [delegate logoutPostFromToken:[appDel.dataHandler getToken]];
         [appDel setDisconnected];
         
         //statioanry alert

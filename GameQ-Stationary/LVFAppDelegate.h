@@ -50,6 +50,7 @@
 @property (weak) IBOutlet NSMenuItem *btnQuitApp;
 @property (strong, nonatomic) NSTimer *countdownQuickTimer;
 @property (strong, nonatomic) NSTimer *countdownSlowTimer;
+@property (strong, nonatomic) NSTimer *upTimeTimer;
 @property int honQPack;
 @property int dotaQPack;
 @property int dotaCPack;

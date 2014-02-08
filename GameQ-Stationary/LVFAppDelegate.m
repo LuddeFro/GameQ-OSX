@@ -212,7 +212,7 @@ int num_packets = 0; /* the number of packets to be caught*/
 	if ([dataHandler getBolIsLoggedIn] && ![newToken isEqualToString:oldToken])
 	{
 		LVFConnect *connectHandler = [[LVFConnect alloc] init];
-        [connectHandler postNow:[NSString stringWithFormat:@"token=%@&device=%@", newToken, [dataHandler getDeviceID]] to:updateTokenURL];
+        [connectHandler postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@", newToken, [dataHandler getDeviceID]] to:updateTokenURL];
 	}
 }
 
@@ -278,7 +278,8 @@ int num_packets = 0; /* the number of packets to be caught*/
     [self.statusBar setAlternateImage:[NSImage imageNamed:@"Qwhite.png"]];
     self.statusBar.menu = self.mainMenu;
     self.statusBar.highlightMode = TRUE;
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToUIElementApplication);
     
     
     dotaQBuffer = [[LVFBuffer alloc] init];
@@ -460,12 +461,13 @@ int num_packets = 0; /* the number of packets to be caught*/
 
     
 -(void) attemptRegister{
-    
+    NSLog(@"attempting register!");
+    [_connectionsHandler registerWithEmail:txtEmail.stringValue andPass:txtPassword.stringValue andSecretQuestion:_txtQuestion.stringValue andSecret:_txtAnswer.stringValue andFirsName:_txtFirstName.stringValue andLastName:_txtLastName.stringValue andGender:1 andYOB:_txtYOB.stringValue andCountry:@"sweden"];
 }
     
 -(void) setupRegister{
     
-    
+    NSLog(@"login = REGISTER, @attemptRegister ie postar!!!!!");
     
     [btnLogin setAction:@selector(attemptRegister)];
     [btnSignUp setAction:@selector(setupLogin)];
@@ -562,8 +564,8 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
     
 -(void) checkQuestion{
-    [_connectionsHandler getSecretPost:txtEmail.value];
-    _strQuestionMail = [[NSString alloc] initWithFormat:@"%@", txtEmail.value];
+    [_connectionsHandler getSecretPost:txtEmail.stringValue];
+    _strQuestionMail = [[NSString alloc] initWithFormat:@"%@", txtEmail.stringValue];
     
 }
 -(void) setupAnswerWithQuestion:(NSString*)question {
@@ -574,7 +576,7 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
     
 -(void) validateQuestion{
-    [_connectionsHandler chkSecretForEmail:_strQuestionMail withSecret:txtEmail.value andSecretQuestion:_strQuestion];
+    [_connectionsHandler chkSecretForEmail:_strQuestionMail withSecret:txtEmail.stringValue andSecretQuestion:_strQuestion];
 }
 
 
@@ -894,24 +896,14 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     bolFirstTick = true;
     [btnToggleActive setTitle:@"Start Monitoring"];
     printf("\nCapture complete.\n");
-    NSColor *color = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
-    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithString:@"GQ"];
-    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
-    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
-    [self.statusBar setAttributedTitle: colorTitle];
+    
     self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
     
 }
 
 - (IBAction)toggleOn:(id)sender {
     [_btnStatus2 setTitle:@"Status: Tracking"];
-    NSColor *color = [NSColor colorWithCalibratedRed:0.1 green:0.3 blue:0.7 alpha:1];
-    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithString:@"GQ"];
-    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
-    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
-    
-    [self.statusBar setAttributedTitle: colorTitle];
-    
+        
     printf("\nCapture started.\n");
     [self performSelectorOnMainThread:@selector(startTimer) withObject:nil waitUntilDone:false];
     [btnToggleActive setTitle:@"Stop Monitoring"];
@@ -924,6 +916,10 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) startTimer {
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    
+    _upTimeTimer = [NSTimer timerWithTimeInterval:60 target:self selector:@selector(upTime) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    
     //countdownSlowTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
     //[[NSRunLoop currentRunLoop] addTimer:countdownSlowTimer forMode:NSDefaultRunLoopMode];
 }
@@ -932,17 +928,24 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     //[countdownSlowTimer invalidate];
 }
 
+- (void) upTime
+{
+    [_connectionsHandler upTimeForToken:[_dataHandler getToken]];
+}
+
 // reg / login button is selected from the GQ toolbar menu
 - (IBAction)log:(id)sender
 {
     [btnToggleActive setEnabled:NO];
     if(bolLoggedIn) {
-        [_connectionsHandler logoutPost];
+        [_connectionsHandler logoutPostFromToken:([_dataHandler getToken])];
         
     } else {
         [loginWindow close];
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+        ProcessSerialNumber psn = { 0, kCurrentProcess };
+        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+        //[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+        //[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         [self setupLogin];
         [loginWindow center];
         [loginWindow makeKeyAndOrderFront:self];
@@ -967,7 +970,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [btnLog setTitle:@"Log Out"];
     [btnToggleActive setEnabled:true];
     // following tells the server the client is online but no games have been launched
-    [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE]];
+    [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     bolLoggedIn = YES;
     [_dataHandler setBolIsLoggedIn:[NSNumber numberWithBool:YES]];
     [_dataHandler setEmail:[txtEmail stringValue]];
@@ -1119,7 +1122,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
         // do nothing if status already offline, (initialized to offline)
     } else {
         
-        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE]];
+        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     }
     [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
     
@@ -1132,7 +1135,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     if ([[bolOnlineArray objectAtIndex:game] boolValue]) {
         // do nothing if status already online, (initialized to offline)
     } else {
-        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE]];
+        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
     }
     [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
 }
@@ -1142,13 +1145,13 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"called method \"ingame\"");
     // if its the first tick
     if (bolFirstTick) {
-        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME]];
+        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
         
     } else if(!bolFirstTick && [[bolInGameArray objectAtIndex:game] boolValue]){
         //do nothing
         
     } else if(!bolFirstTick && ![[bolInGameArray objectAtIndex:game] boolValue]) {
-        [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game]];
+        [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken]];
     }
     [bolInGameArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
     

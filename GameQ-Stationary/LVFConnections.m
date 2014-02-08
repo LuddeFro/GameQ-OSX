@@ -43,6 +43,7 @@
  // register
 - (void)registerWithEmail:(NSString*)email andPass:(NSString*)losenord andSecretQuestion:(NSString*)secretQuestion andSecret:(NSString*)secret andFirsName:(NSString*)firstname andLastName:(NSString*)lastname andGender:(int)gender andYOB:(NSString*)yob andCountry:(NSString*)country
 {
+    NSLog(@"registering from _connectionshandler");
     losenord = [losenord MD5];
     secret = [secret MD5];
     NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@&secretq=%@&secret=%@&firstname=%@&lastname=%@&gender=%d&yob=%@&country=%@",email, losenord, secretQuestion, secret, firstname, lastname, gender, yob, country];
@@ -53,28 +54,38 @@
 
 
 //softPush a status update from a game to 
-- (void)UpdateStatusWithGame:(NSNumber *)game andStatus:(NSNumber *)status
+- (void)UpdateStatusWithGame:(NSNumber *)game andStatus:(NSNumber *)status andToken:(NSString *)token
 {
-    NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@", game, status];
+    NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=%@&device=mac", game, status, token];
     NSString *postUrl = softPushURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"status update posted");
 }
 //Push notification, for now all pushes are sent for recieved queue
-- (void)pushNotificationForGame:(NSNumber *)game
+- (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token
 {
-    NSString *postString = [NSString stringWithFormat:@"game=%@", game];
+    NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac", game, token];
     NSString *postUrl = pushURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"addonepost");
 }
 //Log the client out
-- (void)logoutPost
+- (void)logoutPostFromToken:(NSString *)token
 {
-    NSString *postString = @"";
+    
+    NSString *postString = [NSString stringWithFormat:@"token=%@&device=mac", token];
     NSString *postUrl = logoutURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"logout posted");
+}
+
+- (void) upTimeForToken:(NSString *)token
+{
+    
+    NSString *postString = [NSString stringWithFormat:@"token=%@&device=mac", token];
+    NSString *postUrl = timeURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"timeUpdated (connection active)");
 }
 
 /* used in mobile version to retrieve status data from server
@@ -111,10 +122,7 @@
     NSLog(@"check secret posted");
 }
 
-    
-- (void) registerWithEmailmmmOSV{
-    
-}
+   
 
 
 

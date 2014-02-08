@@ -13,8 +13,8 @@
 - (void)windowWillClose:(NSNotification *)notification {
     // whichever operations are needed when the
     // window is about to be closed
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
-    
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToUIElementApplication);
 }
     
 @end
