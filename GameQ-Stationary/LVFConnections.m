@@ -32,6 +32,7 @@
 
 - (void)loginWithUser:(NSString*)username andPass:(NSString*)losenord
 {
+    
     losenord = [losenord MD5];
     NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@",username, losenord];
     NSString *postUrl = loginURL;

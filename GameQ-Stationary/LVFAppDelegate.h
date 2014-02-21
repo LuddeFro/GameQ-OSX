@@ -19,6 +19,7 @@
 #import "LVFDataModel.h"
 #import "LVFBuffer.h"
 #import "LVFWindowHandler.h"
+#import "LVFWindowViewSubclass.h"
 
 @class LVFBuffer;
 @class LVFConnections;
@@ -86,7 +87,8 @@
 @property LVFBuffer *dotaQBuffer;
 
 
-
+- (void)disableButtons;
+- (void)enableButtons;
 
 static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *packet);
 - (IBAction) toggle:(id)sender;
@@ -96,5 +98,7 @@ static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *
 - (void) setDisconnected;
 - (void) setupLogin;
 - (void) setupAnswerWithQuestion:(NSString*)question;
+- (void) tearDownLoggedIn;
+- (void) setupLoggedIn;
 
 @end

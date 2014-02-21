@@ -268,11 +268,6 @@ int num_packets = 0; /* the number of packets to be caught*/
     // creating statusbar item
     self.statusBar = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     
-    NSColor *color = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:1];
-    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithString:self.statusBar.title];
-    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
-    [colorTitle addAttribute:NSForegroundColorAttributeName value:color range:titleRange];
-    [self.statusBar setAttributedTitle: colorTitle];
     self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
     [self.statusBar setHighlightMode:YES];
     [self.statusBar setAlternateImage:[NSImage imageNamed:@"Qwhite.png"]];
@@ -293,25 +288,32 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     //setup the login window
     NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 573, 473));
-    NSUInteger stylemask = NSTexturedBackgroundWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSTitledWindowMask|NSResizableWindowMask;
+    NSUInteger stylemask = /*NSTexturedBackgroundWindowMask|*/NSClosableWindowMask|NSMiniaturizableWindowMask|NSTitledWindowMask/*|NSResizableWindowMask*/;
     loginWindow = [[NSWindow alloc] initWithContentRect:winFrame styleMask:stylemask backing:NSBackingStoreBuffered defer:YES];
     [loginWindow setReleasedWhenClosed:NO];
     [loginWindow center];
+    
+    //[loginWindow setBackgroundColor:grad ];
+    //[loginWindow setBackgroundColor:[NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1.0] ];
+    [loginWindow setTitle:@"GameQ"];
+    LVFWindowViewSubclass *winView = [[LVFWindowViewSubclass alloc] initWithFrame:winFrame];
+    [loginWindow setContentView:winView];
+    
     NSRect mailFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-233.5, winFrame.size.height-80, 217, 25));
     NSRect passFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, mailFrame.origin.y-30, 217, 25));
     
-    NSRect regFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-50, 12, 100, 25));
+    NSRect regFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/4-82.5, 250, 200, 25));
     
     
-    
-    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, passFrame.origin.y-30, 217, 25));
+    NSRect questionFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, passFrame.origin.y-30, 217, 25));
+    NSRect answerFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, questionFrame.origin.y-30, 217, 25));
+    NSRect firstNameFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, answerFrame.origin.y-30, 217, 25));
     NSRect lastNameFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, firstNameFrame.origin.y-30, 217, 25));
     NSRect yobFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, lastNameFrame.origin.y-30, 217, 25));
-    NSRect questionFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, yobFrame.origin.y-30, 217, 25));
-    NSRect answerFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, questionFrame.origin.y-30, 217, 25));
+    
 
     
-    NSRect countryFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, answerFrame.origin.y-30, 100, 25));
+    NSRect countryFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, yobFrame.origin.y-30, 100, 25));
     NSRect genderFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x+3, countryFrame.origin.y-45, 140, 60));
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, passFrame.origin.y-35, 100, 25));
@@ -328,7 +330,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[txtPassword cell] setPlaceholderString:@"Password"];
     [[txtEmail cell] setPlaceholderString:@"E-Mail"];
     [btnLogin setTitle:@"Log In"];
-    [btnSignUp setTitle:@"Register"];
+    [btnSignUp setTitle:@"Join GameQ"];
     [btnLogin setBezelStyle:NSRoundedBezelStyle];
     [btnLogin setTarget:self];
     [btnLogin setAction:@selector(attemptLogin)];
@@ -365,6 +367,24 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtLastName cell] setPlaceholderString:@"Last Name"];
     [[_txtQuestion cell] setPlaceholderString:@"Secret Question"];
     [[_txtAnswer cell] setPlaceholderString:@"Secret Answer"];
+    
+    NSRect cFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x - 20, countryFrame.origin.y-151, 500, 161));
+    NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
+    [cView setImage:[NSImage imageNamed:@"GameQ.png"]];
+    [loginWindow.contentView addSubview:cView];
+    
+    NSRect aFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x - 15, countryFrame.origin.y-30, 247, 300));
+    NSImageView *aView = [[NSImageView alloc] initWithFrame:aFrame];
+    [aView setImageScaling:NSImageScaleAxesIndependently];
+    [aView setImage:[NSImage imageNamed:@"Gray.png"]];
+    [loginWindow.contentView addSubview:aView];
+    
+    NSRect bFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2 + 1.5, countryFrame.origin.y-30, 247, 300));
+    NSImageView *bView = [[NSImageView alloc] initWithFrame:bFrame];
+    [bView setImageScaling:NSImageScaleAxesIndependently];
+    [bView setImage:[NSImage imageNamed:@"Gray.png"]];
+    [loginWindow.contentView addSubview:bView];
+    
     
     
     [loginWindow.contentView addSubview:_txtFirstName];
@@ -470,9 +490,48 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSLog(@"login = REGISTER, @attemptRegister ie postar!!!!!");
     
     [btnLogin setAction:@selector(attemptRegister)];
+    [_btnQuestion setAction:@selector(setupLogin)];
+    [_btnQuestion setTitle:@"Cancel"];
+    [btnLogin setTitle:@"Join GameQ"];
+    
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, _txtFirstName.frame.origin.y-2, 100, 25));
+    NSRect qstFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    
+    [[btnLogin animator]setFrame:loginFrame];
+    [[_btnQuestion animator]setFrame:qstFrame];
+    //[[_txtFirstName animator]setAlphaValue:1];
+    //[[_txtFirstName animator]setEnabled:YES];
+    //[[_txtLastName animator]setAlphaValue:1];
+    //[[_txtLastName animator]setEnabled:YES];
+    //[[_txtYOB animator]setAlphaValue:1];
+    //[[_txtYOB animator]setEnabled:YES];
+    //[[_segSex animator]setAlphaValue:1];
+    //[[_segSex animator]setEnabled:YES];
+    //[[_rolloverCountry animator]setAlphaValue:1];
+    //[[_rolloverCountry animator]setEnabled:YES];
+    [[_txtQuestion animator]setEnabled:YES];
+    [[_txtAnswer animator]setEnabled:YES];
+    [[_txtAnswer animator]setAlphaValue:1];
+    [[_btnQuestion animator] setAlphaValue:1];
+    [[_txtQuestion animator]setAlphaValue:1];
+    [[txtPassword animator]setAlphaValue:1];
+    [[txtPassword animator]setEnabled:YES];
+    [[txtEmail animator]setAlphaValue:1];
+    [[txtEmail animator]setEnabled:YES];
+    [[btnSignUp animator]setAlphaValue:0];
+    [[btnSignUp animator]setEnabled:NO];
+    
+}
+
+-(void) setupEditProfile{
+    
+    NSLog(@"login = REGISTER, @attemptRegister ie postar!!!!!");
+    
+    [btnLogin setAction:@selector(attemptRegister)];
     [btnSignUp setAction:@selector(setupLogin)];
     [btnSignUp setTitle:@"Cancel"];
-    [btnLogin setTitle:@"Register"];
+    [btnLogin setTitle:@"Join GameQ"];
     
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, _rolloverCountry.frame.origin.y-2, 100, 25));
     
@@ -501,9 +560,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     [btnLogin setAction:@selector(attemptLogin)];
     [btnSignUp setAction:@selector(setupRegister)];
-    [btnSignUp setTitle:@"Register"];
+    [btnSignUp setTitle:@"Join GameQ"];
     [btnLogin setTitle:@"Log In"];
-    [_btnQuestion setTitle:@"Forgot Password"];
+    [_btnQuestion setTitle:@"Forgot?"];
     [_btnQuestion setAction:@selector(setupQuestion)];
     [txtEmail.cell setPlaceholderString:@"E-Mail"];
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtPassword.frame.origin.y-35, 100, 25));
@@ -525,8 +584,25 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_txtAnswer setEnabled:NO];
     [[_txtAnswer animator]setAlphaValue:0];
     [[_txtQuestion animator]setAlphaValue:0];
+    [[_btnQuestion animator] setAlphaValue:1];
+    [[txtPassword animator]setAlphaValue:1];
+    [[txtPassword animator]setEnabled:YES];
+    [[txtEmail animator]setAlphaValue:1];
+    [[txtEmail animator]setEnabled:YES];
+    [[btnSignUp animator]setAlphaValue:1];
+    [[btnSignUp animator]setEnabled:YES];
     
     
+}
+
+- (void) tearDownLoggedIn
+{
+    [loginWindow close];
+}
+
+- (void) setupLoggedIn
+{
+    [self tearDownLoggedIn];
 }
     
 -(void) setupQuestion {
@@ -555,6 +631,11 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtAnswer animator]setEnabled:NO];
     [[_txtAnswer animator]setAlphaValue:0];
     [[_txtQuestion animator]setAlphaValue:0];
+    [[txtPassword animator]setAlphaValue:0];
+    [[txtPassword animator]setEnabled:NO];
+    [[_segSex animator]setEnabled:YES];
+    [[btnSignUp animator]setAlphaValue:1];
+    [[btnSignUp animator]setEnabled:YES];
     
     
     
@@ -564,18 +645,39 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
     
 -(void) checkQuestion{
+    [self disableButtons];
     [_connectionsHandler getSecretPost:txtEmail.stringValue];
     _strQuestionMail = [[NSString alloc] initWithFormat:@"%@", txtEmail.stringValue];
     
 }
 -(void) setupAnswerWithQuestion:(NSString*)question {
+    [self enableButtons];
     _strQuestion = [[NSString alloc] initWithString:question];
     [txtEmail.cell setPlaceholderString:question];
     [btnLogin setTitle:@"OK"];
     [btnLogin setAction:@selector(validateQuestion)];
 }
+
+- (void) enableButtons
+{
+    [btnLogin setEnabled:YES];
+    [btnSignUp setEnabled:YES];
+    [_btnQuestion setEnabled:YES];
+    [btnLog setEnabled:YES];
     
+}
+
+- (void) disableButtons
+{
+    [btnLogin setEnabled:NO];
+    [btnSignUp setEnabled:NO];
+    [_btnQuestion setEnabled:NO];
+    [btnLog setEnabled:NO];
+    
+}
+
 -(void) validateQuestion{
+    [self disableButtons];
     [_connectionsHandler chkSecretForEmail:_strQuestionMail withSecret:txtEmail.stringValue andSecretQuestion:_strQuestion];
 }
 
@@ -879,25 +981,28 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)toggle:(id)sender {
     if (!bolIsActive) {
         [NSThread detachNewThreadSelector:@selector(toggleOn:) toTarget:self withObject:nil];
+        NSLog(@"toggleOn");
     } else {
         [self toggleOff:nil];
+        NSLog(@"toggleOff");
     }
-    NSLog(@"%@", [NSNumber numberWithBool:bolIsActive]);
+    NSLog(@"arglar %@", [NSNumber numberWithBool:bolIsActive]);
     bolIsActive = !bolIsActive;
-    NSLog(@"%@", [NSNumber numberWithBool:bolIsActive]);
+    NSLog(@"arglar %@", [NSNumber numberWithBool:bolIsActive]);
     
 }
 
 - (IBAction)toggleOff:(id)sender {
+    [btnToggleActive setTitle:@"Start Monitoring"];
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblack.png"]];
     [_btnStatus2 setTitle:@"Status: Online"];
     pcap_breakloop(handle);
     printf("\nCapture complete.\n");
     [self performSelectorOnMainThread:@selector(stopTimer) withObject:nil waitUntilDone:false];
     bolFirstTick = true;
-    [btnToggleActive setTitle:@"Start Monitoring"];
     printf("\nCapture complete.\n");
     
-    self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
+    
     
 }
 
@@ -908,10 +1013,11 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [self performSelectorOnMainThread:@selector(startTimer) withObject:nil waitUntilDone:false];
     [btnToggleActive setTitle:@"Stop Monitoring"];
     printf("\nCapture started.\n");
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblue.png"]];
     pcap_loop(handle, num_packets, got_packet, self);
-    self.statusBar.image = [NSImage imageNamed:@"Qblue.png"];
 }
-// end toggle  ---------------------------------------------
+
+// ---------------------------------------------  end toggle  ---------------------------------------------
 
 - (void) startTimer {
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
@@ -936,21 +1042,27 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 // reg / login button is selected from the GQ toolbar menu
 - (IBAction)log:(id)sender
 {
+    
     [btnToggleActive setEnabled:NO];
     if(bolLoggedIn) {
         [_connectionsHandler logoutPostFromToken:([_dataHandler getToken])];
         
     } else {
-        [loginWindow close];
+        
+        //[loginWindow close];
         ProcessSerialNumber psn = { 0, kCurrentProcess };
         TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+        
         //[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
         //[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+        //[loginWindow makeKeyWindow];
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         [self setupLogin];
         [loginWindow center];
-        [loginWindow makeKeyAndOrderFront:self];
+        [loginWindow orderFrontRegardless];
+        [loginWindow makeKeyAndOrderFront:nil];
+        //[loginWindow orderFront:nil];
         NSLog(@"showing window");
-        
         
     }
 }
@@ -966,11 +1078,10 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) setConnected
 {
     
-    
+    [_connectionsHandler.gqConnect postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@&email=%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]] to:updateTokenURL];
+    NSLog(@"token posted with token:%@ devName:%@ and email:%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]);
     [btnLog setTitle:@"Log Out"];
     [btnToggleActive setEnabled:true];
-    // following tells the server the client is online but no games have been launched
-    [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     bolLoggedIn = YES;
     [_dataHandler setBolIsLoggedIn:[NSNumber numberWithBool:YES]];
     [_dataHandler setEmail:[txtEmail stringValue]];
@@ -978,17 +1089,22 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"email is %@", [_dataHandler getEmail]);
     [_dataHandler setPass:[txtPassword stringValue]];
     [txtPassword setStringValue:@""];
-    [_connectionsHandler.gqConnect postNow:[NSString stringWithFormat:@"token=%@&device=%@", [_dataHandler getToken], [_dataHandler getDeviceID]] to:updateTokenURL];
-    NSLog(@"token posted");
-    [loginWindow close];
-    
     [_btnStatus setTitle:[NSString stringWithFormat:@"%@", [_dataHandler getEmail]]];
     [_btnStatus2 setTitle:@"Status: Online"];
     [_btnStatus setHidden:NO];
+    bolIsActive = NO;
     [self toggle:nil];
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblue.png"]];
+    // following tells the server the client is online but no games have been launched
+    [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
+    [self setupLoggedIn];
+    
     
     
 }
+
+
+
 - (void) setDisconnected
 {
     bolLoggedIn = NO;
@@ -1002,6 +1118,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [btnToggleActive setEnabled:NO];
     [_btnStatus setHidden:YES];
     [_btnStatus2 setTitle:@"Status: Offline"];
+    [_upTimeTimer invalidate];
 }
 
 

@@ -38,6 +38,7 @@
 
 - (void)postNow:(NSString*)toPost to:(NSString*)link
 {
+    [appDel disableButtons];
     NSString *postString = toPost;
     NSData *postData = [postString dataUsingEncoding:NSUTF8StringEncoding];
     NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
@@ -79,11 +80,13 @@
     NSLog(@"Connection failed! Error - %@ %@",
           [error localizedDescription],
           [[error userInfo] objectForKey:NSURLErrorFailingURLStringErrorKey]);
+    [appDel enableButtons];
 }
 
 //connection was successful, handle response here
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    [appDel enableButtons];
     NSLog(@"received data length:%lu", (unsigned long)[returnData length]);
     NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
     NSLog(@"%@", returnString);
@@ -103,21 +106,32 @@
      
     if ([returnString isEqualToString:@"wronguser"])
     {
+        [appDel enableButtons];
         [self connectionAlert:@"No such user exists!"];
         return;
     }
     if ([returnString isEqualToString:@"wrongsecret"])
     {
+        [appDel enableButtons];
         [self connectionAlert:@"The answer you supplied is incorrect!"];
+        
         return;
     }
     
     
     if ([returnString isEqualToString:@"pwdreset"])
     {
-        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Congratulations on signing up for GameQ! Please check your E-mail address for a temporary password that is required the first time you log in!"] runModal];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your Password has successfully been reset! Please check your e-mail for a new password. You should login and change this password as soon as possible."] runModal];
         return;
     }
+    
+    if ([returnString isEqualToString:@"mailerr"])
+    {
+        NSString *msgString = [[NSString alloc] init];
+        msgString = @"An error has occured, please try again shortly";
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", msgString] runModal];
+    }
+    
     
     
     if ([returnString isEqualToString:@"postedDevice"])
@@ -194,6 +208,14 @@
         [self connectionAlert:@"An account with that e-mail address already exists!"];
         return;
     }
+    if ([returnString isEqualToString:@"loggedOut"])
+    {
+        [appDel tearDownLoggedIn];
+        [appDel setupLogin];
+        [appDel setDisconnected];
+        return;
+    }
+
     
     if ([returnString isEqualToString:@"badsession"])
     {
