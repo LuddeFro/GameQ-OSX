@@ -60,7 +60,7 @@
     NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=%@&device=mac", game, status, token];
     NSString *postUrl = softPushURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"status update posted");
+    NSLog(@"status update posted for game=%@&status=%@&device=mac", game, status);
 }
 //Push notification, for now all pushes are sent for recieved queue
 - (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token
@@ -88,6 +88,12 @@
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"timeUpdated (connection active)");
 }
+
+- (void) upTokenWithToken:(NSString *)token andDeviceName:(NSString *)name andEmail:(NSString *)email
+{
+    [gqConnect postNow:[NSString stringWithFormat:@"token=%@&device=%@&email=%@", token, name, email] to:updateTokenURL];
+}
+
 
 /* used in mobile version to retrieve status data from server
 - (void)upAppPost

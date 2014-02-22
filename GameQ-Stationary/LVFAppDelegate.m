@@ -182,6 +182,7 @@ int num_packets = 0; /* the number of packets to be caught*/
 {
     //checks if any text exists in the fields
     if (![txtEmail.stringValue isEqual:@""] && ![txtPassword.stringValue isEqual:@""]) {
+        [_dataHandler setEmail:txtEmail.stringValue];
         [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
     } else {
         [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter a valid email address and password"] runModal];
@@ -201,18 +202,17 @@ int num_packets = 0; /* the number of packets to be caught*/
     
 	NSLog(@"My token is: %@", deviceToken);
     
-    LVFDataModel *dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
-    NSString *oldToken = [dataHandler getToken];
+    NSString *oldToken = [_dataHandler getToken];
 	NSString *newToken = [deviceToken description];
 	newToken = [newToken stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
 	newToken = [newToken stringByReplacingOccurrencesOfString:@" " withString:@""];
     
 	NSLog(@"My token is: %@", newToken);
-    [dataHandler setToken:newToken];
-	if ([dataHandler getBolIsLoggedIn] && ![newToken isEqualToString:oldToken])
+    [_dataHandler setToken:newToken];
+	if ([_dataHandler getBolIsLoggedIn] && ![newToken isEqualToString:oldToken])
 	{
-		LVFConnect *connectHandler = [[LVFConnect alloc] init];
-        [connectHandler postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@", newToken, [dataHandler getDeviceID]] to:updateTokenURL];
+		[_connectionsHandler upTokenWithToken:newToken andDeviceName:[_dataHandler getDeviceID] andEmail:[_dataHandler getEmail]];
+        
 	}
 }
 
@@ -1024,7 +1024,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
     
     _upTimeTimer = [NSTimer timerWithTimeInterval:60 target:self selector:@selector(upTime) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] addTimer:_upTimeTimer forMode:NSDefaultRunLoopMode];
     
     //countdownSlowTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
     //[[NSRunLoop currentRunLoop] addTimer:countdownSlowTimer forMode:NSDefaultRunLoopMode];
@@ -1066,12 +1066,15 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
         
     }
 }
+
+//is this method even used? or have i forgotten to remove it? attemptLogin used instead?!?
 - (void)logIn
 {
     
     
     
     [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
+    
     
 }
 
@@ -1179,7 +1182,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
     
     // ---------------- HON handler ----------------------
-    
+    NSLog(@"HoN");
     if (honQPack > 1 && honRunning) {
         // user is in game
         [self inGame:kHEROES_OF_NEWERTH];
@@ -1189,11 +1192,14 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     } else {
         // user is not in game
         [self offline:kHEROES_OF_NEWERTH];
+        
     }
+   
     // -------------- HON handler end --------------------
     
     
     // ---------------- DOTA handler ----------------------
+    NSLog(@"DotA");
     [dotaQBuffer increment:dotaQPack];
     NSLog(@"buffer: %i", dotaQBuffer.bufferValue);
     NSLog(@"%i", dotaRunning);
@@ -1203,6 +1209,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     if (dotaCPack > 1 && dotaRunning) {
         // user is in game
         bolFirstTick = 1; //tricks the app in to not sending a notification
+                          // this is not the queue pop, but the fact of being in a game
         [self inGame:kDOTA2];
     } else if (dotaRunning){
         [self online:kDOTA2];
@@ -1233,7 +1240,16 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 // handles offline state
 - (IBAction)offline:(int)game {
-    
+    for (NSNumber *numberobject in bolInGameArray) {
+        if (numberobject.boolValue == true) {
+            return;
+        }
+    }
+    for (NSNumber *numberobject in bolOnlineArray) {
+        if (numberobject.boolValue == true) {
+            return;
+        }
+    }
     NSLog(@"called method \"offline\"");
     if (![[bolOnlineArray objectAtIndex:game] boolValue]) {
         // do nothing if status already offline, (initialized to offline)
@@ -1247,12 +1263,17 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 //called whenever online status is detected
 - (IBAction)online:(int)game {
-    
+    for (NSNumber *numberobject in bolInGameArray) {
+        if (numberobject.boolValue == true) {
+            return;
+        }
+    }
     NSLog(@"called method \"online\"");
     if ([[bolOnlineArray objectAtIndex:game] boolValue]) {
         // do nothing if status already online, (initialized to offline)
     } else {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
+        
     }
     [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
 }
