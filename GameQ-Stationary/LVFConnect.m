@@ -244,7 +244,8 @@
         // mobile alert
         //[[[UIAlertView alloc] initWithTitle:@"GameQ" message:@"Connection error, please try again in a minute" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
     } else {
-        [self connectionAlert:@"666"];
+        //probably a push
+        //[self connectionAlert:@"666"];
     }
 }
 

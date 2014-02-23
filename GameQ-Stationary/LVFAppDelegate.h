@@ -40,7 +40,7 @@
 
 
 
-
+@property BOOL bolQueueCD;
 @property (strong) LVFWindowHandler *windowHandler;
 @property (weak) IBOutlet NSMenu *mainMenu;
 @property (strong, nonatomic) NSStatusItem *statusBar;

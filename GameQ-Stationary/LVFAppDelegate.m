@@ -241,6 +241,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     
     //initailizing state
+    _bolQueueCD = false;
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:(NSRemoteNotificationTypeAlert | NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound)];
     _connectionsHandler = [[LVFConnections alloc] init];
     _windowHandler = [[LVFWindowHandler alloc] init];
@@ -1240,14 +1241,21 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 // handles offline state
 - (IBAction)offline:(int)game {
-    for (NSNumber *numberobject in bolInGameArray) {
+     for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
-            return;
+            
+            if (!([bolInGameArray indexOfObject:numberobject] == game))
+            {
+                return;
+            }
         }
     }
     for (NSNumber *numberobject in bolOnlineArray) {
         if (numberobject.boolValue == true) {
-            return;
+            if (([bolOnlineArray indexOfObject:numberobject] != game))
+            {
+                return;
+            }
         }
     }
     NSLog(@"called method \"offline\"");
@@ -1257,15 +1265,24 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
         
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     }
+    [bolInGameArray removeObjectAtIndex:game];
+    [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
+    [bolOnlineArray removeObjectAtIndex:game];
     [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
     
 }
 
 //called whenever online status is detected
 - (IBAction)online:(int)game {
+    if (_bolQueueCD) {
+        return;
+    }
     for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
-            return;
+            if (([bolInGameArray indexOfObject:numberobject] != game))
+            {
+                return;
+            }
         }
     }
     NSLog(@"called method \"online\"");
@@ -1275,11 +1292,15 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
         
     }
+    [bolInGameArray removeObjectAtIndex:game];
+    [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
+    [bolOnlineArray removeObjectAtIndex:game];
     [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
 }
 
 //executes every quick timer user is in a match
 - (IBAction)inGame:(int)game {
+    
     NSLog(@"called method \"ingame\"");
     // if its the first tick
     if (bolFirstTick) {
@@ -1289,10 +1310,21 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
         //do nothing
         
     } else if(!bolFirstTick && ![[bolInGameArray objectAtIndex:game] boolValue]) {
-        [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken]];
+        [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken] andEmail:[_dataHandler getEmail]];
     }
+    [bolOnlineArray removeObjectAtIndex:game];
+    [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
+    [bolInGameArray removeObjectAtIndex:game];
     [bolInGameArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
+    _bolQueueCD = true;
+    NSTimer *queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
     
+}
+
+- (void) resetQueueCooldown
+{
+    _bolQueueCD = false;
 }
 
 

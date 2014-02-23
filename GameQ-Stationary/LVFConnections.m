@@ -63,12 +63,12 @@
     NSLog(@"status update posted for game=%@&status=%@&device=mac", game, status);
 }
 //Push notification, for now all pushes are sent for recieved queue
-- (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token
+- (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token andEmail:(NSString *)email
 {
-    NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac", game, token];
+    NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac&email=%@", game, token, email];
     NSString *postUrl = pushURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"addonepost");
+    NSLog(@"addonepost %@ %@", game, token);
 }
 //Log the client out
 - (void)logoutPostFromToken:(NSString *)token
