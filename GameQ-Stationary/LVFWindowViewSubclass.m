@@ -28,9 +28,9 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    NSColor *blueness = [NSColor colorWithCalibratedRed:0.43 green:0.853 blue:0.947 alpha:1];
+    NSColor *whiteness = [NSColor colorWithCalibratedRed:0 green:0.525 blue:0.878 alpha:1];
     
-    NSColor *whiteness = [NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1];
+    NSColor *blueness = [NSColor colorWithCalibratedRed:0 green:0.525 blue:0.878 alpha:1];
     
     NSGradient *grad = [[NSGradient alloc] initWithStartingColor:whiteness endingColor:blueness];
     NSRect windowFrame = [self frame];

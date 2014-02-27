@@ -369,7 +369,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtQuestion cell] setPlaceholderString:@"Secret Question"];
     [[_txtAnswer cell] setPlaceholderString:@"Secret Answer"];
     
-    NSRect cFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x - 20, countryFrame.origin.y-151, 500, 161));
+    NSRect cFrame = NSRectFromCGRect(CGRectMake(25, -2, 520, 159));
     NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
     [cView setImage:[NSImage imageNamed:@"GameQ.png"]];
     [loginWindow.contentView addSubview:cView];
