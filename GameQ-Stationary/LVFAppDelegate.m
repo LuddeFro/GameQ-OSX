@@ -523,7 +523,39 @@ int num_packets = 0; /* the number of packets to be caught*/
     
 -(void) attemptRegister{
     NSLog(@"attempting register!");
-    [_connectionsHandler registerWithEmail:txtEmail.stringValue andPass:txtPassword.stringValue andSecretQuestion:_txtQuestion.stringValue andSecret:_txtAnswer.stringValue andFirsName:_txtFirstName.stringValue andLastName:_txtLastName.stringValue andGender:1 andYOB:_txtYOB.stringValue andCountry:@"sweden"];
+    
+    //checks if any text exists in the fields
+    if (![txtEmail.stringValue isEqual:@""] && ![txtPassword.stringValue isEqual:@""]) {
+        if (txtEmail.stringValue.length > 2 && txtPassword.stringValue.length > 5 && _txtAnswer.stringValue.length > 5) {
+            if ([txtEmail.stringValue rangeOfString:@"@"].location != NSNotFound) {
+                
+                
+                
+                if ([txtEmail.stringValue rangeOfString:@"\""].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\""].location != NSNotFound ||
+                    [txtEmail.stringValue rangeOfString:@"\\"].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\\"].location != NSNotFound || [_txtAnswer.stringValue rangeOfString:@"\""].location != NSNotFound || [_txtQuestion.stringValue rangeOfString:@"\""].location != NSNotFound ||
+                    [_txtQuestion.stringValue rangeOfString:@"\\"].location != NSNotFound || [_txtAnswer.stringValue rangeOfString:@"\\"].location != NSNotFound) {
+                    //what we wanna do
+                    [_connectionsHandler registerWithEmail:txtEmail.stringValue andPass:txtPassword.stringValue andSecretQuestion:_txtQuestion.stringValue andSecret:_txtAnswer.stringValue andFirsName:_txtFirstName.stringValue andLastName:_txtLastName.stringValue andGender:1 andYOB:_txtYOB.stringValue andCountry:@"sweden"];
+                    
+                } else {
+                    [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email or password contains illegal characters"] runModal];
+                }
+            } else {
+                [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email is invalid"] runModal];
+            }
+        } else {
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Password must be a minimum of 6 characters"] runModal];
+        }
+    } else {
+        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter a valid email address and password"] runModal];
+    }
+    
+    
+    
+    
+    
+    
+    
 }
     
 -(void) setupRegister{
