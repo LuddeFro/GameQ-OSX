@@ -183,8 +183,31 @@ int num_packets = 0; /* the number of packets to be caught*/
 {
     //checks if any text exists in the fields
     if (![txtEmail.stringValue isEqual:@""] && ![txtPassword.stringValue isEqual:@""]) {
-        [_dataHandler setEmail:txtEmail.stringValue];
-        [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
+        if (txtEmail.stringValue.length > 2 && txtPassword.stringValue.length > 5) {
+            if ([txtEmail.stringValue rangeOfString:@"@"].location != NSNotFound) {
+                
+                
+                
+                if ([txtEmail.stringValue rangeOfString:@"\""].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\""].location != NSNotFound ||
+                    [txtEmail.stringValue rangeOfString:@"\\"].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\\"].location != NSNotFound) {
+                    //what we wanna do
+                    [_dataHandler setEmail:txtEmail.stringValue];
+                    [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
+                    
+                } else {
+                    [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email or password contains illegal characters"] runModal];
+                }
+            } else {
+                [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email is invalid"] runModal];
+            }
+        } else {
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Password must be a minimum of 6 characters"] runModal];
+        }
+        
+        
+        
+        
+        
     } else {
         [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter a valid email address and password"] runModal];
     }
