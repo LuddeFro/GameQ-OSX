@@ -538,16 +538,16 @@ int num_packets = 0; /* the number of packets to be caught*/
                     [_connectionsHandler registerWithEmail:txtEmail.stringValue andPass:txtPassword.stringValue andSecretQuestion:_txtQuestion.stringValue andSecret:_txtAnswer.stringValue andFirsName:_txtFirstName.stringValue andLastName:_txtLastName.stringValue andGender:1 andYOB:_txtYOB.stringValue andCountry:@"sweden"];
                     
                 } else {
-                    [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email or password contains illegal characters"] runModal];
+                    [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified details contain illegal characters"] runModal];
                 }
             } else {
                 [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified email is invalid"] runModal];
             }
         } else {
-            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Password must be a minimum of 6 characters"] runModal];
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Password and secret must be a minimum of 6 characters"] runModal];
         }
     } else {
-        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter a valid email address and password"] runModal];
+        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter valid details!"] runModal];
     }
     
     
