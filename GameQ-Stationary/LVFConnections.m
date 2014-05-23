@@ -33,7 +33,7 @@
 - (void)loginWithUser:(NSString*)username andPass:(NSString*)losenord
 {
     
-    losenord = [losenord MD5];
+    losenord = [losenord SHA256];
     NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@",username, losenord];
     NSString *postUrl = loginURL;
     [gqConnect postNow:postString to:postUrl];
@@ -45,9 +45,10 @@
 - (void)registerWithEmail:(NSString*)email andPass:(NSString*)losenord andSecretQuestion:(NSString*)secretQuestion andSecret:(NSString*)secret andFirsName:(NSString*)firstname andLastName:(NSString*)lastname andGender:(int)gender andYOB:(NSString*)yob andCountry:(NSString*)country
 {
     NSLog(@"registering from _connectionshandler");
-    losenord = [losenord MD5];
-    secret = [secret MD5];
+    losenord = [losenord SHA256];
+    secret = [secret SHA256];
     NSString *postString = [NSString stringWithFormat:@"email=%@&losenord=%@&secretq=%@&secret=%@&firstname=%@&lastname=%@&gender=%d&yob=%@&country=%@",email, losenord, secretQuestion, secret, firstname, lastname, gender, yob, country];
+    NSLog(@"%@", postString);
     NSString *postUrl = registerURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"signup posted");
@@ -57,6 +58,7 @@
 //softPush a status update from a game to 
 - (void)UpdateStatusWithGame:(NSNumber *)game andStatus:(NSNumber *)status andToken:(NSString *)token
 {
+    //NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=abcdefg&device=mac", game, status];
     NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=%@&device=mac", game, status, token];
     NSString *postUrl = softPushURL;
     [gqConnect postNow:postString to:postUrl];
@@ -66,9 +68,19 @@
 - (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token andEmail:(NSString *)email
 {
     NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac&email=%@", game, token, email];
+    //NSString *postString = [NSString stringWithFormat:@"game=%@&token=abcdefg&device=mac&email=%@", game, email];
     NSString *postUrl = pushURL;
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"addonepost %@ %@", game, token);
+    NSUserNotification *notif = [[NSUserNotification alloc] init];
+    [notif setTitle:@"GameQ"];
+    [notif setInformativeText:@"Your queue has ended!"];
+    [notif setDeliveryDate:[NSDate dateWithTimeIntervalSinceNow:1]];
+    
+    //[notif setContentImage:[NSImage imageNamed:@"NotificationLogo.png"]];
+    NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
+    [center scheduleNotification:notif];
+    
 }
 //Log the client out
 - (void)logoutPostFromToken:(NSString *)token
@@ -91,7 +103,7 @@
 
 - (void) upTokenWithToken:(NSString *)token andDeviceName:(NSString *)name andEmail:(NSString *)email
 {
-    [gqConnect postNow:[NSString stringWithFormat:@"token=%@&device=%@&email=%@", token, name, email] to:updateTokenURL];
+    [gqConnect postNow:[NSString stringWithFormat:@"token=abc123&device=%@&email=%@", /*todotoken, */name, email] to:updateTokenURL];
 }
 
 
@@ -122,7 +134,7 @@
  - (void) chkSecretForEmail:(NSString*)email withSecret:(NSString*)secret andSecretQuestion:(NSString*)secretq
 {
     
-    secret = [secret MD5];
+    secret = [secret SHA256];
     NSString *postString = [NSString stringWithFormat:@"secret=%@&secretQ=%@&email=%@", secret, secretq, email];
     NSString *postUrl = checkSecretURL;
     [gqConnect postNow:postString to:postUrl];

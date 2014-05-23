@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NSString+MD5.h"
+#import "NSString+SHA256.h"
 #import "LVFConnect.h"
 #import "LVFAppDelegate.h"
 @class LVFConnect;

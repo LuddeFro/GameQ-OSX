@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSString (MD5)
+@interface NSString (SHA256)
 
--(NSString *) MD5;
+-(NSString *) SHA256;
 
 @end

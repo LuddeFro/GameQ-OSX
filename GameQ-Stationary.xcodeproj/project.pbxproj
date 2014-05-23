@@ -9,32 +9,7 @@
 /* Begin PBXBuildFile section */
 		8311E3F61848F4E20011212C /* LVFKeyChain.m in Sources */ = {isa = PBXBuildFile; fileRef = 8311E3F51848F4E20011212C /* LVFKeyChain.m */; };
 		8311E3FE184927FA0011212C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8311E3FD184927FA0011212C /* Security.framework */; };
-		8311E42A184B7BB70011212C /* Abstract.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E40B184B7BB70011212C /* Abstract.php */; };
-		8311E42B184B7BB70011212C /* Autoload.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E40C184B7BB70011212C /* Autoload.php */; };
-		8311E42C184B7BB70011212C /* Exception.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E40D184B7BB70011212C /* Exception.php */; };
-		8311E42D184B7BB70011212C /* Feedback.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E40E184B7BB70011212C /* Feedback.php */; };
-		8311E42E184B7BB70011212C /* Embedded.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E410184B7BB70011212C /* Embedded.php */; };
-		8311E42F184B7BB70011212C /* Interface.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E411184B7BB70011212C /* Interface.php */; };
-		8311E430184B7BB70011212C /* Custom.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E413184B7BB70011212C /* Custom.php */; };
-		8311E431184B7BB70011212C /* Exception.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E414184B7BB70011212C /* Exception.php */; };
-		8311E432184B7BB70011212C /* Message.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E415184B7BB70011212C /* Message.php */; };
-		8311E433184B7BB70011212C /* Exception.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E417184B7BB70011212C /* Exception.php */; };
-		8311E434184B7BB70011212C /* Exception.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E419184B7BB70011212C /* Exception.php */; };
-		8311E435184B7BB70011212C /* Server.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E41A184B7BB70011212C /* Server.php */; };
-		8311E436184B7BB70011212C /* Push.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E41B184B7BB70011212C /* Push.php */; };
-		8311E437184B7BB70011212C /* chkSecret copy.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E41C184B7BB70011212C /* chkSecret copy.php */; };
-		8311E438184B7BB70011212C /* connect.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E41D184B7BB70011212C /* connect.php */; };
-		8311E439184B7BB70011212C /* getSecret.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E41E184B7BB70011212C /* getSecret.php */; };
-		8311E43A184B7BB70011212C /* logging.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E420184B7BB70011212C /* logging.php */; };
-		8311E43B184B7BB70011212C /* methods.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E421184B7BB70011212C /* methods.php */; };
-		8311E43C184B7BB70011212C /* push.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E422184B7BB70011212C /* push.php */; };
-		8311E43D184B7BB70011212C /* regging.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E423184B7BB70011212C /* regging.php */; };
-		8311E43E184B7BB70011212C /* signing.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E424184B7BB70011212C /* signing.php */; };
-		8311E43F184B7BB70011212C /* softPush.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E425184B7BB70011212C /* softPush.php */; };
-		8311E440184B7BB70011212C /* updateDraw.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E426184B7BB70011212C /* updateDraw.php */; };
-		8311E441184B7BB70011212C /* updateMe.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E427184B7BB70011212C /* updateMe.php */; };
-		8311E442184B7BB70011212C /* upMacToken.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E428184B7BB70011212C /* upMacToken.php */; };
-		8311E443184B7BB70011212C /* upToken.php in Resources */ = {isa = PBXBuildFile; fileRef = 8311E429184B7BB70011212C /* upToken.php */; };
+		833403E418C6614E00A8B6E0 /* NotificationLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 833403E318C6614E00A8B6E0 /* NotificationLogo.png */; };
 		8338311F18633840003E4493 /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 8338311E18633840003E4493 /* SSKeychain.m */; };
 		833F06E018B678ED00C2B980 /* LVFWindowViewSubclass.m in Sources */ = {isa = PBXBuildFile; fileRef = 833F06DF18B678ED00C2B980 /* LVFWindowViewSubclass.m */; };
 		836DA57318BAD24A007DBC1F /* Gray.png in Resources */ = {isa = PBXBuildFile; fileRef = 836DA57218BAD24A007DBC1F /* Gray.png */; };
@@ -52,10 +27,8 @@
 		837423CC1818B25D000FCC76 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 837423CB1818B25D000FCC76 /* Images.xcassets */; };
 		837423D31818B25D000FCC76 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423D21818B25D000FCC76 /* XCTest.framework */; };
 		837423D41818B25D000FCC76 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423B01818B25D000FCC76 /* Cocoa.framework */; };
-		837423DC1818B25D000FCC76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 837423DA1818B25D000FCC76 /* InfoPlist.strings */; };
-		837423DE1818B25D000FCC76 /* GameQ-StationaryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423DD1818B25D000FCC76 /* GameQ-StationaryTests.m */; };
 		837423E81818B2CF000FCC76 /* libpcap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423E71818B2CF000FCC76 /* libpcap.dylib */; };
-		837423F41818B30E000FCC76 /* NSString+MD5.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423EB1818B30E000FCC76 /* NSString+MD5.m */; };
+		837423F41818B30E000FCC76 /* NSString+SHA256.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423EB1818B30E000FCC76 /* NSString+SHA256.m */; };
 		837423F51818B30E000FCC76 /* LVFConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423ED1818B30E000FCC76 /* LVFConnections.m */; };
 		837423F61818B30E000FCC76 /* LVFConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423EF1818B30E000FCC76 /* LVFConnect.m */; };
 		837423F71818B30E000FCC76 /* LVFDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423F11818B30E000FCC76 /* LVFDataModel.m */; };
@@ -84,32 +57,7 @@
 		8311E3F41848F4E20011212C /* LVFKeyChain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFKeyChain.h; sourceTree = "<group>"; };
 		8311E3F51848F4E20011212C /* LVFKeyChain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFKeyChain.m; sourceTree = "<group>"; };
 		8311E3FD184927FA0011212C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		8311E40B184B7BB70011212C /* Abstract.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Abstract.php; sourceTree = "<group>"; };
-		8311E40C184B7BB70011212C /* Autoload.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Autoload.php; sourceTree = "<group>"; };
-		8311E40D184B7BB70011212C /* Exception.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Exception.php; sourceTree = "<group>"; };
-		8311E40E184B7BB70011212C /* Feedback.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Feedback.php; sourceTree = "<group>"; };
-		8311E410184B7BB70011212C /* Embedded.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Embedded.php; sourceTree = "<group>"; };
-		8311E411184B7BB70011212C /* Interface.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Interface.php; sourceTree = "<group>"; };
-		8311E413184B7BB70011212C /* Custom.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Custom.php; sourceTree = "<group>"; };
-		8311E414184B7BB70011212C /* Exception.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Exception.php; sourceTree = "<group>"; };
-		8311E415184B7BB70011212C /* Message.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Message.php; sourceTree = "<group>"; };
-		8311E417184B7BB70011212C /* Exception.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Exception.php; sourceTree = "<group>"; };
-		8311E419184B7BB70011212C /* Exception.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Exception.php; sourceTree = "<group>"; };
-		8311E41A184B7BB70011212C /* Server.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Server.php; sourceTree = "<group>"; };
-		8311E41B184B7BB70011212C /* Push.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = Push.php; sourceTree = "<group>"; };
-		8311E41C184B7BB70011212C /* chkSecret copy.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = "chkSecret copy.php"; sourceTree = "<group>"; };
-		8311E41D184B7BB70011212C /* connect.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = connect.php; sourceTree = "<group>"; };
-		8311E41E184B7BB70011212C /* getSecret.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = getSecret.php; sourceTree = "<group>"; };
-		8311E420184B7BB70011212C /* logging.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = logging.php; sourceTree = "<group>"; };
-		8311E421184B7BB70011212C /* methods.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = methods.php; sourceTree = "<group>"; };
-		8311E422184B7BB70011212C /* push.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = push.php; sourceTree = "<group>"; };
-		8311E423184B7BB70011212C /* regging.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = regging.php; sourceTree = "<group>"; };
-		8311E424184B7BB70011212C /* signing.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = signing.php; sourceTree = "<group>"; };
-		8311E425184B7BB70011212C /* softPush.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = softPush.php; sourceTree = "<group>"; };
-		8311E426184B7BB70011212C /* updateDraw.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = updateDraw.php; sourceTree = "<group>"; };
-		8311E427184B7BB70011212C /* updateMe.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = updateMe.php; sourceTree = "<group>"; };
-		8311E428184B7BB70011212C /* upMacToken.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = upMacToken.php; sourceTree = "<group>"; };
-		8311E429184B7BB70011212C /* upToken.php */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.php; path = upToken.php; sourceTree = "<group>"; };
+		833403E318C6614E00A8B6E0 /* NotificationLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotificationLogo.png; sourceTree = "<group>"; };
 		8338311D18633840003E4493 /* SSKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSKeychain.h; sourceTree = "<group>"; };
 		8338311E18633840003E4493 /* SSKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSKeychain.m; sourceTree = "<group>"; };
 		833F06DE18B678ED00C2B980 /* LVFWindowViewSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFWindowViewSubclass.h; sourceTree = "<group>"; };
@@ -136,13 +84,10 @@
 		837423CB1818B25D000FCC76 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		837423D11818B25D000FCC76 /* GameQ-StationaryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GameQ-StationaryTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		837423D21818B25D000FCC76 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		837423D91818B25D000FCC76 /* GameQ-StationaryTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GameQ-StationaryTests-Info.plist"; sourceTree = "<group>"; };
-		837423DB1818B25D000FCC76 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		837423DD1818B25D000FCC76 /* GameQ-StationaryTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "GameQ-StationaryTests.m"; path = "../GameQ-StationaryTests/GameQ-StationaryTests.m"; sourceTree = "<group>"; };
 		837423E71818B2CF000FCC76 /* libpcap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcap.dylib; path = usr/lib/libpcap.dylib; sourceTree = SDKROOT; };
 		837423E91818B30E000FCC76 /* LVFpCap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFpCap.h; sourceTree = "<group>"; };
-		837423EA1818B30E000FCC76 /* NSString+MD5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MD5.h"; sourceTree = "<group>"; };
-		837423EB1818B30E000FCC76 /* NSString+MD5.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MD5.m"; sourceTree = "<group>"; };
+		837423EA1818B30E000FCC76 /* NSString+SHA256.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SHA256.h"; sourceTree = "<group>"; };
+		837423EB1818B30E000FCC76 /* NSString+SHA256.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SHA256.m"; sourceTree = "<group>"; };
 		837423EC1818B30E000FCC76 /* LVFConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFConnections.h; sourceTree = "<group>"; };
 		837423ED1818B30E000FCC76 /* LVFConnections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFConnections.m; sourceTree = "<group>"; };
 		837423EE1818B30E000FCC76 /* LVFConnect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFConnect.h; sourceTree = "<group>"; };
@@ -187,92 +132,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8311E409184B7BB70011212C /* GameQ_Server_Code */ = {
-			isa = PBXGroup;
-			children = (
-				8311E40A184B7BB70011212C /* ApnsPHP */,
-				8311E41C184B7BB70011212C /* chkSecret copy.php */,
-				8311E41D184B7BB70011212C /* connect.php */,
-				8311E41E184B7BB70011212C /* getSecret.php */,
-				8311E41F184B7BB70011212C /* log */,
-				8311E420184B7BB70011212C /* logging.php */,
-				8311E421184B7BB70011212C /* methods.php */,
-				8311E422184B7BB70011212C /* push.php */,
-				8311E423184B7BB70011212C /* regging.php */,
-				8311E424184B7BB70011212C /* signing.php */,
-				8311E425184B7BB70011212C /* softPush.php */,
-				8311E426184B7BB70011212C /* updateDraw.php */,
-				8311E427184B7BB70011212C /* updateMe.php */,
-				8311E428184B7BB70011212C /* upMacToken.php */,
-				8311E429184B7BB70011212C /* upToken.php */,
-			);
-			path = GameQ_Server_Code;
-			sourceTree = "<group>";
-		};
-		8311E40A184B7BB70011212C /* ApnsPHP */ = {
-			isa = PBXGroup;
-			children = (
-				8311E40B184B7BB70011212C /* Abstract.php */,
-				8311E40C184B7BB70011212C /* Autoload.php */,
-				8311E40D184B7BB70011212C /* Exception.php */,
-				8311E40E184B7BB70011212C /* Feedback.php */,
-				8311E40F184B7BB70011212C /* Log */,
-				8311E412184B7BB70011212C /* Message */,
-				8311E415184B7BB70011212C /* Message.php */,
-				8311E416184B7BB70011212C /* Push */,
-				8311E41B184B7BB70011212C /* Push.php */,
-			);
-			path = ApnsPHP;
-			sourceTree = "<group>";
-		};
-		8311E40F184B7BB70011212C /* Log */ = {
-			isa = PBXGroup;
-			children = (
-				8311E410184B7BB70011212C /* Embedded.php */,
-				8311E411184B7BB70011212C /* Interface.php */,
-			);
-			path = Log;
-			sourceTree = "<group>";
-		};
-		8311E412184B7BB70011212C /* Message */ = {
-			isa = PBXGroup;
-			children = (
-				8311E413184B7BB70011212C /* Custom.php */,
-				8311E414184B7BB70011212C /* Exception.php */,
-			);
-			path = Message;
-			sourceTree = "<group>";
-		};
-		8311E416184B7BB70011212C /* Push */ = {
-			isa = PBXGroup;
-			children = (
-				8311E417184B7BB70011212C /* Exception.php */,
-				8311E418184B7BB70011212C /* Server */,
-				8311E41A184B7BB70011212C /* Server.php */,
-			);
-			path = Push;
-			sourceTree = "<group>";
-		};
-		8311E418184B7BB70011212C /* Server */ = {
-			isa = PBXGroup;
-			children = (
-				8311E419184B7BB70011212C /* Exception.php */,
-			);
-			path = Server;
-			sourceTree = "<group>";
-		};
-		8311E41F184B7BB70011212C /* log */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = log;
-			sourceTree = "<group>";
-		};
 		837423A41818B25D000FCC76 = {
 			isa = PBXGroup;
 			children = (
 				837423B61818B25D000FCC76 /* GameQ-Stationary */,
-				837423D71818B25D000FCC76 /* GameQ-StationaryTests */,
 				837423AF1818B25D000FCC76 /* Frameworks */,
 				837423AE1818B25D000FCC76 /* Products */,
 			);
@@ -323,8 +186,8 @@
 				83EF17881888D0DF00057F36 /* LVFBuffer.m */,
 				837423C51818B25D000FCC76 /* MainMenu.xib */,
 				837423E91818B30E000FCC76 /* LVFpCap.h */,
-				837423EA1818B30E000FCC76 /* NSString+MD5.h */,
-				837423EB1818B30E000FCC76 /* NSString+MD5.m */,
+				837423EA1818B30E000FCC76 /* NSString+SHA256.h */,
+				837423EB1818B30E000FCC76 /* NSString+SHA256.m */,
 				837423EC1818B30E000FCC76 /* LVFConnections.h */,
 				837423ED1818B30E000FCC76 /* LVFConnections.m */,
 				837423EE1818B30E000FCC76 /* LVFConnect.h */,
@@ -353,6 +216,7 @@
 				836DA57818BAD6C2007DBC1F /* Qblack.png */,
 				836DA58218BAD838007DBC1F /* Qblue.png */,
 				836DA57A18BAD6C2007DBC1F /* Qwhite.png */,
+				833403E318C6614E00A8B6E0 /* NotificationLogo.png */,
 				9CE2280C189BB2E6008C6DDB /* i5man.png */,
 				9CE2280D189BB2E6008C6DDB /* i5woman.png */,
 				9CE22808189BAAE4008C6DDB /* i6man.png */,
@@ -362,25 +226,6 @@
 				837423BC1818B25D000FCC76 /* main.m */,
 				837423BE1818B25D000FCC76 /* GameQ-Stationary-Prefix.pch */,
 				837423BF1818B25D000FCC76 /* Credits.rtf */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		837423D71818B25D000FCC76 /* GameQ-StationaryTests */ = {
-			isa = PBXGroup;
-			children = (
-				837423DD1818B25D000FCC76 /* GameQ-StationaryTests.m */,
-				837423D81818B25D000FCC76 /* Supporting Files */,
-			);
-			path = "GameQ-StationaryTests";
-			sourceTree = "<group>";
-		};
-		837423D81818B25D000FCC76 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				8311E409184B7BB70011212C /* GameQ_Server_Code */,
-				837423D91818B25D000FCC76 /* GameQ-StationaryTests-Info.plist */,
-				837423DA1818B25D000FCC76 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -466,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				837423BB1818B25D000FCC76 /* InfoPlist.strings in Resources */,
+				833403E418C6614E00A8B6E0 /* NotificationLogo.png in Resources */,
 				836DA58718BADD4B007DBC1F /* GameQ.png in Resources */,
 				9CE2280F189BB2E6008C6DDB /* i5woman.png in Resources */,
 				836DA57B18BAD6C2007DBC1F /* Qblack.png in Resources */,
@@ -486,33 +332,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8311E42B184B7BB70011212C /* Autoload.php in Resources */,
-				8311E439184B7BB70011212C /* getSecret.php in Resources */,
-				8311E437184B7BB70011212C /* chkSecret copy.php in Resources */,
-				8311E433184B7BB70011212C /* Exception.php in Resources */,
-				8311E42F184B7BB70011212C /* Interface.php in Resources */,
-				8311E440184B7BB70011212C /* updateDraw.php in Resources */,
-				8311E42A184B7BB70011212C /* Abstract.php in Resources */,
-				8311E43B184B7BB70011212C /* methods.php in Resources */,
-				8311E430184B7BB70011212C /* Custom.php in Resources */,
-				8311E43E184B7BB70011212C /* signing.php in Resources */,
-				8311E431184B7BB70011212C /* Exception.php in Resources */,
-				8311E436184B7BB70011212C /* Push.php in Resources */,
-				8311E43C184B7BB70011212C /* push.php in Resources */,
-				8311E42E184B7BB70011212C /* Embedded.php in Resources */,
-				8311E42D184B7BB70011212C /* Feedback.php in Resources */,
-				8311E442184B7BB70011212C /* upMacToken.php in Resources */,
-				8311E441184B7BB70011212C /* updateMe.php in Resources */,
-				8311E42C184B7BB70011212C /* Exception.php in Resources */,
-				8311E438184B7BB70011212C /* connect.php in Resources */,
-				8311E443184B7BB70011212C /* upToken.php in Resources */,
-				8311E432184B7BB70011212C /* Message.php in Resources */,
-				8311E434184B7BB70011212C /* Exception.php in Resources */,
-				8311E43D184B7BB70011212C /* regging.php in Resources */,
-				8311E43F184B7BB70011212C /* softPush.php in Resources */,
-				837423DC1818B25D000FCC76 /* InfoPlist.strings in Resources */,
-				8311E43A184B7BB70011212C /* logging.php in Resources */,
-				8311E435184B7BB70011212C /* Server.php in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,7 +347,7 @@
 				83EF17891888D0DF00057F36 /* LVFBuffer.m in Sources */,
 				8311E3F61848F4E20011212C /* LVFKeyChain.m in Sources */,
 				837423BD1818B25D000FCC76 /* main.m in Sources */,
-				837423F41818B30E000FCC76 /* NSString+MD5.m in Sources */,
+				837423F41818B30E000FCC76 /* NSString+SHA256.m in Sources */,
 				837423F71818B30E000FCC76 /* LVFDataModel.m in Sources */,
 				837423F51818B30E000FCC76 /* LVFConnections.m in Sources */,
 				837423C41818B25D000FCC76 /* LVFAppDelegate.m in Sources */,
@@ -543,7 +362,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				837423DE1818B25D000FCC76 /* GameQ-StationaryTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,14 +398,6 @@
 				837423C61818B25D000FCC76 /* Base */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		837423DA1818B25D000FCC76 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				837423DB1818B25D000FCC76 /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -667,13 +477,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GameQ-Stationary/GameQ-Stationary-Prefix.pch";
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				INFOPLIST_FILE = "GameQ-Stationary/GameQ-Stationary-Info.plist";
 				PRODUCT_NAME = "GameQ-Stationary";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -682,13 +493,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GameQ-Stationary/GameQ-Stationary-Prefix.pch";
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				INFOPLIST_FILE = "GameQ-Stationary/GameQ-Stationary-Info.plist";
 				PRODUCT_NAME = "GameQ-Stationary";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

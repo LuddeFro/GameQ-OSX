@@ -100,6 +100,9 @@
         if ([[returnString substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"secQ"])
         {
             [appDel setupAnswerWithQuestion:[returnString substringFromIndex:4]];
+            [appDel.txtEmail setStringValue:@""];
+            [appDel enableButtons];
+            [appDel.txtPassword setEnabled:false];
         }
     }
     
@@ -108,13 +111,16 @@
     {
         [appDel enableButtons];
         [self connectionAlert:@"No such user exists!"];
+        [appDel.txtPassword setEnabled:false];
+        [appDel.txtEmail setStringValue:@""];
         return;
     }
     if ([returnString isEqualToString:@"wrongsecret"])
     {
         [appDel enableButtons];
         [self connectionAlert:@"The answer you supplied is incorrect!"];
-        
+        [appDel.txtEmail setStringValue:@""];
+        [appDel.txtPassword setEnabled:false];
         return;
     }
     
@@ -122,6 +128,10 @@
     if ([returnString isEqualToString:@"pwdreset"])
     {
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your Password has successfully been reset! Please check your e-mail for a new password. You should login and change this password as soon as possible."] runModal];
+        [appDel enableButtons];
+        [appDel.txtEmail setStringValue:@""];
+        [appDel.txtPassword setEnabled:true];
+        [appDel setupLogin];
         return;
     }
     
@@ -157,7 +167,7 @@
     {
         [[NSAlert alertWithMessageText:@"Invalid login details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"You entered an invalid password - username combination, please try again.\r\n\r\nToo many failed attempts may lock your account for up to 2 hours."] runModal];
         [appDel setDisconnected];
-        
+        [appDel.txtPassword setStringValue:@""];
         return;
     }
     
@@ -201,6 +211,7 @@
     {
         [appDel setupLogin];
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Registration was successful! A temporary password has been sent to your e-mail account for your first log in!"] runModal];
+        [appDel.txtPassword setStringValue:@""];
         return;
     }
     if ([returnString isEqualToString:@"duplicate"])
@@ -247,6 +258,7 @@
         //probably a push
         //[self connectionAlert:@"666"];
     }
+    
 }
 
 - (void) connectionAlert:(NSString*)code

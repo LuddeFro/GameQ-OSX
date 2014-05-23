@@ -16,6 +16,7 @@
 #define kOFFLINE 0 //app running, but no game
 #define kONLINE 1 //game running
 #define kINGAME 2 //game running and in match
+#define kNotRunningGameQ 4 //self explanatory
 
 #define kNUMBER_OF_GAMES 4 //kNOGAME counts as 1
 
@@ -303,7 +304,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect mailFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-233.5, winFrame.size.height-80, 217, 25));
     NSRect passFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, mailFrame.origin.y-30, 217, 25));
     
-    NSRect regFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/4-82.5, 250, 200, 25));
+   
     
     
     NSRect questionFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, passFrame.origin.y-30, 217, 25));
@@ -318,7 +319,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect genderFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x+3, countryFrame.origin.y-45, 140, 60));
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, passFrame.origin.y-35, 100, 25));
-    
+    NSRect regFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, 170, 220, 25));
     
     
     
@@ -333,21 +334,36 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnLogin setTitle:@"Log In"];
     [btnSignUp setTitle:@"Join GameQ"];
     [btnLogin setBezelStyle:NSRoundedBezelStyle];
+    
+    
+    
     [btnLogin setTarget:self];
     [btnLogin setAction:@selector(attemptLogin)];
     [btnSignUp setTarget:self];
     [btnSignUp setAction:@selector(setupRegister)];
-    [btnSignUp setButtonType:NSMomentaryLight];
-    [btnLogin setButtonType:NSMomentaryLight];
-    [btnSignUp setBordered:YES];
+    [btnSignUp setButtonType:NSMomentaryChangeButton];
+    [btnLogin setButtonType:NSMomentaryChangeButton];
+    [btnSignUp setBordered:NO];
     [btnSignUp setBezelStyle:NSRoundedBezelStyle];
-    [btnLogin setBordered:YES];
+    [btnLogin setBordered:NO];
     [_btnQuestion setTitle:@"Forgot Password"];
     [_btnQuestion setBezelStyle:NSRoundedBezelStyle];
     [_btnQuestion setTarget:self];
     [_btnQuestion setAction:@selector(setupQuestion)];
-    [_btnQuestion setButtonType:NSMomentaryLight];
-    [_btnQuestion setBordered:YES];
+    [_btnQuestion setButtonType:NSMomentaryChangeButton];
+    [_btnQuestion setBordered:NO];
+    
+    
+    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
+    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
+    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
+    
+    [btnLogin setImage:[NSImage imageNamed:@"Gray.png"]];
+    [btnSignUp setImage:[NSImage imageNamed:@"Gray.png"]];
+    [_btnQuestion setImage:[NSImage imageNamed:@"Gray.png"]];
+    [btnLogin setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
+    [btnSignUp setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
+    [_btnQuestion setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
     
     
     _txtFirstName = [[NSTextField alloc] initWithFrame:firstNameFrame];
@@ -356,7 +372,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     _rolloverCountry = [[NSPopUpButton alloc] initWithFrame:countryFrame pullsDown:YES];
     _segSex = [[NSSegmentedControl alloc] initWithFrame:genderFrame];
     _txtQuestion = [[NSTextField alloc] initWithFrame:questionFrame];
-    _txtAnswer = [[NSTextField alloc] initWithFrame:answerFrame];
+    _txtAnswer = [[NSSecureTextField alloc] initWithFrame:answerFrame];
     
     [_segSex setSegmentCount:2];
     [_segSex setImage:[NSImage imageNamed:@"i5woman.png"] forSegment:0];
@@ -368,6 +384,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtLastName cell] setPlaceholderString:@"Last Name"];
     [[_txtQuestion cell] setPlaceholderString:@"Secret Question"];
     [[_txtAnswer cell] setPlaceholderString:@"Secret Answer"];
+    
     
     NSRect cFrame = NSRectFromCGRect(CGRectMake(25, -2, 520, 159));
     NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
@@ -390,14 +407,14 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     [loginWindow.contentView addSubview:_txtFirstName];
     [loginWindow.contentView addSubview:_txtLastName];
+    [loginWindow.contentView addSubview:txtPassword];
+    [loginWindow.contentView addSubview:txtEmail];
     [loginWindow.contentView addSubview:_txtYOB];
     [loginWindow.contentView addSubview:_segSex];
     [loginWindow.contentView addSubview:_rolloverCountry];
     [loginWindow.contentView addSubview:_txtAnswer];
     [loginWindow.contentView addSubview:_txtQuestion];
     [loginWindow.contentView addSubview:btnLogin];
-    [loginWindow.contentView addSubview:txtPassword];
-    [loginWindow.contentView addSubview:txtEmail];
     [loginWindow.contentView addSubview:btnSignUp];
     [loginWindow.contentView addSubview:_btnQuestion];
     [[loginWindow contentView] setAutoresizesSubviews:YES];
@@ -611,6 +628,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnLogin setTitle:@"OK"];
     [_btnQuestion setAction:@selector(setupLogin)];
     [btnLogin setAction:@selector(checkQuestion)];
+    [txtPassword setEnabled:false];
     
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtEmail.frame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
@@ -649,6 +667,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [self disableButtons];
     [_connectionsHandler getSecretPost:txtEmail.stringValue];
     _strQuestionMail = [[NSString alloc] initWithFormat:@"%@", txtEmail.stringValue];
+    
     
 }
 -(void) setupAnswerWithQuestion:(NSString*)question {
@@ -745,6 +764,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
                 printf("   * Invalid UDP header length: %u bytes\n", size_udp);
             }
             printf("Header length: %u bytes\n", size_udp);
+            printf("ip_len: %d", ntohs(ip->ip_len));
             
             
             printf("   Src port: %d\n", ntohs(udp->uh_sport));
@@ -761,7 +781,11 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
                 NSLog(@"%d",[self honQPack]);
             }
             
-            if (sport >= 27015 && sport <= 27019 && ntohs(ip->ip_len) <= 686 && ntohs(ip->ip_len) >= 586) {
+            if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) <= 736 && ntohs(ip->ip_len) >= 586) {
+                //checks wirelength 600-750
+                
+                // size_udp == wirelength - 34
+                // ip_len == size_udp + 20
                 NSLog(@"Dota Q Packet");
                 [self incrementDotaQPack];
                 NSLog(@"%d",[self dotaQPack]);
@@ -1022,10 +1046,10 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) startTimer {
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
     
     _upTimeTimer = [NSTimer timerWithTimeInterval:60 target:self selector:@selector(upTime) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:_upTimeTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop mainRunLoop] addTimer:_upTimeTimer forMode:NSDefaultRunLoopMode];
     
     //countdownSlowTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
     //[[NSRunLoop currentRunLoop] addTimer:countdownSlowTimer forMode:NSDefaultRunLoopMode];
@@ -1118,7 +1142,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     if (bolIsActive) {
         [self toggle:nil];
     }
-    [self.btnLog setTitle:@"Log In"];
+    [self.btnLog setTitle:@"Log In / Sign up"];
     [btnToggleActive setEnabled:NO];
     [_btnStatus setHidden:YES];
     [_btnStatus2 setTitle:@"Status: Offline"];
@@ -1135,7 +1159,8 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [self toggleOff:(nil)];
     pcap_freecode(&fp);
 	pcap_close(handle);
-    [NSApp terminate:self];
+    exit(0);
+    
 }
 
 //what happens on tack? (quick timer)
@@ -1203,8 +1228,8 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"DotA");
     [dotaQBuffer increment:dotaQPack];
     NSLog(@"buffer: %i", dotaQBuffer.bufferValue);
-    NSLog(@"%i", dotaRunning);
-    if (dotaQBuffer.bufferValue > 1 && dotaRunning) {
+    NSLog(@"dota running: %i", dotaRunning);
+    if (dotaQBuffer.bufferValue > 0 && dotaRunning) {
         [self inGame:kDOTA2]; //potentially sends notification
     }
     if (dotaCPack > 1 && dotaRunning) {
@@ -1241,34 +1266,27 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 // handles offline state
 - (IBAction)offline:(int)game {
+    bool bolOnline = [[bolOnlineArray objectAtIndex:game] boolValue];
+    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
+    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
      for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
-            
-            if (!([bolInGameArray indexOfObject:numberobject] == game))
-            {
-                return;
-            }
+            return;
         }
     }
     for (NSNumber *numberobject in bolOnlineArray) {
         if (numberobject.boolValue == true) {
-            if (([bolOnlineArray indexOfObject:numberobject] != game))
-            {
-                return;
-            }
+            return;
         }
     }
     NSLog(@"called method \"offline\"");
-    if (![[bolOnlineArray objectAtIndex:game] boolValue]) {
-        // do nothing if status already offline, (initialized to offline)
+    if (!bolOnline) {
+        // do nothing if status was already offline, (initialized to offline)
     } else {
         
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     }
-    [bolInGameArray removeObjectAtIndex:game];
-    [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
-    [bolOnlineArray removeObjectAtIndex:game];
-    [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
+    
     
 }
 
@@ -1277,25 +1295,23 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     if (_bolQueueCD) {
         return;
     }
+    
+    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
-            if (([bolInGameArray indexOfObject:numberobject] != game))
-            {
-                return;
-            }
+            return;
         }
     }
+    
     NSLog(@"called method \"online\"");
-    if ([[bolOnlineArray objectAtIndex:game] boolValue]) {
+    if ([[bolOnlineArray objectAtIndex:game] boolValue] && ![[bolInGameArray objectAtIndex:game] boolValue]) {
         // do nothing if status already online, (initialized to offline)
     } else {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
         
     }
-    [bolInGameArray removeObjectAtIndex:game];
-    [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:game];
-    [bolOnlineArray removeObjectAtIndex:game];
-    [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
+    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+    
 }
 
 //executes every quick timer user is in a match
@@ -1305,25 +1321,27 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     // if its the first tick
     if (bolFirstTick) {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
+        NSLog(@"ingame- just updating");
         
     } else if(!bolFirstTick && [[bolInGameArray objectAtIndex:game] boolValue]){
         //do nothing
+        NSLog(@"ingame- do nothing");
         
     } else if(!bolFirstTick && ![[bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken] andEmail:[_dataHandler getEmail]];
+        NSLog(@"ingame- pushing");
     }
-    [bolOnlineArray removeObjectAtIndex:game];
-    [bolOnlineArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
-    [bolInGameArray removeObjectAtIndex:game];
-    [bolInGameArray insertObject:[NSNumber numberWithBool:YES] atIndex:game];
+    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     _bolQueueCD = true;
-    NSTimer *queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
-    [[NSRunLoop currentRunLoop] addTimer:queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
+    _queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
+    [[NSRunLoop mainRunLoop] addTimer:_queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
     
 }
 
 - (void) resetQueueCooldown
 {
+    [_queuePopCooldownTimer invalidate];
     _bolQueueCD = false;
 }
 
@@ -1348,14 +1366,17 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 //increment methods used to alter variables from within libPCap function "got_packet"
 - (IBAction)incrementHonQPack {
+    printf("Incrementing HonQPack");
     honQPack++;
 }
 
 - (IBAction)incrementDotaQPack {
+    printf("Incrementing DotaQPack");
     dotaQPack++;
 }
 
 - (IBAction)incrementDotaCPack {
+    printf("Incrementing DotaCPack");
     dotaCPack++;
 }
 

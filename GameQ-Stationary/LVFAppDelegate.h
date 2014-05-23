@@ -52,6 +52,7 @@
 @property (strong, nonatomic) NSTimer *countdownQuickTimer;
 @property (strong, nonatomic) NSTimer *countdownSlowTimer;
 @property (strong, nonatomic) NSTimer *upTimeTimer;
+@property (strong, nonatomic) NSTimer *queuePopCooldownTimer;
 @property int honQPack;
 @property int dotaQPack;
 @property int dotaCPack;
