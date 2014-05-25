@@ -188,8 +188,8 @@ int num_packets = 0; /* the number of packets to be caught*/
                 
                 
                 
-                if ([txtEmail.stringValue rangeOfString:@"\""].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\""].location != NSNotFound ||
-                    [txtEmail.stringValue rangeOfString:@"\\"].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\\"].location != NSNotFound) {
+                if ([txtEmail.stringValue rangeOfString:@"\""].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                    [txtEmail.stringValue rangeOfString:@"\\"].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\\"].location == NSNotFound) {
                     //what we wanna do
                     [_dataHandler setEmail:txtEmail.stringValue];
                     [_connectionsHandler loginWithUser:txtEmail.stringValue andPass:txtPassword.stringValue];
@@ -531,9 +531,9 @@ int num_packets = 0; /* the number of packets to be caught*/
                 
                 
                 
-                if ([txtEmail.stringValue rangeOfString:@"\""].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\""].location != NSNotFound ||
-                    [txtEmail.stringValue rangeOfString:@"\\"].location != NSNotFound || [txtPassword.stringValue rangeOfString:@"\\"].location != NSNotFound || [_txtAnswer.stringValue rangeOfString:@"\""].location != NSNotFound || [_txtQuestion.stringValue rangeOfString:@"\""].location != NSNotFound ||
-                    [_txtQuestion.stringValue rangeOfString:@"\\"].location != NSNotFound || [_txtAnswer.stringValue rangeOfString:@"\\"].location != NSNotFound) {
+                if ([txtEmail.stringValue rangeOfString:@"\""].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                    [txtEmail.stringValue rangeOfString:@"\\"].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\\"].location == NSNotFound && [_txtAnswer.stringValue rangeOfString:@"\""].location == NSNotFound && [_txtQuestion.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                    [_txtQuestion.stringValue rangeOfString:@"\\"].location == NSNotFound && [_txtAnswer.stringValue rangeOfString:@"\\"].location == NSNotFound) {
                     //what we wanna do
                     [_connectionsHandler registerWithEmail:txtEmail.stringValue andPass:txtPassword.stringValue andSecretQuestion:_txtQuestion.stringValue andSecret:_txtAnswer.stringValue andFirsName:_txtFirstName.stringValue andLastName:_txtLastName.stringValue andGender:1 andYOB:_txtYOB.stringValue andCountry:@"sweden"];
                     
