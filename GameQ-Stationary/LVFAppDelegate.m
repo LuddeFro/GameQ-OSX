@@ -252,7 +252,10 @@ int num_packets = 0; /* the number of packets to be caught*/
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     
-    
+    NSColor *myWhite = [NSColor colorWithWhite:1 alpha:1];
+    NSColor *myTransWhite = [NSColor colorWithWhite:1 alpha:0.5];
+    NSColor *myRed = [NSColor colorWithRed:0.905 green:0.298 blue:0.235 alpha:0.9];
+    NSColor *myDarkGray = [NSColor colorWithRed:0.1333 green:0.1333 blue:0.1333 alpha:1];
     
     //first init
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
@@ -312,14 +315,13 @@ int num_packets = 0; /* the number of packets to be caught*/
 
     
     //setup the login window
-    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 573, 473));
+    NSRect winFrame = NSRectFromCGRect(CGRectMake(0, 0, 573, 335));
     NSUInteger stylemask = /*NSTexturedBackgroundWindowMask|*/NSClosableWindowMask|NSMiniaturizableWindowMask|NSTitledWindowMask/*|NSResizableWindowMask*/;
     loginWindow = [[NSWindow alloc] initWithContentRect:winFrame styleMask:stylemask backing:NSBackingStoreBuffered defer:YES];
     [loginWindow setReleasedWhenClosed:NO];
     [loginWindow center];
     
-    //[loginWindow setBackgroundColor:grad ];
-    //[loginWindow setBackgroundColor:[NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:1.0] ];
+    
     [loginWindow setTitle:@"GameQ"];
     LVFWindowViewSubclass *winView = [[LVFWindowViewSubclass alloc] initWithFrame:winFrame];
     [loginWindow setContentView:winView];
@@ -342,8 +344,8 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect genderFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x+3, countryFrame.origin.y-45, 140, 60));
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, passFrame.origin.y-35, 100, 25));
-    NSRect regFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, 170, 220, 25));
-    
+    NSRect regFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, 25, 220, 25));
+    NSLog(@"set frames");
     
     
     txtPassword = [[NSSecureTextField alloc] initWithFrame:passFrame];
@@ -377,17 +379,40 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_btnQuestion setBordered:NO];
     
     
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[btnSignUp attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [btnSignUp setAttributedTitle:colorTitle2];
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    
+    
+    
+    
     [btnLogin.cell setHighlightsBy:NSContentsCellMask];
     [btnLogin.cell setHighlightsBy:NSContentsCellMask];
     [btnLogin.cell setHighlightsBy:NSContentsCellMask];
     
-    [btnLogin setImage:[NSImage imageNamed:@"Gray.png"]];
-    [btnSignUp setImage:[NSImage imageNamed:@"Gray.png"]];
-    [_btnQuestion setImage:[NSImage imageNamed:@"Gray.png"]];
-    [btnLogin setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
-    [btnSignUp setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
-    [_btnQuestion setAlternateImage:[NSImage imageNamed:@"GQLogo.png"]];
+    [btnLogin setImage:[NSImage imageNamed:@"Red.png"]];
+    [btnSignUp setImage:[NSImage imageNamed:@"Red.png"]];
+    [_btnQuestion setImage:[NSImage imageNamed:@"Red.png"]];
+    [btnLogin setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
+    [btnSignUp setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
+    [_btnQuestion setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
     
+    
+    
+   
+    NSLog(@"set colors");
+
     
     _txtFirstName = [[NSTextField alloc] initWithFrame:firstNameFrame];
     _txtLastName = [[NSTextField alloc] initWithFrame:lastNameFrame];
@@ -409,11 +434,6 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtAnswer cell] setPlaceholderString:@"Secret Answer"];
     
     
-    NSRect cFrame = NSRectFromCGRect(CGRectMake(25, -2, 520, 159));
-    NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
-    [cView setImage:[NSImage imageNamed:@"GameQ.png"]];
-    [loginWindow.contentView addSubview:cView];
-    
     NSRect aFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x - 15, countryFrame.origin.y-30, 247, 300));
     NSImageView *aView = [[NSImageView alloc] initWithFrame:aFrame];
     [aView setImageScaling:NSImageScaleAxesIndependently];
@@ -421,10 +441,16 @@ int num_packets = 0; /* the number of packets to be caught*/
     [loginWindow.contentView addSubview:aView];
     
     NSRect bFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2 + 1.5, countryFrame.origin.y-30, 247, 300));
-    NSImageView *bView = [[NSImageView alloc] initWithFrame:bFrame];
+    /*NSImageView *bView = [[NSImageView alloc] initWithFrame:bFrame];
     [bView setImageScaling:NSImageScaleAxesIndependently];
     [bView setImage:[NSImage imageNamed:@"Gray.png"]];
     [loginWindow.contentView addSubview:bView];
+    */
+    //NSRect cFrame = NSRectFromCGRect(CGRectMake(bFrame.origin.x + (bFrame.size.width-256)/2, bFrame.origin.y + (bFrame.size.height-256)/2, 256, 256));
+    NSRect cFrame = NSRectFromCGRect(CGRectMake((((winFrame.size.width-(aFrame.origin.x + aFrame.size.width))-256)/2) + aFrame.origin.x + aFrame.size.width, bFrame.origin.y + (bFrame.size.height-256)/2, 256, 256));
+    NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
+    [cView setImage:[NSImage imageNamed:@"128blacker.png"]];
+    [loginWindow.contentView addSubview:cView];
     
     
     
@@ -457,7 +483,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_txtYOB setAlphaValue:0];
     [_segSex setAlphaValue:0];
     [_rolloverCountry setAlphaValue:0];
-    
+    NSLog(@"added views");
     
     
     
@@ -595,6 +621,23 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[btnSignUp animator]setAlphaValue:0];
     [[btnSignUp animator]setEnabled:NO];
     
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[btnSignUp attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [btnSignUp setAttributedTitle:colorTitle2];
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    
+    sleep(0.3);
+    [txtPassword setHidden:NO];
 }
 
 -(void) setupEditProfile{
@@ -626,6 +669,24 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_txtAnswer animator]setAlphaValue:1];
     [[_btnQuestion animator] setAlphaValue:0];
     [[_txtQuestion animator]setAlphaValue:1];
+    
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[btnSignUp attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [btnSignUp setAttributedTitle:colorTitle2];
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    
+    sleep(0.3);
+    [txtPassword setHidden:NO];
     
 }
 
@@ -665,6 +726,23 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[btnSignUp animator]setAlphaValue:1];
     [[btnSignUp animator]setEnabled:YES];
     
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[btnSignUp attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [btnSignUp setAttributedTitle:colorTitle2];
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    
+    sleep(0.3);
+    [txtPassword setHidden:NO];
     
 }
 
@@ -714,7 +792,24 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     
     
-   
+    
+    
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[btnSignUp attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [btnSignUp setAttributedTitle:colorTitle2];
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    sleep(0.3);
+    [txtPassword setHidden:YES];
     
 }
     
