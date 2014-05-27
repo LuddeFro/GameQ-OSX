@@ -1445,7 +1445,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     if (_bolQueueCD) {
         return;
     }
-    
+    bool bolWasInGame = [[bolInGameArray objectAtIndex:game] boolValue];
     [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
@@ -1454,7 +1454,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     
     NSLog(@"called method \"online\"");
-    if ([[bolOnlineArray objectAtIndex:game] boolValue] && ![[bolInGameArray objectAtIndex:game] boolValue]) {
+    if ([[bolOnlineArray objectAtIndex:game] boolValue] && !bolWasInGame) {
         // do nothing if status already online, (initialized to offline)
     } else {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
@@ -1484,6 +1484,9 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     _bolQueueCD = true;
+    if (_queuePopCooldownTimer != NULL) {
+        [_queuePopCooldownTimer invalidate];
+    }
     _queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
     [[NSRunLoop mainRunLoop] addTimer:_queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
     
