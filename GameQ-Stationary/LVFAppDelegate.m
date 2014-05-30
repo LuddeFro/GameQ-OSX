@@ -262,6 +262,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSLog(@"%@", [_dataHandler getDeviceID]);
     if ([_dataHandler getDeviceID] == NULL) {
         [_dataHandler setDeviceID: [[NSHost currentHost] localizedName]];
+        SMLoginItemSetEnabled ((__bridge CFStringRef)@"LVF.GameQ-Launcher", YES);
     }
     NSLog(@"%@", [_dataHandler getDeviceID]);
     
@@ -329,6 +330,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect mailFrame = NSRectFromCGRect(CGRectMake(winFrame.size.width/2-233.5, winFrame.size.height-80, 217, 25));
     NSRect passFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, mailFrame.origin.y-30, 217, 25));
     
+    
    
     
     
@@ -345,11 +347,26 @@ int num_packets = 0; /* the number of packets to be caught*/
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x+countryFrame.size.width+20, passFrame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, passFrame.origin.y-35, 100, 25));
     NSRect regFrame = NSRectFromCGRect(CGRectMake(countryFrame.origin.x, 25, 220, 25));
+    
+    
+    NSRect setSecretFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, regFrame.origin.y, mailFrame.size.width, mailFrame.size.height));
+    NSRect setPassFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, setSecretFrame.origin.y+35, mailFrame.size.width, mailFrame.size.height));
+    NSRect setDeviceFrame = NSRectFromCGRect(CGRectMake(mailFrame.origin.x, setPassFrame.origin.y+35, mailFrame.size.width, mailFrame.size.height));
+    
+    
     NSLog(@"set frames");
     
     
     txtPassword = [[NSSecureTextField alloc] initWithFrame:passFrame];
     txtEmail = [[NSTextField alloc] initWithFrame:mailFrame];
+    _txt1Secure = [[NSSecureTextField alloc] initWithFrame:mailFrame];
+    _txt3Secure = [[NSSecureTextField alloc] initWithFrame:questionFrame];
+    _txt2Insecure = [[NSTextField alloc] initWithFrame:passFrame];
+    
+    _btnSetPass  = [[NSButton alloc] initWithFrame:setPassFrame];
+    _btnSetDeviceName = [[NSButton alloc] initWithFrame:setDeviceFrame];
+    _btnSetSecret = [[NSButton alloc] initWithFrame:setSecretFrame];
+    
     
     btnSignUp = [[NSButton alloc] initWithFrame:regFrame];
     btnLogin = [[NSButton alloc] initWithFrame:loginFrame];
@@ -359,6 +376,25 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnLogin setTitle:@"Log In"];
     [btnSignUp setTitle:@"Join GameQ"];
     [btnLogin setBezelStyle:NSRoundedBezelStyle];
+    [_btnSetSecret setTitle:@"Change secret question"];
+    [_btnSetPass setTitle:@"Change password"];
+    [_btnSetDeviceName setTitle:@"Set device name"];
+    [_btnSetDeviceName setBezelStyle:NSRoundedBezelStyle];
+    [_btnSetPass setBezelStyle:NSRoundedBezelStyle];
+    [_btnSetSecret setBezelStyle:NSRoundedBezelStyle];
+    [_btnSetDeviceName setButtonType:NSMomentaryChangeButton];
+    [_btnSetPass setButtonType:NSMomentaryChangeButton];
+    [_btnSetSecret setButtonType:NSMomentaryChangeButton];
+    [_btnSetSecret setTarget:self];
+    [_btnSetPass setTarget:self];
+    [_btnSetDeviceName setTarget:self];
+    [_btnSetDeviceName setAction:@selector(setupSetDevice)];
+    [_btnSetPass setAction:@selector(setupSetPass)];
+    [_btnSetSecret setAction:@selector(setupSetSecret)];
+    [_btnSetPass setBordered:NO];
+    [_btnSetSecret setBordered:NO];
+    [_btnSetDeviceName setBordered:NO];
+    
     
     
     
@@ -397,17 +433,20 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     
     
-    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
-    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
-    [btnLogin.cell setHighlightsBy:NSContentsCellMask];
+    
     
     [btnLogin setImage:[NSImage imageNamed:@"Red.png"]];
     [btnSignUp setImage:[NSImage imageNamed:@"Red.png"]];
     [_btnQuestion setImage:[NSImage imageNamed:@"Red.png"]];
+    [_btnSetPass setImage:[NSImage imageNamed:@"Red.png"]];
+    [_btnSetSecret setImage:[NSImage imageNamed:@"Red.png"]];
+    [_btnSetDeviceName setImage:[NSImage imageNamed:@"Red.png"]];
     [btnLogin setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
     [btnSignUp setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
     [_btnQuestion setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
-    
+    [_btnSetPass setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
+    [_btnSetSecret setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
+    [_btnSetDeviceName setAlternateImage:[NSImage imageNamed:@"HighRed.png"]];
     
     
    
@@ -466,6 +505,12 @@ int num_packets = 0; /* the number of packets to be caught*/
     [loginWindow.contentView addSubview:btnLogin];
     [loginWindow.contentView addSubview:btnSignUp];
     [loginWindow.contentView addSubview:_btnQuestion];
+    [loginWindow.contentView addSubview:_btnSetDeviceName];
+    [loginWindow.contentView addSubview:_btnSetSecret];
+    [loginWindow.contentView addSubview:_btnSetPass];
+    [loginWindow.contentView addSubview:_txt1Secure];
+    [loginWindow.contentView addSubview:_txt2Insecure];
+    [loginWindow.contentView addSubview:_txt3Secure];
     [[loginWindow contentView] setAutoresizesSubviews:YES];
     [btnLogin setKeyEquivalent:@"\r"];
     [loginWindow setDelegate:_windowHandler];
@@ -483,6 +528,18 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_txtYOB setAlphaValue:0];
     [_segSex setAlphaValue:0];
     [_rolloverCountry setAlphaValue:0];
+    [_btnSetPass setAlphaValue:0];
+    [_btnSetDeviceName setAlphaValue:0];
+    [_btnSetSecret setAlphaValue:0];
+    [_btnSetSecret setEnabled:NO];
+    [_btnSetPass setEnabled:NO];
+    [_btnSetDeviceName setEnabled:NO];
+    [_txt1Secure setEnabled:NO];
+    [_txt1Secure setHidden:YES];
+    [_txt3Secure setEnabled:NO];
+    [_txt3Secure setHidden:YES];
+    [_txt2Insecure setEnabled:NO];
+    [_txt2Insecure setHidden:YES];
     NSLog(@"added views");
     
     
@@ -699,8 +756,15 @@ int num_packets = 0; /* the number of packets to be caught*/
     [_btnQuestion setTitle:@"Forgot?"];
     [_btnQuestion setAction:@selector(setupQuestion)];
     [txtEmail.cell setPlaceholderString:@"E-Mail"];
+    [txtPassword.cell setPlaceholderString:@"Password"];
+    [_txtQuestion.cell setPlaceholderString:@"Secret Question"];
     NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtPassword.frame.origin.y-35, 100, 25));
     NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    [txtPassword setHidden:NO];
+    [txtEmail setHidden:NO];
+    [_txtQuestion setHidden:NO];
+    [_txtAnswer setHidden:NO];
     
     [[_btnQuestion animator] setFrame:questionBtnFrame];
     [[btnLogin animator] setFrame:loginFrame];
@@ -721,10 +785,27 @@ int num_packets = 0; /* the number of packets to be caught*/
     [[_btnQuestion animator] setAlphaValue:1];
     [[txtPassword animator]setAlphaValue:1];
     [[txtPassword animator]setEnabled:YES];
+    [txtPassword setHidden:NO];
     [[txtEmail animator]setAlphaValue:1];
     [[txtEmail animator]setEnabled:YES];
     [[btnSignUp animator]setAlphaValue:1];
     [[btnSignUp animator]setEnabled:YES];
+    [[btnLogin animator] setEnabled:YES];
+    [[btnLogin animator] setAlphaValue:1];
+    
+    [_txt1Secure setEnabled:NO];
+    [_txt1Secure setHidden:YES];
+    [_txt3Secure setEnabled:NO];
+    [_txt3Secure setHidden:YES];
+    [_txt2Insecure setEnabled:NO];
+    [_txt2Insecure setHidden:YES];
+    
+    [[_btnSetSecret animator]setEnabled:NO];
+    [[_btnSetPass animator]setEnabled:NO];
+    [[_btnSetDeviceName animator] setEnabled:NO];
+    [[_btnSetDeviceName animator] setAlphaValue:0];
+    [[_btnSetPass animator] setAlphaValue:0];
+    [[_btnSetSecret animator] setAlphaValue:0];
     
     NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
     NSRange titleRange = NSMakeRange(0, [colorTitle length]);
@@ -741,9 +822,355 @@ int num_packets = 0; /* the number of packets to be caught*/
     [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
     [_btnQuestion setAttributedTitle:colorTitle3];
     
-    sleep(0.3);
-    [txtPassword setHidden:NO];
     
+    
+}
+
+-(void) setupSettings{
+    
+    
+    [btnLogin setTitle:@"OK"];
+    [_btnQuestion setTitle:@"Cancel"];
+    [_btnQuestion setAction:@selector(setupSettings)];
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtEmail.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    [[_btnQuestion animator] setFrame:questionBtnFrame];
+    [[btnLogin animator] setFrame:loginFrame];
+    [[_txtFirstName animator] setAlphaValue:0];
+    [[_txtLastName animator] setAlphaValue:0];
+    [[_txtYOB animator] setAlphaValue:0];
+    [[_segSex animator] setAlphaValue:0];
+    [[_rolloverCountry animator] setAlphaValue:0];
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    [[_btnQuestion animator] setAlphaValue:0];
+    [_btnQuestion setEnabled:NO];
+    [[btnLogin animator] setEnabled:NO];
+    [[btnLogin animator] setAlphaValue:0];
+    [[txtPassword animator]setAlphaValue:0];
+    [[txtPassword animator]setEnabled:NO];
+    [[txtEmail animator]setAlphaValue:0];
+    [[txtEmail animator]setEnabled:NO];
+    [[btnSignUp animator]setAlphaValue:0];
+    [[btnSignUp animator]setEnabled:NO];
+    [_txt1Secure setEnabled:NO];
+    [_txt3Secure setEnabled:NO];
+    [_txt2Insecure setEnabled:NO];
+    [_txt1Secure setAlphaValue:0];
+    [_txt2Insecure setAlphaValue:0];
+    [_txt3Secure setAlphaValue:0];
+    
+    [[_btnSetSecret animator]setEnabled:YES];
+    [[_btnSetPass animator]setEnabled:YES];
+    [[_btnSetDeviceName animator] setEnabled:YES];
+    [[_btnSetDeviceName animator] setAlphaValue:1];
+    [[_btnSetPass animator] setAlphaValue:1];
+    [[_btnSetSecret animator] setAlphaValue:1];
+    
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
+    NSMutableAttributedString *colorTitle2 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnSetDeviceName attributedTitle]];
+    NSRange title2Range = NSMakeRange(0, [colorTitle2 length]);
+    [colorTitle2 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title2Range];
+    [_btnSetDeviceName setAttributedTitle:colorTitle2];
+    
+    
+    NSMutableAttributedString *colorTitle3 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnQuestion attributedTitle]];
+    NSRange title3Range = NSMakeRange(0, [colorTitle3 length]);
+    [colorTitle3 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title3Range];
+    [_btnQuestion setAttributedTitle:colorTitle3];
+    
+    NSMutableAttributedString *colorTitle4 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnSetPass attributedTitle]];
+    NSRange title4Range = NSMakeRange(0, [colorTitle4 length]);
+    [colorTitle4 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title4Range];
+    [_btnSetPass setAttributedTitle:colorTitle4];
+    
+    NSMutableAttributedString *colorTitle5 = [[NSMutableAttributedString alloc] initWithAttributedString:[_btnSetSecret attributedTitle]];
+    NSRange title5Range = NSMakeRange(0, [colorTitle5 length]);
+    [colorTitle5 addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:title5Range];
+    [_btnSetSecret setAttributedTitle:colorTitle5];
+    
+    [self enableButtons];
+    sleep(0.3f);
+    [txtPassword setHidden:YES];
+    [_txt3Secure setHidden:YES];
+    [_txt2Insecure setHidden:YES];
+    [_txt1Secure setHidden:YES];
+    
+}
+
+-(void) setupSetSecret
+{
+    [btnLogin setAction:@selector(attemptSetSecret)];
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, _txtQuestion.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    [_txt1Secure.cell setPlaceholderString:@"Password"];
+    [_txt2Insecure.cell setPlaceholderString:@"New secret question"];
+    [_txt3Secure.cell setPlaceholderString:@"New secret answer"];
+    
+    
+    [_txt1Secure setStringValue:@""];
+    [_txt2Insecure setStringValue:@""];
+    [_txt3Secure setStringValue:@""];
+    
+    [[_btnQuestion animator] setFrame:questionBtnFrame];
+    [[btnLogin animator] setFrame:loginFrame];
+    [[_txtFirstName animator] setAlphaValue:0];
+    [[_txtLastName animator] setAlphaValue:0];
+    [[_txtYOB animator] setAlphaValue:0];
+    [[_segSex animator] setAlphaValue:0];
+    [[_rolloverCountry animator] setAlphaValue:0];
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    [[_btnQuestion animator] setAlphaValue:1];
+    [[_btnQuestion animator] setEnabled:YES];
+    [[btnLogin animator] setEnabled:YES];
+    [[btnLogin animator] setAlphaValue:1];
+    [[txtPassword animator]setAlphaValue:0];
+    [[txtPassword animator]setEnabled:NO];
+    [[txtEmail animator]setAlphaValue:0];
+    [[txtEmail animator]setEnabled:NO];
+    [[btnSignUp animator]setAlphaValue:0];
+    [[btnSignUp animator]setEnabled:NO];
+    
+    [_txt3Secure setHidden:NO];
+    [_txt2Insecure setHidden:NO];
+    [_txt1Secure setHidden:NO];
+    [_txt1Secure setEnabled:YES];
+    [_txt3Secure setEnabled:YES];
+    [_txt2Insecure setEnabled:YES];
+    [[_txt1Secure animator] setAlphaValue:1];
+    [[_txt2Insecure animator] setAlphaValue:1];
+    [[_txt3Secure animator] setAlphaValue:1];
+    
+    [[_btnSetSecret animator]setEnabled:NO];
+    [[_btnSetPass animator]setEnabled:YES];
+    [[_btnSetDeviceName animator] setEnabled:YES];
+    [[_btnSetDeviceName animator] setAlphaValue:1];
+    [[_btnSetPass animator] setAlphaValue:1];
+    [[_btnSetSecret animator] setAlphaValue:1];
+    
+    sleep(0.3f);
+    [txtPassword setHidden:YES];
+    [txtEmail setHidden:YES];
+    [_txtQuestion setHidden:YES];
+    [_txtAnswer setHidden:YES];
+    
+}
+
+-(void) setupSetPass
+{
+    [btnLogin setAction:@selector(attemptSetPass)];
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtPassword.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    [_txt1Secure.cell setPlaceholderString:@"Old password"];
+    [txtPassword.cell setPlaceholderString:@"New password"];
+    
+    [_txt1Secure setStringValue:@""];
+    [txtPassword setStringValue:@""];
+    [txtPassword setHidden:NO];
+    [[_btnQuestion animator] setFrame:questionBtnFrame];
+    [[btnLogin animator] setFrame:loginFrame];
+    [[_txtFirstName animator] setAlphaValue:0];
+    [[_txtLastName animator] setAlphaValue:0];
+    [[_txtYOB animator] setAlphaValue:0];
+    [[_segSex animator] setAlphaValue:0];
+    [[_rolloverCountry animator] setAlphaValue:0];
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    [[_btnQuestion animator] setAlphaValue:1];
+    [[_btnQuestion animator] setEnabled:YES];
+    [[btnLogin animator] setEnabled:YES];
+    [[btnLogin animator] setAlphaValue:1];
+    
+    [txtPassword setHidden:NO];
+    [[txtPassword animator]setAlphaValue:1];
+    [[txtPassword animator]setEnabled:YES];
+    [[txtEmail animator]setAlphaValue:1];
+    [[txtEmail animator]setEnabled:YES];
+    [[btnSignUp animator]setAlphaValue:0];
+    [[btnSignUp animator]setEnabled:NO];
+    
+    [[_btnSetSecret animator]setEnabled:YES];
+    [[_btnSetPass animator]setEnabled:NO];
+    [[_btnSetDeviceName animator] setEnabled:YES];
+    [[_btnSetDeviceName animator] setAlphaValue:1];
+    [[_btnSetPass animator] setAlphaValue:1];
+    [[_btnSetSecret animator] setAlphaValue:1];
+    
+    
+    [_txt1Secure setHidden:NO];
+    [_txt1Secure setEnabled:YES];
+    [_txt3Secure setEnabled:NO];
+    [_txt2Insecure setEnabled:NO];
+    [[_txt1Secure animator] setAlphaValue:1];
+    [[_txt2Insecure animator] setAlphaValue:0];
+    [[_txt3Secure animator] setAlphaValue:0];
+    
+    sleep(0.3f);
+    
+    [txtEmail setHidden:YES];
+    [_txtQuestion setHidden:YES];
+    [_txtAnswer setHidden:YES];
+    [_txt3Secure setHidden:YES];
+    [_txt2Insecure setHidden:YES];
+}
+
+-(void) setupSetDevice
+{
+    [btnLogin setAction:@selector(attemptSetDevice)];
+    NSRect loginFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x+_rolloverCountry.frame.size.width+20, txtEmail.frame.origin.y-35, 100, 25));
+    NSRect questionBtnFrame = NSRectFromCGRect(CGRectMake(_rolloverCountry.frame.origin.x, loginFrame.origin.y, 100, 25));
+    
+    [txtEmail.cell setPlaceholderString:@"Device name"];
+    [txtEmail setStringValue:_dataHandler.getDeviceID];
+    [txtEmail setHidden:NO];
+    [[_btnQuestion animator] setFrame:questionBtnFrame];
+    [[btnLogin animator] setFrame:loginFrame];
+    [[_txtFirstName animator] setAlphaValue:0];
+    [[_txtLastName animator] setAlphaValue:0];
+    [[_txtYOB animator] setAlphaValue:0];
+    [[_segSex animator] setAlphaValue:0];
+    [[_rolloverCountry animator] setAlphaValue:0];
+    [_txtFirstName setEnabled:NO];
+    [_txtLastName setEnabled:NO];
+    [_txtYOB setEnabled:NO];
+    [_segSex setEnabled:NO];
+    [_rolloverCountry setEnabled:NO];
+    [_txtQuestion setEnabled:NO];
+    [_txtAnswer setEnabled:NO];
+    [[_txtAnswer animator]setAlphaValue:0];
+    [[_txtQuestion animator]setAlphaValue:0];
+    [[_btnQuestion animator] setAlphaValue:1];
+    [[_btnQuestion animator] setEnabled:YES];
+    [[btnLogin animator] setEnabled:YES];
+    [[btnLogin animator] setAlphaValue:1];
+    [[txtPassword animator]setAlphaValue:0];
+    [[txtPassword animator]setEnabled:NO];
+    
+    [[txtEmail animator]setAlphaValue:1];
+    [[txtEmail animator]setEnabled:YES];
+    [[btnSignUp animator]setAlphaValue:0];
+    [[btnSignUp animator]setEnabled:NO];
+    
+    [[_btnSetSecret animator]setEnabled:YES];
+    [[_btnSetPass animator]setEnabled:YES];
+    [[_btnSetDeviceName animator] setEnabled:NO];
+    [[_btnSetDeviceName animator] setAlphaValue:1];
+    [[_btnSetPass animator] setAlphaValue:1];
+    [[_btnSetSecret animator] setAlphaValue:1];
+    
+    
+    [_txt1Secure setEnabled:NO];
+    [_txt3Secure setEnabled:NO];
+    [_txt2Insecure setEnabled:NO];
+    [[_txt1Secure animator] setAlphaValue:0];
+    [[_txt2Insecure animator] setAlphaValue:0];
+    [[_txt3Secure animator] setAlphaValue:0];
+    
+    sleep(0.3f);
+    [_txt1Secure setHidden:YES];
+    [txtPassword setHidden:YES];
+    [_txtQuestion setHidden:YES];
+    [_txtAnswer setHidden:YES];
+    [_txt3Secure setHidden:YES];
+    [_txt2Insecure setHidden:YES];
+}
+
+-(void) attemptSetSecret
+{
+    //checks if any text exists in the fields
+    if (![_txt1Secure.stringValue isEqual:@""] && ![_txt3Secure.stringValue isEqual:@""]) {
+        if (_txt1Secure.stringValue.length > 5 && _txt3Secure.stringValue.length > 5) {
+            if ([_txt1Secure.stringValue rangeOfString:@"\""].location == NSNotFound && [_txt2Insecure.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                [_txt1Secure.stringValue rangeOfString:@"\\"].location == NSNotFound && [_txt2Insecure.stringValue rangeOfString:@"\\"].location == NSNotFound && [_txt3Secure.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                [_txt3Secure.stringValue rangeOfString:@"\\"].location == NSNotFound) {
+                //what we wanna do
+                
+                [self disableButtons];
+                [_connectionsHandler postNewSecretQuestion:_txt2Insecure.stringValue andSecret:_txt3Secure.stringValue forEmail:_dataHandler.getEmail andPassword:_txt1Secure.stringValue];
+                
+                
+                
+            } else {
+                [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified details contain illegal characters"] runModal];
+            }
+        } else {
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Password and secret must be a minimum of 6 characters"] runModal];
+        }
+    } else {
+        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter valid details!"] runModal];
+    }
+}
+
+-(void) attemptSetDevice
+{
+    //checks if any text exists in the fields
+    if (![txtEmail.stringValue isEqual:@""]) {
+        if ([txtEmail.stringValue rangeOfString:@"\""].location == NSNotFound &&
+            [txtEmail.stringValue rangeOfString:@"\\"].location == NSNotFound) {
+            //what we wanna do
+            [_dataHandler setDeviceID:txtEmail.stringValue];
+            [self disableButtons];
+            [_connectionsHandler postNewDeviceName:txtEmail.stringValue forToken:_dataHandler.getToken andEmail:_dataHandler.getEmail];
+        } else {
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified name contains illegal characters"] runModal];
+        }
+    } else {
+        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter valid details!"] runModal];
+    }
+}
+
+-(void) attemptSetPass
+{
+    //checks if any text exists in the fields
+    if (![_txt1Secure.stringValue isEqual:@""] && ![txtPassword.stringValue isEqual:@""]) {
+        if (_txt1Secure.stringValue.length > 5 && txtPassword.stringValue.length > 5) {
+            if ([_txt1Secure.stringValue rangeOfString:@"\""].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\""].location == NSNotFound &&
+                [_txt1Secure.stringValue rangeOfString:@"\\"].location == NSNotFound && [txtPassword.stringValue rangeOfString:@"\\"].location == NSNotFound) {
+                //what we wanna do
+                
+                [self disableButtons];
+                [_connectionsHandler postNewPassword:txtPassword.stringValue forEmail:_dataHandler.getEmail andOldPassword:_txt1Secure.stringValue];
+                
+                
+                
+            } else {
+                [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified details contain illegal characters"] runModal];
+            }
+        } else {
+            [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Passwords must be a minimum of 6 characters"] runModal];
+        }
+    } else {
+        [[NSAlert alertWithMessageText:@"Invalid details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Please enter valid details!"] runModal];
+    }
 }
 
 - (void) tearDownLoggedIn
@@ -822,10 +1249,17 @@ int num_packets = 0; /* the number of packets to be caught*/
 }
 -(void) setupAnswerWithQuestion:(NSString*)question {
     [self enableButtons];
+    
+    [btnLogin setAction:@selector(validateQuestion)];
     _strQuestion = [[NSString alloc] initWithString:question];
     [txtEmail.cell setPlaceholderString:question];
     [btnLogin setTitle:@"OK"];
-    [btnLogin setAction:@selector(validateQuestion)];
+    
+    NSMutableAttributedString *colorTitle = [[NSMutableAttributedString alloc] initWithAttributedString:[btnLogin attributedTitle]];
+    NSRange titleRange = NSMakeRange(0, [colorTitle length]);
+    [colorTitle addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+    [btnLogin setAttributedTitle:colorTitle];
+    
 }
 
 - (void) enableButtons
@@ -834,6 +1268,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnSignUp setEnabled:YES];
     [_btnQuestion setEnabled:YES];
     [btnLog setEnabled:YES];
+    [_btnSetDeviceName setEnabled:YES];
+    [_btnSetPass setEnabled:YES];
+    [_btnSetSecret setEnabled:YES];
     
 }
 
@@ -843,6 +1280,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     [btnSignUp setEnabled:NO];
     [_btnQuestion setEnabled:NO];
     [btnLog setEnabled:NO];
+    [_btnSetDeviceName setEnabled:NO];
+    [_btnSetPass setEnabled:NO];
+    [_btnSetSecret setEnabled:NO];
     
 }
 
@@ -1167,6 +1607,26 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     
 }
 
+- (IBAction)showPrefs:(id)sender {
+    
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+    
+    //[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+    //[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    //[loginWindow makeKeyWindow];
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [self setupSettings];
+    [loginWindow center];
+    [loginWindow orderFrontRegardless];
+    [loginWindow makeKeyAndOrderFront:nil];
+    [self setupSetDevice];
+    //[loginWindow orderFront:nil];
+    NSLog(@"showing window");
+    
+    
+}
+
 - (IBAction)toggleOff:(id)sender {
     [btnToggleActive setTitle:@"Start Monitoring"];
     [self.statusBar setImage:[NSImage imageNamed:@"Qblack.png"]];
@@ -1270,6 +1730,8 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [_btnStatus setTitle:[NSString stringWithFormat:@"%@", [_dataHandler getEmail]]];
     [_btnStatus2 setTitle:@"Status: Online"];
     [_btnStatus setHidden:NO];
+    [_btnPrefs setHidden:NO];
+    [_btnPrefs setEnabled:YES];
     bolIsActive = NO;
     [self toggle:nil];
     [self.statusBar setImage:[NSImage imageNamed:@"Qblue.png"]];
@@ -1285,6 +1747,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) setDisconnected
 {
+    [txtEmail setStringValue:[_dataHandler getEmail]];
     bolLoggedIn = NO;
     [_dataHandler setBolIsLoggedIn:[NSNumber numberWithBool:NO]];
     [_dataHandler setPass:@""];
@@ -1295,6 +1758,8 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     [self.btnLog setTitle:@"Log In / Sign up"];
     [btnToggleActive setEnabled:NO];
     [_btnStatus setHidden:YES];
+    [_btnPrefs setHidden:YES];
+    [_btnPrefs setEnabled:NO];
     [_btnStatus2 setTitle:@"Status: Offline"];
     [_upTimeTimer invalidate];
 }

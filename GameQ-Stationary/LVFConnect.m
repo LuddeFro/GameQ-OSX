@@ -210,7 +210,7 @@
     if ([returnString isEqualToString:@"signing up"])
     {
         [appDel setupLogin];
-        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Registration was successful! A temporary password has been sent to your e-mail account for your first log in!"] runModal];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Registration was successful! A temporary password has been sent to your e-mail, use this for your first login to activate your account!"] runModal];
         [appDel.txtPassword setStringValue:@""];
         return;
     }
@@ -224,6 +224,31 @@
         [appDel tearDownLoggedIn];
         [appDel setupLogin];
         [appDel setDisconnected];
+        return;
+    }
+    if ([returnString isEqualToString:@"newPass"])
+    {
+        [appDel setupSettings];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your password has been successfully changed."] runModal];
+        return;
+    }
+    if ([returnString isEqualToString:@"newSecret"])
+    {
+        [appDel setupSettings];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your secret has been successfully changed."] runModal];
+        return;
+    }
+    if ([returnString isEqualToString:@"newName"])
+    {
+        [appDel setupSettings];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Your device name has been successfully changed."] runModal];
+        return;
+    }
+    if ([returnString isEqualToString:@"wrongPassword"])
+    {
+        [appDel.txtEmail setStringValue:@""];
+        [appDel enableButtons];
+        [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"The specified password was incorrect."] runModal];
         return;
     }
 
@@ -248,7 +273,7 @@
         disconnected = true;
         [delegate logoutPostFromToken:[appDel.dataHandler getToken]];
         [appDel setDisconnected];
-        
+        [appDel enableButtons];
         //statioanry alert
         [self connectionAlert:@"&no"];
         

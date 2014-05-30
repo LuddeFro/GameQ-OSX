@@ -20,6 +20,7 @@
 #import "LVFBuffer.h"
 #import "LVFWindowHandler.h"
 #import "LVFWindowViewSubclass.h"
+#import <ServiceManagement/ServiceManagement.h>
 
 @class LVFBuffer;
 @class LVFConnections;
@@ -47,6 +48,7 @@
 @property (weak) IBOutlet NSMenuItem *btnStatus;
 @property (weak) IBOutlet NSMenuItem *btnStatus2;
 @property (weak) IBOutlet NSMenuItem *btnToggleActive;
+@property (weak) IBOutlet NSMenuItem *btnPrefs;
 @property (weak) IBOutlet NSMenuItem *btnLog;
 @property (weak) IBOutlet NSMenuItem *btnQuitApp;
 @property (strong, nonatomic) NSTimer *countdownQuickTimer;
@@ -78,12 +80,21 @@
 @property NSTextField *txtQuestion;
 @property NSTextField *txtAnswer;
 @property NSSegmentedControl *segSex;
+
+@property NSSecureTextField *txt1Secure;
+@property NSSecureTextField *txt3Secure;
+@property NSTextField *txt2Insecure;
+
 @property NSPopUpButton *rolloverCountry;
     @property NSButton *btnQuestion;
     @property NSString *strQuestionMail;
     @property NSString *strQuestion;
-    
 
+@property NSButton *btnSetPass;
+@property NSButton *btnSetSecret;
+@property NSButton *btnSetDeviceName;
+    
+@property NSString *tmpDevName;
 
 @property LVFBuffer *dotaQBuffer;
 
@@ -93,6 +104,7 @@
 
 static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *packet);
 - (IBAction) toggle:(id)sender;
+- (IBAction)showPrefs:(id)sender;
 - (IBAction) log:(id)sender;
 - (IBAction) quit:(id)sender;
 - (void) setConnected;
@@ -101,5 +113,6 @@ static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *
 - (void) setupAnswerWithQuestion:(NSString*)question;
 - (void) tearDownLoggedIn;
 - (void) setupLoggedIn;
+- (void) setupSettings;
 
 @end

@@ -20,6 +20,9 @@
 #define checkSecretURL kGameQServerURL@"chkSecret.php";
 #define updateTokenURL kGameQServerURL@"upMacToken.php"
 #define timeURL kGameQServerURL@"upTime.php"
+#define updateDeviceURL kGameQServerURL@"updateDeviceName.php"
+#define updatePasswordURL kGameQServerURL@"updatePassword.php"
+#define updateSecretURL kGameQServerURL@"updateSecret.php"
 #define kAPPID @"GameQ"
 
 #define URL_ABOUT @"https://www.gameQ.com/about"

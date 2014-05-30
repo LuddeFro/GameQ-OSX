@@ -28,6 +28,7 @@
 - (void) setBolIsLoggedIn:(NSNumber *)isLoggedIn;
 - (void) setDeviceID:(NSString *)devID;
 - (void) setPass:(NSString *)pass;
+
 - (NSString *) getToken;
 - (NSString *) getEmail;
 - (NSNumber *) getBolIsLoggedIn;

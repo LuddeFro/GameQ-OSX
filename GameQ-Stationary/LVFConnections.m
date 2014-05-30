@@ -141,7 +141,36 @@
     NSLog(@"check secret posted");
 }
 
-   
+
+
+- (void) postNewSecretQuestion:(NSString *)secretq andSecret:(NSString *)secret forEmail:(NSString *)email andPassword:(NSString *)losenord
+{
+    secret = [secret SHA256];
+    losenord = [losenord SHA256];
+    NSString *postString = [NSString stringWithFormat:@"secretq=%@&secret=%@&email=%@&losenord=%@", secretq, secret, email, losenord];
+    NSString *postUrl = updateSecretURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"Posted new secret");
+}
+- (void) postNewPassword:(NSString *)newLosenord forEmail:(NSString *)email andOldPassword:(NSString *)losenord
+{
+    
+    NSLog(@"%@", [NSString stringWithFormat:@"newLosenord=%@&email=%@&losenord=%@", newLosenord, email, losenord]);
+    newLosenord = [newLosenord SHA256];
+    losenord = [losenord SHA256];
+    NSString *postString = [NSString stringWithFormat:@"newLosenord=%@&email=%@&losenord=%@", newLosenord, email, losenord];
+    NSString *postUrl = updatePasswordURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"Posted new password: ");
+}
+- (void) postNewDeviceName:(NSString *)deviceName forToken:(NSString *)token andEmail:(NSString *)email
+{
+    NSString *postString = [NSString stringWithFormat:@"deviceName=%@&token=%@&email=%@", deviceName, token, email];
+    NSString *postUrl = updateDeviceURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"Posted new device Name");
+}
+
 
 
 
