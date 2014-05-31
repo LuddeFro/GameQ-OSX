@@ -21,8 +21,6 @@
 		837423C71818B25D000FCC76 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 837423C51818B25D000FCC76 /* MainMenu.xib */; };
 		837423CA1818B25D000FCC76 /* GameQ-Stationary.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 837423C81818B25D000FCC76 /* GameQ-Stationary.xcdatamodeld */; };
 		837423CC1818B25D000FCC76 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 837423CB1818B25D000FCC76 /* Images.xcassets */; };
-		837423D31818B25D000FCC76 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423D21818B25D000FCC76 /* XCTest.framework */; };
-		837423D41818B25D000FCC76 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423B01818B25D000FCC76 /* Cocoa.framework */; };
 		837423E81818B2CF000FCC76 /* libpcap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 837423E71818B2CF000FCC76 /* libpcap.dylib */; };
 		837423F41818B30E000FCC76 /* NSString+SHA256.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423EB1818B30E000FCC76 /* NSString+SHA256.m */; };
 		837423F51818B30E000FCC76 /* LVFConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423ED1818B30E000FCC76 /* LVFConnections.m */; };
@@ -52,13 +50,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		837423D51818B25D000FCC76 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 837423A51818B25D000FCC76 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 837423AC1818B25D000FCC76;
-			remoteInfo = testtest;
-		};
 		83CBD4FB1938ECB40075C1DE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBD4F61938ECB40075C1DE /* GameQ-Launcher.xcodeproj */;
@@ -113,7 +104,6 @@
 		837423C61818B25D000FCC76 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		837423C91818B25D000FCC76 /* GameQ-Stationary.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "GameQ-Stationary.xcdatamodel"; sourceTree = "<group>"; };
 		837423CB1818B25D000FCC76 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		837423D11818B25D000FCC76 /* GameQ-StationaryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GameQ-StationaryTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		837423D21818B25D000FCC76 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		837423E71818B2CF000FCC76 /* libpcap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcap.dylib; path = usr/lib/libpcap.dylib; sourceTree = SDKROOT; };
 		837423E91818B30E000FCC76 /* LVFpCap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFpCap.h; sourceTree = "<group>"; };
@@ -164,15 +154,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		837423CE1818B25D000FCC76 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				837423D41818B25D000FCC76 /* Cocoa.framework in Frameworks */,
-				837423D31818B25D000FCC76 /* XCTest.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -190,7 +171,6 @@
 			isa = PBXGroup;
 			children = (
 				837423AD1818B25D000FCC76 /* GameQ-Stationary.app */,
-				837423D11818B25D000FCC76 /* GameQ-StationaryTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -312,24 +292,6 @@
 			productReference = 837423AD1818B25D000FCC76 /* GameQ-Stationary.app */;
 			productType = "com.apple.product-type.application";
 		};
-		837423D01818B25D000FCC76 /* GameQ-StationaryTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 837423E41818B25D000FCC76 /* Build configuration list for PBXNativeTarget "GameQ-StationaryTests" */;
-			buildPhases = (
-				837423CD1818B25D000FCC76 /* Sources */,
-				837423CE1818B25D000FCC76 /* Frameworks */,
-				837423CF1818B25D000FCC76 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				837423D61818B25D000FCC76 /* PBXTargetDependency */,
-			);
-			name = "GameQ-StationaryTests";
-			productName = testtestTests;
-			productReference = 837423D11818B25D000FCC76 /* GameQ-StationaryTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -342,9 +304,6 @@
 				TargetAttributes = {
 					837423AC1818B25D000FCC76 = {
 						DevelopmentTeam = NZ5DEAP476;
-					};
-					837423D01818B25D000FCC76 = {
-						TestTargetID = 837423AC1818B25D000FCC76;
 					};
 				};
 			};
@@ -368,7 +327,6 @@
 			projectRoot = "";
 			targets = (
 				837423AC1818B25D000FCC76 /* GameQ-Stationary */,
-				837423D01818B25D000FCC76 /* GameQ-StationaryTests */,
 			);
 		};
 /* End PBXProject section */
@@ -419,13 +377,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		837423CF1818B25D000FCC76 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -449,22 +400,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		837423CD1818B25D000FCC76 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		837423D61818B25D000FCC76 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 837423AC1818B25D000FCC76 /* GameQ-Stationary */;
-			targetProxy = 837423D51818B25D000FCC76 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		837423B91818B25D000FCC76 /* InfoPlist.strings */ = {
@@ -509,6 +445,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -547,6 +484,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -569,7 +507,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GameQ-Stationary/GameQ-Stationary-Prefix.pch";
@@ -586,7 +524,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -596,46 +534,6 @@
 				PRODUCT_NAME = "GameQ-Stationary";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		837423E51818B25D000FCC76 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/testtest.app/Contents/MacOS/testtest";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "testtest/testtest-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "testtestTests/GameQ-StationaryTests-Info.plist";
-				PRODUCT_NAME = "GameQ-StationaryTests";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		837423E61818B25D000FCC76 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/testtest.app/Contents/MacOS/testtest";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "testtest/testtest-Prefix.pch";
-				INFOPLIST_FILE = "testtestTests/GameQ-StationaryTests-Info.plist";
-				PRODUCT_NAME = "GameQ-StationaryTests";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
@@ -656,15 +554,6 @@
 			buildConfigurations = (
 				837423E21818B25D000FCC76 /* Debug */,
 				837423E31818B25D000FCC76 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		837423E41818B25D000FCC76 /* Build configuration list for PBXNativeTarget "GameQ-StationaryTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				837423E51818B25D000FCC76 /* Debug */,
-				837423E61818B25D000FCC76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -28,7 +28,7 @@
 
 - (NSString *) getToken
 {
-    return @"abcd1234";
+    return [[NSHost currentHost] localizedName];
     NSError *error;
     NSArray *objects = [_context executeFetchRequest:_request error:&error];
     if (objects == Nil) {
