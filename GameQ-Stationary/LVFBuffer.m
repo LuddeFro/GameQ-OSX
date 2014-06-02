@@ -12,6 +12,7 @@
 
 @property NSMutableArray *array;
 @property int intInc;
+@property int size;
 
 @end
 
@@ -21,13 +22,14 @@
 @synthesize intInc;
 
 
-- (id) init
+- (id) initWithSize:(int)size
 {
+    _size = size;
     self = [super init];
     if (self)
     {
         array = [[NSMutableArray alloc] init];
-        for (int j = 0; j<5; j++) {
+        for (int j = 0; j<_size; j++) {
             [array insertObject:[NSNumber numberWithInt:0] atIndex:j];
         }
         intInc = 0;
@@ -40,7 +42,7 @@
 - (int) bufferValue
 {
     int value = 0;
-    for (int j = 0; j<5; j++) {
+    for (int j = 0; j<_size; j++) {
         value += [[array objectAtIndex:j] integerValue];
     }
     return value;
@@ -50,7 +52,7 @@
 {
     [array insertObject:[NSNumber numberWithInt:value] atIndex:intInc];
     
-    if (intInc >=4) {
+    if (intInc >= (_size-1)) {
         intInc = 0;
     } else {
         intInc++;

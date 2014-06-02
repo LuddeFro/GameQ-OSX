@@ -39,8 +39,12 @@ void * reftoself;
 @synthesize countdownSlowTimer;
 @synthesize honQPack;
 @synthesize dotaQPack;
+@synthesize dota174Pack;
+@synthesize dota190Pack;
+@synthesize dota206Pack;
 @synthesize dotaCPack;
 @synthesize csgoQPack;
+@synthesize csgoGamePack;
 @synthesize bolFirstTick;
 @synthesize bolInGameArray;
 @synthesize bolOnlineArray;
@@ -54,7 +58,6 @@ void * reftoself;
 @synthesize btnSignUp;
 @synthesize btnLogin;
 @synthesize bolIsActive;
-@synthesize dotaQBuffer;
 
 
 
@@ -269,6 +272,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     
     //initailizing state
+    _bolCSGOCD = false;
     _bolQueueCD = false;
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:(NSRemoteNotificationTypeAlert | NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound)];
     _connectionsHandler = [[LVFConnections alloc] init];
@@ -306,7 +310,14 @@ int num_packets = 0; /* the number of packets to be caught*/
     TransformProcessType(&psn, kProcessTransformToUIElementApplication);
     
     
-    dotaQBuffer = [[LVFBuffer alloc] init];
+    _dotaQBuffer = [[LVFBuffer alloc] initWithSize:5];
+    _dota174Buffer = [[LVFBuffer alloc] initWithSize:6];
+    _dota190Buffer = [[LVFBuffer alloc] initWithSize:4];
+    _dota206Buffer = [[LVFBuffer alloc] initWithSize:3];
+    _dotaCBuffer = [[LVFBuffer alloc] initWithSize:5];
+    _honQBuffer = [[LVFBuffer alloc] initWithSize:5];
+    _csgoQBuffer = [[LVFBuffer alloc] initWithSize:3];
+    _csgoGameBuffer = [[LVFBuffer alloc] initWithSize:5];
     NSLog(@"init delegate");
     
     
@@ -1376,11 +1387,30 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
                 
                 // size_udp == wirelength - 34
                 // ip_len == size_udp + 20
+                // ip_len == wirelength - 14
+                
+                
                 NSLog(@"Dota Q Packet");
                 [self incrementDotaQPack];
                 NSLog(@"%d",[self dotaQPack]);
-                
+            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 192) { //192 +14 = 206
+                if ([[self dota190Buffer] bufferValue] > 0 && [[self dota174Buffer] bufferValue] > 0) {
+                    NSLog(@"Dota 206 Packet");
+                    [self incrementDota206Pack];
+                    NSLog(@"%d",[self dota206Pack]);
+                }
+            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 176) { // 176 +14 = 190
+                if ([[self dota174Buffer] bufferValue] > 0) {
+                NSLog(@"Dota 190 Packet");
+                [self incrementDota190Pack];
+                NSLog(@"%d",[self dota190Pack]);
+                }
+            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 160) { // 160 +14 = 174
+                NSLog(@"Dota 174 Packet");
+                [self incrementDota174Pack];
+                NSLog(@"%d",[self dota174Pack]);
             }
+            
             
             if (dport == 27005) {
                 [self incrementDotaCPack];
@@ -1388,6 +1418,14 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
                 NSLog(@"%d",[self dotaCPack]);
             }
             
+            if (dport == 27005 && ntohs(ip->ip_len) == 46 && sport >= 27000 && sport <= 27050) { // 46 +14 = 60
+                [self incrementcsgoQPack];
+                NSLog(@"CSGO 60 Packet");
+            }
+            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && sport >= 27000 && sport <= 27050) { // 100 = ~100
+                [self incrementcsgoGamePack];
+                NSLog(@"CSGO Game Packet");
+            }
             
             
             /*
@@ -1452,18 +1490,10 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
     
     printf("Header length: %u bytes\n", size_tcp);
     
-    /*
-    int dport = ntohs(tcp->th_dport);
+
+    
 	
-     //Hon chat server packets
-     
-     if (dport == 11031) {
-        NSLog(@"Hon ChatPacket");
-        [self incrementHonCPack];
-        NSLog(@"%i",[self honCPack]);
-        
-        
-    }*/
+    
 	printf("   Src port: %d\n", ntohs(tcp->th_sport));
 	printf("   Dst port: %d\n", ntohs(tcp->th_dport));
     
@@ -1475,40 +1505,40 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
 /*
  * print packet payload data (avoid printing binary data)
  */
-void
-print_payload(const u_char *payload, int len)
+
+void print_payload(const u_char *payload, int len)
 {
     
 	int len_rem = len;
-	int line_width = 16;			/* number of bytes per line */
+	int line_width = 16;			// number of bytes per line
 	int line_len;
-	int offset = 0;					/* zero-based offset counter */
+	int offset = 0;					// zero-based offset counter
 	const u_char *ch = payload;
     
 	if (len <= 0)
 		return;
     
-	/* data fits on one line */
+	// data fits on one line
 	if (len <= line_width) {
 		print_hex_ascii_line(ch, len, offset);
 		return;
 	}
     
-	/* data spans multiple lines */
+	// data spans multiple lines
 	for ( ;; ) {
-		/* compute current line length */
+		// compute current line length
 		line_len = line_width % len_rem;
-		/* print line */
+		// print line
 		print_hex_ascii_line(ch, line_len, offset);
-		/* compute total remaining */
+		// compute total remaining
 		len_rem = len_rem - line_len;
-		/* shift pointer to remaining bytes to print */
+		// shift pointer to remaining bytes to print
 		ch = ch + line_len;
-		/* add offset */
+		// add offset
 		offset = offset + line_width;
-		/* check if we have line width chars or less */
+		// check if we have line width chars or less
 		if (len_rem <= line_width) {
-			/* print last line and get out */
+			// print last line and get out
 			print_hex_ascii_line(ch, len_rem, offset);
 			break;
 		}
@@ -1523,31 +1553,31 @@ print_payload(const u_char *payload, int len)
  *
  * 00000   47 45 54 20 2f 20 48 54  54 50 2f 31 2e 31 0d 0a   GET / HTTP/1.1..
  */
-void
-print_hex_ascii_line(const u_char *payload, int len, int offset)
+
+void print_hex_ascii_line(const u_char *payload, int len, int offset)
 {
     
 	int i;
 	int gap;
 	const u_char *ch;
     
-	/* offset */
+	// offset
 	printf("%05d   ", offset);
 	
-	/* hex */
+	// hex
 	ch = payload;
 	for(i = 0; i < len; i++) {
 		printf("%02x ", *ch);
 		ch++;
-		/* print extra space after 8th byte for visual aid */
+		// print extra space after 8th byte for visual aid
 		if (i == 7)
 			printf(" ");
 	}
-	/* print space to handle line less than 8 bytes */
+	// print space to handle line less than 8 bytes
 	if (len < 8)
 		printf(" ");
 	
-	/* fill hex gap with spaces if not full line */
+	// fill hex gap with spaces if not full line
 	if (len < 16) {
 		gap = 16 - len;
 		for (i = 0; i < gap; i++) {
@@ -1556,7 +1586,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 	}
 	printf("   ");
 	
-	/* ascii (if printable) */
+	// ascii (if printable)
 	ch = payload;
 	for(i = 0; i < len; i++) {
 		if (isprint(*ch))
@@ -1792,6 +1822,26 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     //NSLog(@"%@", output);
     
     
+    
+    [_dotaQBuffer increment:dotaQPack];
+    [_dota174Buffer increment:dota174Pack];
+    [_dota190Buffer increment:dota190Pack];
+    [_dota206Buffer increment:dota206Pack];
+    [_dotaCBuffer increment:dotaCPack];
+    [_honQBuffer increment:honQPack];
+    [_csgoQBuffer increment:csgoQPack];
+    [_csgoGameBuffer increment:csgoGamePack];
+    
+    
+    dotaCPack = 0;
+    dotaQPack = 0;
+    dota174Pack = 0;
+    dota190Pack = 0;
+    dota206Pack = 0;
+    honQPack = 0;
+    csgoQPack = 0;
+    csgoGamePack = 0;
+    
     //NSLog(@"<<<processes checked>>>");
     
     //-------------------check processes------------------
@@ -1824,7 +1874,7 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     // ---------------- HON handler ----------------------
     NSLog(@"HoN");
-    if (honQPack > 1 && honRunning) {
+    if (_honQBuffer.bufferValue > 1 && honRunning) {
         // user is in game
         [self inGame:kHEROES_OF_NEWERTH];
     } else if (honRunning){
@@ -1841,16 +1891,14 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     // ---------------- DOTA handler ----------------------
     NSLog(@"DotA");
-    [dotaQBuffer increment:dotaQPack];
-    NSLog(@"buffer: %i", dotaQBuffer.bufferValue);
     NSLog(@"dota running: %i", dotaRunning);
-    if (dotaQBuffer.bufferValue > 0 && dotaRunning) {
+    if ((_dotaQBuffer.bufferValue > 1 && dotaRunning) || (dotaRunning && _dota174Buffer.bufferValue > 0 && _dota190Buffer.bufferValue > 0 && _dota206Buffer.bufferValue > 0 && ((_dota206Buffer.bufferValue + _dota190Buffer.bufferValue) >= 4))) {
         [self inGame:kDOTA2]; //potentially sends notification
     }
-    if (dotaCPack > 1 && dotaRunning) {
+    if (_dotaCBuffer.bufferValue > 1 && dotaRunning) {
         // user is in game
         bolFirstTick = 1; //tricks the app in to not sending a notification
-                          // this is not the queue pop, but the fact of being in a game
+        // this is not the queue pop, but the fact of being in a game
         [self inGame:kDOTA2];
     } else if (dotaRunning){
         [self online:kDOTA2];
@@ -1862,10 +1910,35 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     // -------------- DOTA handler end --------------------
     
     
+    // ---------------- CSGO handler ----------------------
+    NSLog(@"CSGO");
+    NSLog(@"csgo running: %i", csgoRunning);
+    if (_csgoGameBuffer.bufferValue > 40 && csgoRunning) {
+        // user is in game
+        bolFirstTick = 1; //tricks the app in to not sending a notification
+        // this is not the queue pop, but the fact of being in a game
+        [self inGame:kCS_GO];
+    } else if (csgoRunning && _csgoQBuffer.bufferValue == 2) {
+        [self inGame:kCS_GO]; //potentially sends notification
+        _bolCSGOCD = true;
+        if (_CSGOCooldownTimer != NULL) {
+            [_CSGOCooldownTimer invalidate];
+        }
+        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
+        [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
+        
+    } else if (csgoRunning){
+        [self online:kCS_GO];
+        
+    } else {
+        // user is not in game
+        [self offline:kCS_GO];
+    }
+    // -------------- CSGO handler end --------------------
     
-    dotaCPack = 0;
-    dotaQPack = 0;
-    honQPack = 0;
+    
+    
+    
     bolFirstTick = 0;
     //NSLog(@"");
 }
@@ -1908,6 +1981,8 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
 //called whenever online status is detected
 - (IBAction)online:(int)game {
     if (_bolQueueCD) {
+        return;
+    } else if (_bolCSGOCD && game == kCS_GO) {
         return;
     }
     bool bolWasInGame = [[bolInGameArray objectAtIndex:game] boolValue];
@@ -1963,6 +2038,13 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     _bolQueueCD = false;
 }
 
+- (void) resetCSGOCooldown
+{
+    
+    [_CSGOCooldownTimer invalidate];
+    _bolCSGOCD = false;
+}
+
 
 /* What the fuck does this method do? this was active while offline:(int)game was inactive.... it was wrong!?!?
 //executes every quick timer user has not launched a game
@@ -1993,7 +2075,32 @@ print_hex_ascii_line(const u_char *payload, int len, int offset)
     dotaQPack++;
 }
 
+- (IBAction)incrementDota174Pack {
+    printf("Incrementing Dota174Pack");
+    dota174Pack++;
+}
+
+- (IBAction)incrementDota190Pack {
+    printf("Incrementing Dota190Pack");
+    dota190Pack++;
+}
+
+- (IBAction)incrementDota206Pack {
+    printf("Incrementing Dota206Pack");
+    dota206Pack++;
+}
+
 - (IBAction)incrementDotaCPack {
+    printf("Incrementing DotaCPack");
+    dotaCPack++;
+}
+
+- (IBAction)incrementcsgoQPack {
+    printf("Incrementing DotaCPack");
+    dotaCPack++;
+}
+
+- (IBAction)incrementcsgoGamePack {
     printf("Incrementing DotaCPack");
     dotaCPack++;
 }

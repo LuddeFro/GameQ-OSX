@@ -42,6 +42,7 @@
 
 
 @property BOOL bolQueueCD;
+@property BOOL bolCSGOCD;
 @property (strong) LVFWindowHandler *windowHandler;
 @property (weak) IBOutlet NSMenu *mainMenu;
 @property (strong, nonatomic) NSStatusItem *statusBar;
@@ -55,10 +56,15 @@
 @property (strong, nonatomic) NSTimer *countdownSlowTimer;
 @property (strong, nonatomic) NSTimer *upTimeTimer;
 @property (strong, nonatomic) NSTimer *queuePopCooldownTimer;
+@property (strong, nonatomic) NSTimer *CSGOCooldownTimer;
 @property int honQPack;
 @property int dotaQPack;
+@property int dota174Pack;
+@property int dota190Pack;
+@property int dota206Pack;
 @property int dotaCPack;
 @property int csgoQPack;
+@property int csgoGamePack;
 
 @property NSMutableArray *bolInGameArray;
 @property NSMutableArray *bolOnlineArray;
@@ -97,7 +103,13 @@
 @property NSString *tmpDevName;
 
 @property LVFBuffer *dotaQBuffer;
-
+@property LVFBuffer *dota174Buffer;
+@property LVFBuffer *dota190Buffer;
+@property LVFBuffer *dota206Buffer;
+@property LVFBuffer *dotaCBuffer;
+@property LVFBuffer *honQBuffer;
+@property LVFBuffer *csgoQBuffer;
+@property LVFBuffer *csgoGameBuffer;
 
 - (void)disableButtons;
 - (void)enableButtons;
@@ -114,5 +126,15 @@ static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *
 - (void) tearDownLoggedIn;
 - (void) setupLoggedIn;
 - (void) setupSettings;
+
+- (IBAction)incrementHonQPack;
+- (IBAction)incrementDotaQPack;
+- (IBAction)incrementDota174Pack;
+- (IBAction)incrementDota190Pack;
+- (IBAction)incrementDota206Pack;
+- (IBAction)incrementDotaCPack;
+- (IBAction)incrementcsgoQPack;
+
+
 
 @end
