@@ -266,6 +266,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     if ([_dataHandler getDeviceID] == NULL) {
         [_dataHandler setDeviceID: [[NSHost currentHost] localizedName]];
         SMLoginItemSetEnabled ((__bridge CFStringRef)@"LVF.GameQ-Launcher", YES);
+    } else if ([[_dataHandler getDeviceID] isEqualToString:@""]) {
+        [_dataHandler setDeviceID: [[NSHost currentHost] localizedName]];
+        SMLoginItemSetEnabled ((__bridge CFStringRef)@"LVF.GameQ-Launcher", YES);
     }
     NSLog(@"%@", [_dataHandler getDeviceID]);
     
@@ -285,10 +288,12 @@ int num_packets = 0; /* the number of packets to be caught*/
         [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
         [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
     }
-    if ([_dataHandler getBolIsLoggedIn]) {
+    if ([_dataHandler getBolIsLoggedIn].boolValue) {
         [_connectionsHandler loginWithUser:[_dataHandler getEmail] andPass:[_dataHandler getPass]];
     }
-    NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword: like I would tell you :P \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], [_dataHandler getDeviceID]);
+    
+    
+    NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword:%@ \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], [_dataHandler getPass], [_dataHandler getDeviceID]);
     
     
     
@@ -301,9 +306,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     // creating statusbar item
     self.statusBar = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     
-    self.statusBar.image = [NSImage imageNamed:@"Qblack.png"];
+    self.statusBar.image = [NSImage imageNamed:@"Qblack"];
     [self.statusBar setHighlightMode:YES];
-    [self.statusBar setAlternateImage:[NSImage imageNamed:@"Qwhite.png"]];
+    [self.statusBar setAlternateImage:[NSImage imageNamed:@"Qwhite"]];
     self.statusBar.menu = self.mainMenu;
     self.statusBar.highlightMode = TRUE;
     ProcessSerialNumber psn = { 0, kCurrentProcess };
@@ -499,7 +504,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     //NSRect cFrame = NSRectFromCGRect(CGRectMake(bFrame.origin.x + (bFrame.size.width-256)/2, bFrame.origin.y + (bFrame.size.height-256)/2, 256, 256));
     NSRect cFrame = NSRectFromCGRect(CGRectMake((((winFrame.size.width-(aFrame.origin.x + aFrame.size.width))-256)/2) + aFrame.origin.x + aFrame.size.width, bFrame.origin.y + (bFrame.size.height-256)/2, 256, 256));
     NSImageView *cView = [[NSImageView alloc] initWithFrame:cFrame];
-    [cView setImage:[NSImage imageNamed:@"128blacker.png"]];
+    [cView setImage:[NSImage imageNamed:@"NotificationLogo"]];
     [loginWindow.contentView addSubview:cView];
     
     
@@ -612,6 +617,12 @@ int num_packets = 0; /* the number of packets to be caught*/
         return;
     }
     
+    
+    
+    if (![_dataHandler getBolIsLoggedIn].boolValue) {
+        [self log:self];
+    }
+    [_connectionsHandler chkVersion];
 }
 
     
@@ -1659,7 +1670,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (IBAction)toggleOff:(id)sender {
     [btnToggleActive setTitle:@"Start Monitoring"];
-    [self.statusBar setImage:[NSImage imageNamed:@"Qblack.png"]];
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblack"]];
     [_btnStatus2 setTitle:@"Status: Online"];
     pcap_breakloop(handle);
     printf("\nCapture complete.\n");
@@ -1678,7 +1689,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [self performSelectorOnMainThread:@selector(startTimer) withObject:nil waitUntilDone:false];
     [btnToggleActive setTitle:@"Stop Monitoring"];
     printf("\nCapture started.\n");
-    [self.statusBar setImage:[NSImage imageNamed:@"Qblue.png"]];
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblue"]];
     pcap_loop(handle, num_packets, got_packet, self);
 }
 
@@ -1764,7 +1775,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [_btnPrefs setEnabled:YES];
     bolIsActive = NO;
     [self toggle:nil];
-    [self.statusBar setImage:[NSImage imageNamed:@"Qblue.png"]];
+    [self.statusBar setImage:[NSImage imageNamed:@"Qblue"]];
     // following tells the server the client is online but no games have been launched
     [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     [self setupLoggedIn];
@@ -1915,9 +1926,13 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"csgo running: %i", csgoRunning);
     if (_csgoGameBuffer.bufferValue > 40 && csgoRunning) {
         // user is in game
-        bolFirstTick = 1; //tricks the app in to not sending a notification
-        // this is not the queue pop, but the fact of being in a game
         [self inGame:kCS_GO];
+        _bolCSGOCD = true;
+        if (_CSGOCooldownTimer != NULL) {
+            [_CSGOCooldownTimer invalidate];
+        }
+        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
+        [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
     } else if (csgoRunning && _csgoQBuffer.bufferValue == 2) {
         [self inGame:kCS_GO]; //potentially sends notification
         _bolCSGOCD = true;

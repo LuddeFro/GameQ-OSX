@@ -28,6 +28,8 @@
 
 - (NSString *) getToken
 {
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kToken] encoding:NSUTF8StringEncoding];
+    return  string;/*
     return [[NSHost currentHost] localizedName];
     NSError *error;
     NSArray *objects = [_context executeFetchRequest:_request error:&error];
@@ -39,10 +41,12 @@
     for (NSManagedObject *oneObject in objects) {
         return [oneObject valueForKey:@"token"];
     }
-    return nil;
+    return nil;*/
 }
 - (NSString *) getEmail
 {
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kEmail] encoding:NSUTF8StringEncoding];
+    return  string;/*
     NSError *error;
     NSArray *objects = [_context executeFetchRequest:_request error:&error];
     if (objects == Nil) {
@@ -53,11 +57,18 @@
     for (NSManagedObject *oneObject in objects) {
         return [oneObject valueForKey:@"email"];
     }
-    return nil;
+    return nil;*/
 
 }
 - (NSNumber *) getBolIsLoggedIn
 {
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kBolIsLoggedIn] encoding:NSUTF8StringEncoding];
+    if ([string isEqualToString:@"true"]) {
+        return [NSNumber numberWithBool:true];
+    } else {
+        return [NSNumber numberWithBool:false];
+    }
+    /*
     NSError *error;
     NSArray *objects = [_context executeFetchRequest:_request error:&error];
     if (objects == Nil) {
@@ -68,11 +79,19 @@
     for (NSManagedObject *oneObject in objects) {
         return [oneObject valueForKey:@"bolIsLoggedIn"];
     }
-    return nil;
+    return nil;*/
 
 }
 - (NSString *) getDeviceID
 {
+    
+    return [[NSHost currentHost] localizedName];
+    
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kDeviceID] encoding:NSUTF8StringEncoding];
+    return  string;
+    /*
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kAPPID] encoding:NSUTF8StringEncoding];
+    return  string;
     NSError *error;
     NSArray *objects = [_context executeFetchRequest:_request error:&error];
     if (objects == Nil) {
@@ -81,13 +100,13 @@
     for (NSManagedObject *oneObject in objects) {
         return [oneObject valueForKey:@"deviceID"];
     }
-    return nil;
+    return nil;*/
     
 }
 - (NSString *) getPass
 {
     
-    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kAPPID] encoding:NSUTF8StringEncoding];
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kPass] encoding:NSUTF8StringEncoding];
     return  string;
     
     //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
@@ -95,27 +114,34 @@
 }
 - (void) setDeviceID:(NSString *)devID
 {
-    [self setSomething:devID forField:@"deviceID"];
+    [SSKeychain setPassword:devID forService:kAPPID account:kDeviceID];
+    //[self setSomething:devID forField:@"deviceID"];
 }
 - (void) setPass:(NSString *)pass
 {
-    [SSKeychain setPassword:pass forService:kAPPID account:kAPPID];
-    
+    [SSKeychain setPassword:pass forService:kAPPID account:kPass];
     //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
     //[keyChain setPassword:pass];
     
 }
 - (void) setToken:(NSString *)token
 {
-    [self setSomething:token forField:@"token"];
+    [SSKeychain setPassword:token forService:kAPPID account:kToken];
+    //[self setSomething:token forField:@"token"];
 }
 - (void) setEmail:(NSString *)email
 {
-    [self setSomething:email forField:@"email"];
+    [SSKeychain setPassword:email forService:kAPPID account:kEmail];
+    //[self setSomething:email forField:@"email"];
 }
 - (void) setBolIsLoggedIn:(NSNumber *)isLoggedIn
 {
-    [self setSomething:isLoggedIn forField:@"bolIsLoggedIn"];
+    if (isLoggedIn.boolValue) {
+        [SSKeychain setPassword:@"true" forService:kAPPID account:kBolIsLoggedIn];
+    } else {
+        [SSKeychain setPassword:@"false" forService:kAPPID account:kBolIsLoggedIn];
+    }
+    //[self setSomething:isLoggedIn forField:@"bolIsLoggedIn"];
 }
 - (void) setSomething:(id)value forField:(NSString *)field
 {

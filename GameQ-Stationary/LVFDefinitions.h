@@ -23,9 +23,16 @@
 #define updateDeviceURL kGameQServerURL@"updateDeviceName.php"
 #define updatePasswordURL kGameQServerURL@"updatePassword.php"
 #define updateSecretURL kGameQServerURL@"updateSecret.php"
+#define versionURL kGameQServerURL@"versionControl.php"
 #define kAPPID @"GameQ"
+#define kVersion @"1.0"
+#define kEmail @"EmailEmail"
+#define kPass @"PasswordPassword"
+#define kBolIsLoggedIn @"BolIsLoggedInBolIsLoggedIn"
+#define kToken @"TokenToken"
+#define kDeviceID @"DeviceIDDeviceID"
 
-#define URL_ABOUT @"https://www.gameQ.com/about"
+#define URL_ABOUT @"https://www.gameQ.io/"
 
 @interface LVFDefinitions : NSObject
 

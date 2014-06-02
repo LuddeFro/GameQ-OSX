@@ -28,7 +28,7 @@
 - (void) postNewSecretQuestion:(NSString *)secretq andSecret:(NSString *)secret forEmail:(NSString *)email andPassword:(NSString *)losenord;
 - (void) postNewPassword:(NSString *)newLosenord forEmail:(NSString *)email andOldPassword:(NSString *)losenord;
 - (void) postNewDeviceName:(NSString *)deviceName forToken:(NSString *)token andEmail:(NSString *)email;
-
+- (void) chkVersion;
 // mobile method
 //- (void)upAppPost;
 

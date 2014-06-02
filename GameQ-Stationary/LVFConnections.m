@@ -120,7 +120,13 @@
 
 
 
-
+- (void) chkVersion
+{
+    NSString *postString = [NSString stringWithFormat:@"device=mac"];
+    NSString *postUrl = versionURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"get secret posted");
+}
 
  
 - (void) getSecretPost:(NSString*)email

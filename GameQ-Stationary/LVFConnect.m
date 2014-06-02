@@ -95,6 +95,19 @@
     
     
      
+    //check if newer version exists
+    if (returnString.length >= 7) {
+        if ([[returnString substringWithRange:NSMakeRange(0, 7)] isEqualToString:@"version"])
+        {
+            if (![[returnString substringFromIndex:7] isEqualToString:kVersion])
+            {
+                [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"A newer version of GameQ is available. Get it in the appstore or at GameQ.io"] runModal];
+            }
+            return;
+            
+        }
+    }
+    
     //secret question has been retrieved, response syntax "secQ%@", secretQuestion
     if (returnString.length >= 4) {
         if ([[returnString substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"secQ"])
@@ -168,6 +181,7 @@
         [[NSAlert alertWithMessageText:@"Invalid login details" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"You entered an invalid password - username combination, please try again.\r\n\r\nToo many failed attempts may lock your account for up to 2 hours."] runModal];
         [appDel setDisconnected];
         [appDel.txtPassword setStringValue:@""];
+        
         return;
     }
     
