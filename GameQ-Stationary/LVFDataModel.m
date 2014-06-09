@@ -85,9 +85,14 @@
 - (NSString *) getDeviceID
 {
     
-    return [[NSHost currentHost] localizedName];
+    
     
     NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kDeviceID] encoding:NSUTF8StringEncoding];
+    
+    if (string == NULL || [string isEqualToString:@""]) {
+        return [[NSHost currentHost] localizedName];
+    }
+    
     return  string;
     /*
     NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kAPPID] encoding:NSUTF8StringEncoding];

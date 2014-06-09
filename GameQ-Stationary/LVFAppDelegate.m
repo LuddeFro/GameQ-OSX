@@ -288,9 +288,7 @@ int num_packets = 0; /* the number of packets to be caught*/
         [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
         [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
     }
-    if ([_dataHandler getBolIsLoggedIn].boolValue) {
-        [_connectionsHandler loginWithUser:[_dataHandler getEmail] andPass:[_dataHandler getPass]];
-    }
+    
     
     
     NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword:%@ \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], [_dataHandler getPass], [_dataHandler getDeviceID]);
@@ -618,8 +616,9 @@ int num_packets = 0; /* the number of packets to be caught*/
     }
     
     
-    
-    if (![_dataHandler getBolIsLoggedIn].boolValue) {
+    if ([_dataHandler getBolIsLoggedIn].boolValue) {
+        [_connectionsHandler loginWithUser:[_dataHandler getEmail] andPass:[_dataHandler getPass]];
+    } else {
         [self log:self];
     }
     [_connectionsHandler chkVersion];
@@ -1433,7 +1432,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
                 [self incrementcsgoQPack];
                 NSLog(@"CSGO 60 Packet");
             }
-            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && sport >= 27000 && sport <= 27050) { // 100 = ~100
+            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && ntohs(ip->ip_len) <= 1200 && sport >= 27000 && sport <= 27050) { // 100 = ~100
                 [self incrementcsgoGamePack];
                 NSLog(@"CSGO Game Packet");
             }
@@ -1759,7 +1758,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     [_connectionsHandler.gqConnect postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@&email=%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]] to:updateTokenURL];
     NSLog(@"token posted with token:%@ devName:%@ and email:%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]);
-    [btnLog setTitle:@"Log Out"];
+    [btnLog setTitle:@"Change user"];
     [btnToggleActive setEnabled:true];
     bolLoggedIn = YES;
     [_dataHandler setBolIsLoggedIn:[NSNumber numberWithBool:YES]];
@@ -1803,6 +1802,14 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [_btnPrefs setEnabled:NO];
     [_btnStatus2 setTitle:@"Status: Offline"];
     [_upTimeTimer invalidate];
+    
+    ProcessSerialNumber psn = { 0, kCurrentProcess };
+    TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [self setupLogin];
+    [loginWindow center];
+    [loginWindow orderFrontRegardless];
+    [loginWindow makeKeyAndOrderFront:nil];
 }
 
 
