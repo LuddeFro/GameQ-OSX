@@ -15,6 +15,7 @@
 
 @interface LVFConnect : NSObject
 
+@property NSString *shortTermMemory;
 
 
 - (void)postNow:(NSString *)toPost to:(NSString *)link;

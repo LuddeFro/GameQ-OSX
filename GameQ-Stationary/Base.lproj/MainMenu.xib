@@ -652,7 +652,7 @@
                 <outlet property="btnLog" destination="s7E-OH-rZs" id="FJH-qb-HTY"/>
                 <outlet property="btnPrefs" destination="jkr-Bg-dif" id="uqK-HM-VeA"/>
                 <outlet property="btnQuitApp" destination="cUQ-4P-2Me" id="Zxf-sS-LB6"/>
-                <outlet property="btnStatus" destination="dkG-yM-CbO" id="I1y-Af-CaP"/>
+                <outlet property="btnStatus" destination="dkG-yM-CbO" id="FBR-ZE-64m"/>
                 <outlet property="btnStatus2" destination="PG9-aa-ne8" id="RhL-zQ-9VG"/>
                 <outlet property="btnToggleActive" destination="IUn-z2-cHw" id="cgs-gN-ADx"/>
                 <outlet property="mainMenu" destination="YfF-BM-fDc" id="dt7-h2-S9Q"/>

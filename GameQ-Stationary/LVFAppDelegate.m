@@ -255,10 +255,7 @@ int num_packets = 0; /* the number of packets to be caught*/
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     
-    NSColor *myWhite = [NSColor colorWithWhite:1 alpha:1];
-    NSColor *myTransWhite = [NSColor colorWithWhite:1 alpha:0.5];
-    NSColor *myRed = [NSColor colorWithRed:0.905 green:0.298 blue:0.235 alpha:0.9];
-    NSColor *myDarkGray = [NSColor colorWithRed:0.1333 green:0.1333 blue:0.1333 alpha:1];
+    
     
     //first init
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
@@ -1683,7 +1680,6 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (IBAction)toggleOn:(id)sender {
     [_btnStatus2 setTitle:@"Status: Tracking"];
-        
     printf("\nCapture started.\n");
     [self performSelectorOnMainThread:@selector(startTimer) withObject:nil waitUntilDone:false];
     [btnToggleActive setTitle:@"Stop Monitoring"];
@@ -1762,10 +1758,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [btnToggleActive setEnabled:true];
     bolLoggedIn = YES;
     [_dataHandler setBolIsLoggedIn:[NSNumber numberWithBool:YES]];
-    [_dataHandler setEmail:[txtEmail stringValue]];
-    NSLog(@"set email to %@", txtEmail.stringValue);
-    NSLog(@"email is %@", [_dataHandler getEmail]);
-    [_dataHandler setPass:[txtPassword stringValue]];
+    if (![txtEmail.stringValue isEqualToString:@""] && ![txtPassword.stringValue isEqualToString:@""]) {
+        [_dataHandler setEmail:txtEmail.stringValue];
+        [_dataHandler setPass:txtPassword.stringValue];
+    }
     [txtPassword setStringValue:@""];
     [_btnStatus setTitle:[NSString stringWithFormat:@"%@", [_dataHandler getEmail]]];
     [_btnStatus2 setTitle:@"Status: Online"];
@@ -1828,6 +1824,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 //what happens on tack? (quick timer)
 - (IBAction)tack:(id)sender {
+    
     NSLog(@"tick");
     // get processes
     NSString *output = [NSString string];

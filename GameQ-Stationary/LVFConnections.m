@@ -160,7 +160,7 @@
 }
 - (void) postNewPassword:(NSString *)newLosenord forEmail:(NSString *)email andOldPassword:(NSString *)losenord
 {
-    
+    gqConnect.shortTermMemory = newLosenord;
     NSLog(@"%@", [NSString stringWithFormat:@"newLosenord=%@&email=%@&losenord=%@", newLosenord, email, losenord]);
     newLosenord = [newLosenord SHA256];
     losenord = [losenord SHA256];
@@ -176,6 +176,8 @@
     [gqConnect postNow:postString to:postUrl];
     NSLog(@"Posted new device Name");
 }
+
+
 
 
 

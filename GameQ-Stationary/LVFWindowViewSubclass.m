@@ -29,8 +29,7 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
     
-    NSColor *myDarkGray = [NSColor colorWithRed:0.1333 green:0.1333 blue:0.1333 alpha:1];
-    NSColor *myWhite = [NSColor whiteColor];
+    
     NSColor *cloudWhite = [NSColor colorWithRed:0.9255 green:0.9411 blue:0.9450 alpha:1];
     
     NSGradient *grad = [[NSGradient alloc] initWithStartingColor:cloudWhite endingColor:cloudWhite];
