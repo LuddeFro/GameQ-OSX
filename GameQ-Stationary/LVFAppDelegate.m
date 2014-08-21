@@ -694,7 +694,7 @@ unsigned char * main2()
     [loginWindow.contentView addSubview:btnLogin];
     [loginWindow.contentView addSubview:btnSignUp];
     [loginWindow.contentView addSubview:_btnQuestion];
-    //[loginWindow.contentView addSubview:_btnSetDeviceName]; commented Out btnsetdevicename
+    [loginWindow.contentView addSubview:_btnSetDeviceName];
     [loginWindow.contentView addSubview:_btnSetSecret];
     [loginWindow.contentView addSubview:_btnSetPass];
     [loginWindow.contentView addSubview:_txt1Secure];
@@ -1835,7 +1835,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [loginWindow center];
     [loginWindow orderFrontRegardless];
     [loginWindow makeKeyAndOrderFront:nil];
-    [self setupSetPass];
+    [self setupSetDevice];
     //[loginWindow orderFront:nil];
     NSLog(@"showing window");
     
