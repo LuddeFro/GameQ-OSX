@@ -117,6 +117,35 @@
     //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
     //return [keyChain getPassword];
 }
+- (NSString *) getFirstLog
+{
+    
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kFirstLog] encoding:NSUTF8StringEncoding];
+    return  string;
+    
+    //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
+    //return [keyChain getPassword];
+}
+- (NSString *) getUniqueID
+{
+    
+    NSString *string = [[NSString alloc] initWithData:[SSKeychain passwordDataForService:kAPPID account:kUnique] encoding:NSUTF8StringEncoding];
+    return  string;
+    
+    //LVFKeyChain *keyChain = [[LVFKeyChain alloc] init];
+    //return [keyChain getPassword];
+}
+- (void) setUniqueID:(NSString *)string
+{
+    [SSKeychain setPassword:string forService:kAPPID account:kUnique];
+    //[self setSomething:devID forField:@"deviceID"];
+}
+
+- (void) setFirstLog:(NSString *)string
+{
+    [SSKeychain setPassword:string forService:kAPPID account:kFirstLog];
+    //[self setSomething:devID forField:@"deviceID"];
+}
 - (void) setDeviceID:(NSString *)devID
 {
     [SSKeychain setPassword:devID forService:kAPPID account:kDeviceID];
@@ -131,7 +160,11 @@
 }
 - (void) setToken:(NSString *)token
 {
+    NSLog(@"setting token: %@", token);
+    [SSKeychain deletePasswordForService:kAPPID account:kToken];
     [SSKeychain setPassword:token forService:kAPPID account:kToken];
+    NSLog(@"set token");
+
     //[self setSomething:token forField:@"token"];
 }
 - (void) setEmail:(NSString *)email
@@ -147,7 +180,7 @@
         [SSKeychain setPassword:@"false" forService:kAPPID account:kBolIsLoggedIn];
     }
     //[self setSomething:isLoggedIn forField:@"bolIsLoggedIn"];
-}
+}/*
 - (void) setSomething:(id)value forField:(NSString *)field
 {
     NSLog(@"%@", field);
@@ -172,7 +205,7 @@
     }
     [_context save:&error];
     
-}
+}*/
     
     /*
      - (id)initWithIdentifier: (NSString *)identifier accessGroup:(NSString *) accessGroup;

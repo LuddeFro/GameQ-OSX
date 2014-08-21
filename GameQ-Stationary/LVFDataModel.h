@@ -28,12 +28,17 @@
 - (void) setBolIsLoggedIn:(NSNumber *)isLoggedIn;
 - (void) setDeviceID:(NSString *)devID;
 - (void) setPass:(NSString *)pass;
+- (void) setFirstLog:(NSString *)pass;
+- (void) setUniqueID:(NSString *)string;
 
 - (NSString *) getToken;
 - (NSString *) getEmail;
 - (NSNumber *) getBolIsLoggedIn;
 - (NSString *) getDeviceID;
 - (NSString *) getPass;
+- (NSString *) getFirstLog;
+- (NSString *) getUniqueID;
+
 
 -(id) initWithAppDelegate:(LVFAppDelegate *)appDel;
 

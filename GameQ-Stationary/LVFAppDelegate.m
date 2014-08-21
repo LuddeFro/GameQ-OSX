@@ -154,7 +154,7 @@ pcap_t *handle;		/* Session handle */
 const char *dev;		/* Device to sniff on */
 char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
 struct bpf_program fp;		/* The compiled filter expression */
-char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-27030 or udp dst port 27005";	/* The filter expression */
+char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-28999 or udp dst port 27005";	/* The filter expression */
 bpf_u_int32 mask;		/* The netmask of our sniffing device */
 bpf_u_int32 net;		/* The IP of our sniffing device */
 //  struct pcap_pkthdr header;	/* The header that pcap gives us */
@@ -251,6 +251,180 @@ int num_packets = 0; /* the number of packets to be caught*/
 	NSLog(@"Failed to get token, error: %@", error);
 }
 
+#include <stdio.h>
+
+#include <CoreFoundation/CoreFoundation.h>
+
+#include <IOKit/IOKitLib.h>
+#include <IOKit/network/IOEthernetInterface.h>
+#include <IOKit/network/IONetworkInterface.h>
+#include <IOKit/network/IOEthernetController.h>
+
+static kern_return_t FindEthernetInterfaces(io_iterator_t *matchingServices);
+static kern_return_t GetMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize);
+
+// Returns an iterator containing the primary (built-in) Ethernet interface. The caller is responsible for
+// releasing the iterator after the caller is done with it.
+static kern_return_t FindEthernetInterfaces(io_iterator_t *matchingServices)
+{
+    kern_return_t           kernResult;
+    CFMutableDictionaryRef	matchingDict;
+    CFMutableDictionaryRef	propertyMatchDict;
+    
+    // Ethernet interfaces are instances of class kIOEthernetInterfaceClass.
+    // IOServiceMatching is a convenience function to create a dictionary with the key kIOProviderClassKey and
+    // the specified value.
+    matchingDict = IOServiceMatching(kIOEthernetInterfaceClass);
+    
+    // Note that another option here would be:
+    // matchingDict = IOBSDMatching("en0");
+    // but en0: isn't necessarily the primary interface, especially on systems with multiple Ethernet ports.
+    
+    if (NULL == matchingDict) {
+        printf("IOServiceMatching returned a NULL dictionary.\n");
+    }
+    else {
+        // Each IONetworkInterface object has a Boolean property with the key kIOPrimaryInterface. Only the
+        // primary (built-in) interface has this property set to TRUE.
+        
+        // IOServiceGetMatchingServices uses the default matching criteria defined by IOService. This considers
+        // only the following properties plus any family-specific matching in this order of precedence
+        // (see IOService::passiveMatch):
+        //
+        // kIOProviderClassKey (IOServiceMatching)
+        // kIONameMatchKey (IOServiceNameMatching)
+        // kIOPropertyMatchKey
+        // kIOPathMatchKey
+        // kIOMatchedServiceCountKey
+        // family-specific matching
+        // kIOBSDNameKey (IOBSDNameMatching)
+        // kIOLocationMatchKey
+        
+        // The IONetworkingFamily does not define any family-specific matching. This means that in
+        // order to have IOServiceGetMatchingServices consider the kIOPrimaryInterface property, we must
+        // add that property to a separate dictionary and then add that to our matching dictionary
+        // specifying kIOPropertyMatchKey.
+        
+        propertyMatchDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+													  &kCFTypeDictionaryKeyCallBacks,
+													  &kCFTypeDictionaryValueCallBacks);
+        
+        if (NULL == propertyMatchDict) {
+            printf("CFDictionaryCreateMutable returned a NULL dictionary.\n");
+        }
+        else {
+            // Set the value in the dictionary of the property with the given key, or add the key
+            // to the dictionary if it doesn't exist. This call retains the value object passed in.
+            CFDictionarySetValue(propertyMatchDict, CFSTR(kIOPrimaryInterface), kCFBooleanTrue);
+            
+            // Now add the dictionary containing the matching value for kIOPrimaryInterface to our main
+            // matching dictionary. This call will retain propertyMatchDict, so we can release our reference
+            // on propertyMatchDict after adding it to matchingDict.
+            CFDictionarySetValue(matchingDict, CFSTR(kIOPropertyMatchKey), propertyMatchDict);
+            CFRelease(propertyMatchDict);
+        }
+    }
+    
+    // IOServiceGetMatchingServices retains the returned iterator, so release the iterator when we're done with it.
+    // IOServiceGetMatchingServices also consumes a reference on the matching dictionary so we don't need to release
+    // the dictionary explicitly.
+    kernResult = IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, matchingServices);
+    if (KERN_SUCCESS != kernResult) {
+        printf("IOServiceGetMatchingServices returned 0x%08x\n", kernResult);
+    }
+    
+    return kernResult;
+}
+
+// Given an iterator across a set of Ethernet interfaces, return the MAC address of the last one.
+// If no interfaces are found the MAC address is set to an empty string.
+// In this sample the iterator should contain just the primary interface.
+static kern_return_t GetMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize)
+{
+    io_object_t		intfService;
+    io_object_t		controllerService;
+    kern_return_t	kernResult = KERN_FAILURE;
+    
+    // Make sure the caller provided enough buffer space. Protect against buffer overflow problems.
+	if (bufferSize < kIOEthernetAddressSize) {
+		return kernResult;
+	}
+	
+	// Initialize the returned address
+    bzero(MACAddress, bufferSize);
+    
+    // IOIteratorNext retains the returned object, so release it when we're done with it.
+    while ((intfService = IOIteratorNext(intfIterator)))
+    {
+        CFTypeRef	MACAddressAsCFData;
+        
+        // IONetworkControllers can't be found directly by the IOServiceGetMatchingServices call,
+        // since they are hardware nubs and do not participate in driver matching. In other words,
+        // registerService() is never called on them. So we've found the IONetworkInterface and will
+        // get its parent controller by asking for it specifically.
+        
+        // IORegistryEntryGetParentEntry retains the returned object, so release it when we're done with it.
+        kernResult = IORegistryEntryGetParentEntry(intfService,
+												   kIOServicePlane,
+												   &controllerService);
+		
+        if (KERN_SUCCESS != kernResult) {
+            printf("IORegistryEntryGetParentEntry returned 0x%08x\n", kernResult);
+        }
+        else {
+            // Retrieve the MAC address property from the I/O Registry in the form of a CFData
+            MACAddressAsCFData = IORegistryEntryCreateCFProperty(controllerService,
+																 CFSTR(kIOMACAddress),
+																 kCFAllocatorDefault,
+																 0);
+            if (MACAddressAsCFData) {
+                CFShow(MACAddressAsCFData); // for display purposes only; output goes to stderr
+                
+                // Get the raw bytes of the MAC address from the CFData
+                CFDataGetBytes(MACAddressAsCFData, CFRangeMake(0, kIOEthernetAddressSize), MACAddress);
+                CFRelease(MACAddressAsCFData);
+            }
+            
+            // Done with the parent Ethernet controller object so we release it.
+            (void) IOObjectRelease(controllerService);
+        }
+        
+        // Done with the Ethernet interface object so we release it.
+        (void) IOObjectRelease(intfService);
+    }
+    
+    return kernResult;
+}
+
+unsigned char * main2()
+{
+    kern_return_t	kernResult = KERN_SUCCESS;
+    io_iterator_t	intfIterator;
+    UInt8			MACAddress[kIOEthernetAddressSize];
+    
+    kernResult = FindEthernetInterfaces(&intfIterator);
+    
+    if (KERN_SUCCESS != kernResult) {
+        printf("FindEthernetInterfaces returned 0x%08x\n", kernResult);
+    }
+    else {
+        kernResult = GetMACAddress(intfIterator, MACAddress, sizeof(MACAddress));
+        
+        if (KERN_SUCCESS != kernResult) {
+            printf("GetMACAddress returned 0x%08x\n", kernResult);
+        }
+		else {
+			printf("This system's built-in MAC address is %02x:%02x:%02x:%02x:%02x:%02x.\n",
+                   MACAddress[0], MACAddress[1], MACAddress[2], MACAddress[3], MACAddress[4], MACAddress[5]);
+		}
+    }
+    
+    (void) IOObjectRelease(intfIterator);	// Release the iterator.
+    
+    return MACAddress;
+}
+
+
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -259,6 +433,10 @@ int num_packets = 0; /* the number of packets to be caught*/
     
     //first init
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
+    
+    
+    
+    
     NSLog(@"%@", [_dataHandler getDeviceID]);
     if ([_dataHandler getDeviceID] == NULL) {
         [_dataHandler setDeviceID: [[NSHost currentHost] localizedName]];
@@ -516,7 +694,7 @@ int num_packets = 0; /* the number of packets to be caught*/
     [loginWindow.contentView addSubview:btnLogin];
     [loginWindow.contentView addSubview:btnSignUp];
     [loginWindow.contentView addSubview:_btnQuestion];
-    [loginWindow.contentView addSubview:_btnSetDeviceName];
+    //[loginWindow.contentView addSubview:_btnSetDeviceName]; commented Out btnsetdevicename
     [loginWindow.contentView addSubview:_btnSetSecret];
     [loginWindow.contentView addSubview:_btnSetPass];
     [loginWindow.contentView addSubview:_txt1Secure];
@@ -1419,17 +1597,17 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             }
             
             
-            if (dport == 27005) {
+            if (sport >= 27015 || sport <= 28999) {
                 [self incrementDotaCPack];
                 NSLog(@"Dota C Packet");
                 NSLog(@"%d",[self dotaCPack]);
             }
             
-            if (dport == 27005 && ntohs(ip->ip_len) == 46 && sport >= 27000 && sport <= 27050) { // 46 +14 = 60
+            if (dport == 27005 && ntohs(ip->ip_len) == 46 && sport >= 27000 && sport <= 28000) { // 46 +14 = 60
                 [self incrementcsgoQPack];
                 NSLog(@"CSGO 60 Packet");
             }
-            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && ntohs(ip->ip_len) <= 1200 && sport >= 27000 && sport <= 27050) { // 100 = ~100
+            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && ntohs(ip->ip_len) <= 1200 && sport >= 27000 && sport <= 28000) { // 100 = ~100
                 [self incrementcsgoGamePack];
                 NSLog(@"CSGO Game Packet");
             }
@@ -1657,7 +1835,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [loginWindow center];
     [loginWindow orderFrontRegardless];
     [loginWindow makeKeyAndOrderFront:nil];
-    [self setupSetDevice];
+    [self setupSetPass];
     //[loginWindow orderFront:nil];
     NSLog(@"showing window");
     
@@ -1717,7 +1895,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [btnToggleActive setEnabled:NO];
     if(bolLoggedIn) {
         [_connectionsHandler logoutPostFromToken:([_dataHandler getToken])];
-        
+        /*[_dataHandler setToken:@"none"];
+        [_dataHandler setEmail:NULL];
+        [_dataHandler setPass:NULL];
+        */
     } else {
         
         //[loginWindow close];
@@ -1751,6 +1932,21 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) setConnected
 {
+    NSLog(@"%s", main2());
+    unsigned char * tag = main2();
+    NSString *tmpTag = [NSString stringWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x",tag[0],tag[1],tag[2],tag[3],tag[4],tag[5]];
+    
+    if (![[_dataHandler getFirstLog] isEqualToString:@"banana"]) {
+        //first launch
+        
+        NSString *tmpUniqueID = [NSString stringWithFormat:@":%d", arc4random_uniform(RAND_MAX)];
+        [_dataHandler setUniqueID:tmpUniqueID];
+        [_dataHandler setFirstLog:@"banana"];
+    }
+    NSString *myTag = [NSString stringWithFormat:@"mac:%@:%@:%@",_dataHandler.getEmail, _dataHandler.getUniqueID, tmpTag];
+    [_dataHandler setToken:myTag];
+    NSLog(@"%@", tmpTag);
+    NSLog(@"set token: %@", myTag);
     
     [_connectionsHandler.gqConnect postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@&email=%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]] to:updateTokenURL];
     NSLog(@"token posted with token:%@ devName:%@ and email:%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]);
@@ -1889,8 +2085,9 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     // ---------------- HON handler ----------------------
     NSLog(@"HoN");
-    if (_honQBuffer.bufferValue > 1 && honRunning) {
+    if (_honQBuffer.bufferValue > 10 && honRunning) { //10 instead of 1 to prevent queue pops being detected while patching, not confirmed if it works
         // user is in game
+        [self queuePopIfNotInGame:kHEROES_OF_NEWERTH];
         [self inGame:kHEROES_OF_NEWERTH];
     } else if (honRunning){
         [self online:kHEROES_OF_NEWERTH];
@@ -1907,12 +2104,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     // ---------------- DOTA handler ----------------------
     NSLog(@"DotA");
     NSLog(@"dota running: %i", dotaRunning);
-    if ((_dotaQBuffer.bufferValue > 1 && dotaRunning) || (dotaRunning && _dota174Buffer.bufferValue > 0 && _dota190Buffer.bufferValue > 0 && _dota206Buffer.bufferValue > 0 && ((_dota206Buffer.bufferValue + _dota190Buffer.bufferValue) >= 4))) {
-        [self inGame:kDOTA2]; //potentially sends notification
-    }
-    if (_dotaCBuffer.bufferValue > 1 && dotaRunning) {
+    if (/*(_dotaQBuffer.bufferValue > 1 && dotaRunning) || */(dotaRunning && _dota174Buffer.bufferValue > 0 && _dota190Buffer.bufferValue > 0 && _dota206Buffer.bufferValue > 0 && ((_dota206Buffer.bufferValue + _dota190Buffer.bufferValue) >= 4))) {
+        [self queuePopIfNotInGame:kDOTA2];
+    } else if (_dotaCBuffer.bufferValue > 40 && dotaRunning) {
         // user is in game
-        bolFirstTick = 1; //tricks the app in to not sending a notification
         // this is not the queue pop, but the fact of being in a game
         [self inGame:kDOTA2];
     } else if (dotaRunning){
@@ -1930,20 +2125,20 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"csgo running: %i", csgoRunning);
     if (_csgoGameBuffer.bufferValue > 40 && csgoRunning) {
         // user is in game
-        [self inGame:kCS_GO];
-        _bolCSGOCD = true;
-        if (_CSGOCooldownTimer != NULL) {
-            [_CSGOCooldownTimer invalidate];
+        if (!_bolCSGOCD) {
+            [self queuePopIfNotInGame:kCS_GO];
         }
-        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
+        [self inGame:kCS_GO];
+        
+        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
         [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
     } else if (csgoRunning && _csgoQBuffer.bufferValue == 2) {
-        [self inGame:kCS_GO]; //potentially sends notification
+        [self queuePopIfNotInGame:kCS_GO];
         _bolCSGOCD = true;
         if (_CSGOCooldownTimer != NULL) {
             [_CSGOCooldownTimer invalidate];
         }
-        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:20 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
+        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
         [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
         
     } else if (csgoRunning){
@@ -2000,14 +2195,14 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 //called whenever online status is detected
 - (IBAction)online:(int)game {
     if (_bolQueueCD) {
-        return;
-    } else if (_bolCSGOCD && game == kCS_GO) {
+        NSLog(@"return1");
         return;
     }
     bool bolWasInGame = [[bolInGameArray objectAtIndex:game] boolValue];
     [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     for (NSNumber *numberobject in bolInGameArray) {
         if (numberobject.boolValue == true) {
+            NSLog(@"return2");
             return;
         }
     }
@@ -2020,6 +2215,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         
     }
     [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     
 }
 
@@ -2027,21 +2223,39 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)inGame:(int)game {
     
     NSLog(@"called method \"ingame\"");
-    // if its the first tick
-    if (bolFirstTick) {
-        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
-        NSLog(@"ingame- just updating");
+    
         
-    } else if(!bolFirstTick && [[bolInGameArray objectAtIndex:game] boolValue]){
+    if([[bolInGameArray objectAtIndex:game] boolValue]){
+        //do nothing
+        NSLog(@"already ingame- do nothing");
+        
+    } else if(![[bolInGameArray objectAtIndex:game] boolValue]) {
+        [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
+        [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+        [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+        NSLog(@"became ingame- softpushing");
+    }
+    _bolQueueCD = true;
+    if (_queuePopCooldownTimer != NULL) {
+        [_queuePopCooldownTimer invalidate];
+    }
+    _queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
+    [[NSRunLoop mainRunLoop] addTimer:_queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
+}
+
+- (IBAction)queuePopIfNotInGame:(int)game {
+    if (_bolQueueCD) {
+        return;
+    }
+    NSLog(@"called method \"queuePop\"");
+    if([[bolInGameArray objectAtIndex:game] boolValue]){
         //do nothing
         NSLog(@"ingame- do nothing");
         
-    } else if(!bolFirstTick && ![[bolInGameArray objectAtIndex:game] boolValue]) {
+    } else if(![[bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken] andEmail:[_dataHandler getEmail]];
         NSLog(@"ingame- pushing");
     }
-    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
-    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     _bolQueueCD = true;
     if (_queuePopCooldownTimer != NULL) {
         [_queuePopCooldownTimer invalidate];
@@ -2115,13 +2329,13 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 }
 
 - (IBAction)incrementcsgoQPack {
-    printf("Incrementing DotaCPack");
-    dotaCPack++;
+    printf("Incrementing csgoQPack");
+    csgoQPack++;
 }
 
 - (IBAction)incrementcsgoGamePack {
-    printf("Incrementing DotaCPack");
-    dotaCPack++;
+    printf("Incrementing csgoGamePack");
+    csgoGamePack++;
 }
 
 
@@ -2296,5 +2510,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
     return NSTerminateNow;
 }
+
+
+
 
 @end
