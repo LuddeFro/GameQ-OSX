@@ -28,23 +28,19 @@
 		837423F61818B30E000FCC76 /* LVFConnect.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423EF1818B30E000FCC76 /* LVFConnect.m */; };
 		837423F71818B30E000FCC76 /* LVFDataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423F11818B30E000FCC76 /* LVFDataModel.m */; };
 		837423F81818B30E000FCC76 /* LVFDefinitions.m in Sources */ = {isa = PBXBuildFile; fileRef = 837423F31818B30E000FCC76 /* LVFDefinitions.m */; };
-		83960C7D1933352C00DD8818 /* 128white.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C7B1933352C00DD8818 /* 128white.png */; };
-		83960C7E1933352C00DD8818 /* 128white@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C7C1933352C00DD8818 /* 128white@2x.png */; };
 		83960C801933401700DD8818 /* Red.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C7F1933401700DD8818 /* Red.png */; };
 		83960C821933401D00DD8818 /* HigherRed.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C811933401D00DD8818 /* HigherRed.png */; };
 		83960C841933403C00DD8818 /* HighRed.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C831933403C00DD8818 /* HighRed.png */; };
-		83960C871933424D00DD8818 /* 128black.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C851933424D00DD8818 /* 128black.png */; };
-		83960C881933424D00DD8818 /* 128black@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83960C861933424D00DD8818 /* 128black@2x.png */; };
 		83CBD503193903F90075C1DE /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83CBD502193903F90075C1DE /* ServiceManagement.framework */; };
-		83D074CF193B3E860094DBC7 /* NotificationLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83D074CE193B3E860094DBC7 /* NotificationLogo@2x.png */; };
 		83D074D3193B3FE20094DBC7 /* Qwhite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83D074D0193B3FE20094DBC7 /* Qwhite@2x.png */; };
 		83D074D4193B3FE20094DBC7 /* Qblack@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83D074D1193B3FE20094DBC7 /* Qblack@2x.png */; };
 		83D074D5193B3FE20094DBC7 /* Qblue@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83D074D2193B3FE20094DBC7 /* Qblue@2x.png */; };
 		83E67FAD1935DF32004ACB33 /* Qwhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FA91935DF32004ACB33 /* Qwhite.png */; };
 		83E67FAE1935DF32004ACB33 /* Qblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FAA1935DF32004ACB33 /* Qblack.png */; };
 		83E67FAF1935DF32004ACB33 /* Qblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FAB1935DF32004ACB33 /* Qblue.png */; };
-		83E67FB21935E070004ACB33 /* NotificationLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FB11935E070004ACB33 /* NotificationLogo.png */; };
 		83EF17891888D0DF00057F36 /* LVFBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 83EF17881888D0DF00057F36 /* LVFBuffer.m */; };
+		83F76CF119B4CC840023441F /* NotificationLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 83F76CEF19B4CC840023441F /* NotificationLogo.png */; };
+		83F76CF219B4CC840023441F /* NotificationLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83F76CF019B4CC840023441F /* NotificationLogo@2x.png */; };
 		9CE22807189B9FEF008C6DDB /* LVFWindowHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CE22806189B9FEF008C6DDB /* LVFWindowHandler.m */; };
 		9CE2280A189BAAE4008C6DDB /* i6man.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE22808189BAAE4008C6DDB /* i6man.png */; };
 		9CE2280B189BAAE4008C6DDB /* i6woman.png in Resources */ = {isa = PBXBuildFile; fileRef = 9CE22809189BAAE4008C6DDB /* i6woman.png */; };
@@ -104,24 +100,20 @@
 		837423F11818B30E000FCC76 /* LVFDataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFDataModel.m; sourceTree = "<group>"; };
 		837423F21818B30E000FCC76 /* LVFDefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFDefinitions.h; sourceTree = "<group>"; };
 		837423F31818B30E000FCC76 /* LVFDefinitions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFDefinitions.m; sourceTree = "<group>"; };
-		83960C7B1933352C00DD8818 /* 128white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 128white.png; sourceTree = "<group>"; };
-		83960C7C1933352C00DD8818 /* 128white@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "128white@2x.png"; sourceTree = "<group>"; };
 		83960C7F1933401700DD8818 /* Red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red.png; sourceTree = "<group>"; };
 		83960C811933401D00DD8818 /* HigherRed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HigherRed.png; sourceTree = "<group>"; };
 		83960C831933403C00DD8818 /* HighRed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HighRed.png; sourceTree = "<group>"; };
-		83960C851933424D00DD8818 /* 128black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 128black.png; sourceTree = "<group>"; };
-		83960C861933424D00DD8818 /* 128black@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "128black@2x.png"; sourceTree = "<group>"; };
 		83CBD502193903F90075C1DE /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		83D074CE193B3E860094DBC7 /* NotificationLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NotificationLogo@2x.png"; sourceTree = "<group>"; };
 		83D074D0193B3FE20094DBC7 /* Qwhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qwhite@2x.png"; sourceTree = "<group>"; };
 		83D074D1193B3FE20094DBC7 /* Qblack@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qblack@2x.png"; sourceTree = "<group>"; };
 		83D074D2193B3FE20094DBC7 /* Qblue@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qblue@2x.png"; sourceTree = "<group>"; };
 		83E67FA91935DF32004ACB33 /* Qwhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Qwhite.png; sourceTree = "<group>"; };
 		83E67FAA1935DF32004ACB33 /* Qblack.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Qblack.png; sourceTree = "<group>"; };
 		83E67FAB1935DF32004ACB33 /* Qblue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Qblue.png; sourceTree = "<group>"; };
-		83E67FB11935E070004ACB33 /* NotificationLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotificationLogo.png; sourceTree = "<group>"; };
 		83EF17871888D0DF00057F36 /* LVFBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFBuffer.h; sourceTree = "<group>"; };
 		83EF17881888D0DF00057F36 /* LVFBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFBuffer.m; sourceTree = "<group>"; };
+		83F76CEF19B4CC840023441F /* NotificationLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotificationLogo.png; sourceTree = "<group>"; };
+		83F76CF019B4CC840023441F /* NotificationLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NotificationLogo@2x.png"; sourceTree = "<group>"; };
 		9CE22805189B9FEF008C6DDB /* LVFWindowHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFWindowHandler.h; sourceTree = "<group>"; };
 		9CE22806189B9FEF008C6DDB /* LVFWindowHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFWindowHandler.m; sourceTree = "<group>"; };
 		9CE22808189BAAE4008C6DDB /* i6man.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = i6man.png; sourceTree = "<group>"; };
@@ -245,15 +237,11 @@
 				83D074D2193B3FE20094DBC7 /* Qblue@2x.png */,
 				837423B81818B25D000FCC76 /* GameQ-Stationary-Info.plist */,
 				836DA57218BAD24A007DBC1F /* Gray.png */,
-				83960C7B1933352C00DD8818 /* 128white.png */,
-				83960C7C1933352C00DD8818 /* 128white@2x.png */,
-				83960C851933424D00DD8818 /* 128black.png */,
-				83960C861933424D00DD8818 /* 128black@2x.png */,
 				83960C831933403C00DD8818 /* HighRed.png */,
 				83960C811933401D00DD8818 /* HigherRed.png */,
+				83F76CEF19B4CC840023441F /* NotificationLogo.png */,
+				83F76CF019B4CC840023441F /* NotificationLogo@2x.png */,
 				83960C7F1933401700DD8818 /* Red.png */,
-				83E67FB11935E070004ACB33 /* NotificationLogo.png */,
-				83D074CE193B3E860094DBC7 /* NotificationLogo@2x.png */,
 				9CE2280C189BB2E6008C6DDB /* i5man.png */,
 				9CE2280D189BB2E6008C6DDB /* i5woman.png */,
 				9CE22808189BAAE4008C6DDB /* i6man.png */,
@@ -326,15 +314,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83960C881933424D00DD8818 /* 128black@2x.png in Resources */,
 				83E67FAF1935DF32004ACB33 /* Qblue.png in Resources */,
 				83D074D4193B3FE20094DBC7 /* Qblack@2x.png in Resources */,
 				83960C841933403C00DD8818 /* HighRed.png in Resources */,
 				837423BB1818B25D000FCC76 /* InfoPlist.strings in Resources */,
-				83960C7E1933352C00DD8818 /* 128white@2x.png in Resources */,
 				9CE2280F189BB2E6008C6DDB /* i5woman.png in Resources */,
 				9CE2280B189BAAE4008C6DDB /* i6woman.png in Resources */,
-				83D074CF193B3E860094DBC7 /* NotificationLogo@2x.png in Resources */,
 				837423CC1818B25D000FCC76 /* Images.xcassets in Resources */,
 				83D074D5193B3FE20094DBC7 /* Qblue@2x.png in Resources */,
 				83960C801933401700DD8818 /* Red.png in Resources */,
@@ -343,11 +328,10 @@
 				83D074D3193B3FE20094DBC7 /* Qwhite@2x.png in Resources */,
 				83E67FAE1935DF32004ACB33 /* Qblack.png in Resources */,
 				837423C71818B25D000FCC76 /* MainMenu.xib in Resources */,
-				83960C7D1933352C00DD8818 /* 128white.png in Resources */,
+				83F76CF219B4CC840023441F /* NotificationLogo@2x.png in Resources */,
 				83E67FAD1935DF32004ACB33 /* Qwhite.png in Resources */,
-				83E67FB21935E070004ACB33 /* NotificationLogo.png in Resources */,
-				83960C871933424D00DD8818 /* 128black.png in Resources */,
 				836DA57318BAD24A007DBC1F /* Gray.png in Resources */,
+				83F76CF119B4CC840023441F /* NotificationLogo.png in Resources */,
 				9CE2280E189BB2E6008C6DDB /* i5man.png in Resources */,
 				9CE2280A189BAAE4008C6DDB /* i6man.png in Resources */,
 			);
