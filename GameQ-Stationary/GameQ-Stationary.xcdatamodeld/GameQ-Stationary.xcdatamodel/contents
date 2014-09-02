@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13A603" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13E28" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="LoginEntity" syncable="YES">
         <attribute name="bolIsLoggedIn" attributeType="Integer 16" syncable="YES"/>
         <attribute name="deviceID" attributeType="String" syncable="YES"/>
         <attribute name="email" attributeType="String" syncable="YES"/>
+        <attribute name="firstLogguurs" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mfUAID" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="pass" attributeType="String" syncable="YES"/>
         <attribute name="token" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="LoginEntity" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="LoginEntity" positionX="0" positionY="0" width="128" height="150"/>
     </elements>
 </model>

@@ -151,18 +151,23 @@
     
     if ([returnString isEqualToString:@"signing upmailerr"])
     {
+        [appDel.txtPassword setStringValue:@""];
+        [appDel setupLogin];
         NSString *msgString = [[NSString alloc] init];
         msgString = @"Welcome to GameQ, you can sign in immediately";
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", msgString] runModal];
     }
     if ([returnString isEqualToString:@"signing upmailerrno"])
     {
+        [appDel.txtPassword setStringValue:@""];
+        [appDel setupLogin];
         NSString *msgString = [[NSString alloc] init];
-        msgString = @"A critical error has occured, please contact support";
+        msgString = @"A critical error has occured, please contact support or sign up with a different e-mail address";
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", msgString] runModal];
     }
     if ([returnString isEqualToString:@"mailerr"])
     {
+        
         NSString *msgString = [[NSString alloc] init];
         msgString = @"Something went wrong, the GameQ servers may not be working";
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", msgString] runModal];

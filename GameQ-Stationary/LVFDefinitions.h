@@ -31,8 +31,8 @@
 #define kBolIsLoggedIn @"BolIsLoggedInBolIsLoggedIn"
 #define kToken @"TokenToken"
 #define kDeviceID @"DeviceIDDeviceID"
-#define kFirstLog @"FirstLogguurs"
-#define kUnique @"mf-U-A-I-D"
+#define kFirstLog @"firstLogguurs"
+#define kUnique @"mfUAID"
 
 #define URL_ABOUT @"https://www.gameQ.io/"
 
