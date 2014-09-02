@@ -11,7 +11,6 @@
 #import "LVFAppDelegate.h"
 #import "LVFDefinitions.h"
 #import "LVFKeyChain.h"
-#import "SSKeychain.h"
 
 
 @class LVFAppDelegate;
