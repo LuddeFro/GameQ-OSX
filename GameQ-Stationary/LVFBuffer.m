@@ -60,6 +60,13 @@
     
 }
 
+- (void) clear
+{
+    for (int j = 0; j<_size; j++) {
+        [array replaceObjectAtIndex:j withObject:[NSNumber numberWithInt:0]];
+    }
+}
+
 
 
 

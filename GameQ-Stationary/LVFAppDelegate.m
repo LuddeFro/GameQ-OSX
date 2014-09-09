@@ -16,6 +16,7 @@
 #define kOFFLINE 0 //app running, but no game
 #define kONLINE 1 //game running
 #define kINGAME 2 //game running and in match
+#define kNOTTRACKING 3 //tracking toggled off
 #define kNotRunningGameQ 4 //self explanatory
 
 #define kNUMBER_OF_GAMES 4 //kNOGAME counts as 1
@@ -1845,14 +1846,29 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)toggleOff:(id)sender {
     [btnToggleActive setTitle:@"Start Monitoring"];
     [self.statusBar setImage:[NSImage imageNamed:@"Qblack"]];
-    [_btnStatus2 setTitle:@"Status: Online"];
+    [_btnStatus2 setTitle:@"Status: Not Tracking"];
     pcap_breakloop(handle);
     printf("\nCapture complete.\n");
     [self performSelectorOnMainThread:@selector(stopTimer) withObject:nil waitUntilDone:false];
     bolFirstTick = true;
+    [self clearBuffers];
+    [_connectionsHandler UpdateStatusWithGame:kNOGAME andStatus:[NSNumber numberWithInt:kNOTTRACKING] andToken:[_dataHandler getToken]];
     printf("\nCapture complete.\n");
     
     
+    
+}
+
+- (void) clearBuffers {
+    
+    [_csgoGameBuffer clear];
+    [_csgoQBuffer clear];
+    [_dota174Buffer clear];
+    [_dota190Buffer clear];
+    [_dota206Buffer clear];
+    [_dotaCBuffer clear];
+    [_dotaQBuffer clear];
+    [_honQBuffer clear];
     
 }
 
@@ -1871,6 +1887,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) startTimer {
     countdownQuickTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(tack:) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:countdownQuickTimer forMode:NSDefaultRunLoopMode];
+    
     
     _upTimeTimer = [NSTimer timerWithTimeInterval:60 target:self selector:@selector(upTime) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:_upTimeTimer forMode:NSDefaultRunLoopMode];
@@ -2123,7 +2140,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     // ---------------- CSGO handler ----------------------
     NSLog(@"CSGO");
     NSLog(@"csgo running: %i", csgoRunning);
-    if (_csgoGameBuffer.bufferValue > 40 && csgoRunning) {
+    if (_csgoGameBuffer.bufferValue > 50 && csgoRunning) {
         // user is in game
         if (!_bolCSGOCD) {
             [self queuePopIfNotInGame:kCS_GO];
@@ -2132,7 +2149,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         
         _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
         [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
-    } else if (csgoRunning && _csgoQBuffer.bufferValue == 2) {
+    } else if (csgoRunning && _csgoQBuffer.bufferValue >= 2) {
         [self queuePopIfNotInGame:kCS_GO];
         _bolCSGOCD = true;
         if (_CSGOCooldownTimer != NULL) {

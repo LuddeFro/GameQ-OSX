@@ -13,5 +13,5 @@
 - (int) bufferValue;
 - (void) increment:(int)value;
 - (id) initWithSize:(int)size;
-
+- (void) clear;
 @end
