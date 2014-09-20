@@ -29,6 +29,7 @@
 - (void) postNewPassword:(NSString *)newLosenord forEmail:(NSString *)email andOldPassword:(NSString *)losenord;
 - (void) postNewDeviceName:(NSString *)deviceName forToken:(NSString *)token andEmail:(NSString *)email;
 - (void) chkVersion;
+- (void) monitorMeForEmail:(NSString *)email;
 // mobile method
 //- (void)upAppPost;
 

@@ -38,6 +38,9 @@
 		83E67FAE1935DF32004ACB33 /* Qblack.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FAA1935DF32004ACB33 /* Qblack.png */; };
 		83E67FAF1935DF32004ACB33 /* Qblue.png in Resources */ = {isa = PBXBuildFile; fileRef = 83E67FAB1935DF32004ACB33 /* Qblue.png */; };
 		83EF17891888D0DF00057F36 /* LVFBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 83EF17881888D0DF00057F36 /* LVFBuffer.m */; };
+		83F27C2819CDA51A00A43F8F /* LVFCapObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F27C2719CDA51A00A43F8F /* LVFCapObj.m */; };
+		83F27C2B19CDACD900A43F8F /* LVFCompartment.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F27C2A19CDACD900A43F8F /* LVFCompartment.m */; };
+		83F27C2E19CDC43000A43F8F /* LVFState.m in Sources */ = {isa = PBXBuildFile; fileRef = 83F27C2D19CDC43000A43F8F /* LVFState.m */; };
 		83F76CF119B4CC840023441F /* NotificationLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 83F76CEF19B4CC840023441F /* NotificationLogo.png */; };
 		83F76CF219B4CC840023441F /* NotificationLogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 83F76CF019B4CC840023441F /* NotificationLogo@2x.png */; };
 		9CE22807189B9FEF008C6DDB /* LVFWindowHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CE22806189B9FEF008C6DDB /* LVFWindowHandler.m */; };
@@ -109,6 +112,12 @@
 		83E67FAB1935DF32004ACB33 /* Qblue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Qblue.png; sourceTree = "<group>"; };
 		83EF17871888D0DF00057F36 /* LVFBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFBuffer.h; sourceTree = "<group>"; };
 		83EF17881888D0DF00057F36 /* LVFBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFBuffer.m; sourceTree = "<group>"; };
+		83F27C2619CDA51A00A43F8F /* LVFCapObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFCapObj.h; sourceTree = "<group>"; };
+		83F27C2719CDA51A00A43F8F /* LVFCapObj.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFCapObj.m; sourceTree = "<group>"; };
+		83F27C2919CDACD900A43F8F /* LVFCompartment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFCompartment.h; sourceTree = "<group>"; };
+		83F27C2A19CDACD900A43F8F /* LVFCompartment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFCompartment.m; sourceTree = "<group>"; };
+		83F27C2C19CDC43000A43F8F /* LVFState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFState.h; sourceTree = "<group>"; };
+		83F27C2D19CDC43000A43F8F /* LVFState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LVFState.m; sourceTree = "<group>"; };
 		83F76CEF19B4CC840023441F /* NotificationLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotificationLogo.png; sourceTree = "<group>"; };
 		83F76CF019B4CC840023441F /* NotificationLogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NotificationLogo@2x.png"; sourceTree = "<group>"; };
 		9CE22805189B9FEF008C6DDB /* LVFWindowHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LVFWindowHandler.h; sourceTree = "<group>"; };
@@ -213,6 +222,12 @@
 				837423F31818B30E000FCC76 /* LVFDefinitions.m */,
 				8311E3F41848F4E20011212C /* LVFKeyChain.h */,
 				8311E3F51848F4E20011212C /* LVFKeyChain.m */,
+				83F27C2619CDA51A00A43F8F /* LVFCapObj.h */,
+				83F27C2719CDA51A00A43F8F /* LVFCapObj.m */,
+				83F27C2C19CDC43000A43F8F /* LVFState.h */,
+				83F27C2D19CDC43000A43F8F /* LVFState.m */,
+				83F27C2919CDACD900A43F8F /* LVFCompartment.h */,
+				83F27C2A19CDACD900A43F8F /* LVFCompartment.m */,
 				837423CB1818B25D000FCC76 /* Images.xcassets */,
 				837423C81818B25D000FCC76 /* GameQ-Stationary.xcdatamodeld */,
 				837423B71818B25D000FCC76 /* Supporting Files */,
@@ -357,8 +372,11 @@
 			files = (
 				837423CA1818B25D000FCC76 /* GameQ-Stationary.xcdatamodeld in Sources */,
 				837423F61818B30E000FCC76 /* LVFConnect.m in Sources */,
+				83F27C2E19CDC43000A43F8F /* LVFState.m in Sources */,
 				83EF17891888D0DF00057F36 /* LVFBuffer.m in Sources */,
+				83F27C2819CDA51A00A43F8F /* LVFCapObj.m in Sources */,
 				8311E3F61848F4E20011212C /* LVFKeyChain.m in Sources */,
+				83F27C2B19CDACD900A43F8F /* LVFCompartment.m in Sources */,
 				837423BD1818B25D000FCC76 /* main.m in Sources */,
 				837423F41818B30E000FCC76 /* NSString+SHA256.m in Sources */,
 				837423F71818B30E000FCC76 /* LVFDataModel.m in Sources */,

@@ -21,7 +21,9 @@
 #import "LVFWindowHandler.h"
 #import "LVFWindowViewSubclass.h"
 #import <ServiceManagement/ServiceManagement.h>
-
+#import "LVFCompartment.h"
+#import "LVFState.h"
+#import "LVFCapObj.h"
 @class LVFBuffer;
 @class LVFConnections;
 @class LVFDataModel;
@@ -30,7 +32,38 @@
 
 
     
-    
+
+
+
+@property NSMutableArray *capObjs;
+@property NSMutableDictionary *buffers;
+@property NSMutableDictionary *prebuffers;
+@property NSMutableArray *states;
+@property NSMutableDictionary *coolers;
+@property NSMutableArray *procs;
+@property NSString *monitorString;
+@property NSString *currentFilter;
+@property int totalGames;
+- (void) analyzePacketWithSport:(int)sport Dport:(int)dport andWlen:(int)wlen;
+
+@property NSMutableArray *bolInGameArray;
+@property NSMutableArray *bolOnlineArray;
+@property NSMutableArray *bolpushArray;
+
+@property NSMutableArray *bolInGameArrayLast;
+@property NSMutableArray *bolOnlineArrayLast;
+@property NSMutableArray *bolpushArrayLast;
+@property (strong, nonatomic) NSTimer *specialCooldownTimer;
+
+
+
+
+
+
+
+
+
+
 @property (assign) IBOutlet NSWindow *window;
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
@@ -42,7 +75,7 @@
 
 
 @property BOOL bolQueueCD;
-@property BOOL bolCSGOCD;
+@property BOOL bolSpecialCD;
 @property (strong) LVFWindowHandler *windowHandler;
 @property (weak) IBOutlet NSMenu *mainMenu;
 @property (strong, nonatomic) NSStatusItem *statusBar;
@@ -56,7 +89,6 @@
 @property (strong, nonatomic) NSTimer *countdownSlowTimer;
 @property (strong, nonatomic) NSTimer *upTimeTimer;
 @property (strong, nonatomic) NSTimer *queuePopCooldownTimer;
-@property (strong, nonatomic) NSTimer *CSGOCooldownTimer;
 @property int honQPack;
 @property int dotaQPack;
 @property int dota174Pack;
@@ -66,8 +98,6 @@
 @property int csgoQPack;
 @property int csgoGamePack;
 
-@property NSMutableArray *bolInGameArray;
-@property NSMutableArray *bolOnlineArray;
 
 
 @property BOOL bolFirstTick;
@@ -135,6 +165,14 @@ static void got_packet(id args, const struct pcap_pkthdr *header, const u_char *
 - (IBAction)incrementDota206Pack;
 - (IBAction)incrementDotaCPack;
 - (IBAction)incrementcsgoQPack;
+- (void) startMonitor;
+
+
+
+
+
+
+
 
 
 

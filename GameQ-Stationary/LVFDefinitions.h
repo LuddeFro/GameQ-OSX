@@ -24,6 +24,7 @@
 #define updatePasswordURL kGameQServerURL@"updatePassword.php"
 #define updateSecretURL kGameQServerURL@"updateSecret.php"
 #define versionURL kGameQServerURL@"versionControl.php"
+#define monitorMeURL kGameQServerURL@"monitorMe.php"
 #define kAPPID @"GameQ"
 #define kVersion @"1.0"
 #define kEmail @"EmailEmail"

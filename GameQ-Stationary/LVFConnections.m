@@ -92,6 +92,14 @@
     NSLog(@"logout posted");
 }
 
+- (void) monitorMeForEmail:(NSString *)email
+{
+    NSString *postString = [NSString stringWithFormat:@"email=%@", email];
+    NSString *postUrl = monitorMeURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"logout posted");
+}
+
 - (void) upTimeForToken:(NSString *)token
 {
     

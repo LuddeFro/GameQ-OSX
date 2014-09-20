@@ -19,7 +19,9 @@
 #define kNOTTRACKING 3 //tracking toggled off
 #define kNotRunningGameQ 4 //self explanatory
 
-#define kNUMBER_OF_GAMES 4 //kNOGAME counts as 1
+#define kINGAME_FOR_LVFSTATE 1
+#define kPUSH_FOR_LVFSTATE 0
+
 
 
 void * reftoself;
@@ -47,8 +49,6 @@ void * reftoself;
 @synthesize csgoQPack;
 @synthesize csgoGamePack;
 @synthesize bolFirstTick;
-@synthesize bolInGameArray;
-@synthesize bolOnlineArray;
 @synthesize btnLog;
 @synthesize btnQuitApp;
 @synthesize btnToggleActive;
@@ -155,7 +155,7 @@ pcap_t *handle;		/* Session handle */
 const char *dev;		/* Device to sniff on */
 char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
 struct bpf_program fp;		/* The compiled filter expression */
-char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-28999 or udp dst port 27005";	/* The filter expression */
+//char filter_exp[] = "udp dst portrange 11235-11335 or tcp dst port 11031 or udp src portrange 27015-28999 or udp dst port 27005";	/* The filter expression */
 bpf_u_int32 mask;		/* The netmask of our sniffing device */
 bpf_u_int32 net;		/* The IP of our sniffing device */
 //  struct pcap_pkthdr header;	/* The header that pcap gives us */
@@ -451,19 +451,14 @@ unsigned char * main2()
     
     
     //initailizing state
-    _bolCSGOCD = false;
+    _bolSpecialCD = false;
     _bolQueueCD = false;
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:(NSRemoteNotificationTypeAlert | NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound)];
     _connectionsHandler = [[LVFConnections alloc] init];
     _windowHandler = [[LVFWindowHandler alloc] init];
     bolIsActive = false;
     bolFirstTick = true;
-    bolInGameArray = [[NSMutableArray alloc] init];
-    bolOnlineArray = [[NSMutableArray alloc] init];
-    for (int j = 0; j<kNUMBER_OF_GAMES ; j++) {
-        [bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
-        [bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
-    }
+    
     
     
     
@@ -471,9 +466,7 @@ unsigned char * main2()
     
     
     
-    //pCap vars
-    struct ifaddrs* interfaces = NULL;
-    struct ifaddrs* temp_addr = NULL;
+    
     
     
     
@@ -736,60 +729,6 @@ unsigned char * main2()
     
     
     
-    // define the device!
-    
-    // retrieve the current interfaces - returns 0 on success
-    NSInteger success = getifaddrs(&interfaces);
-    if (success == 0)
-    {
-        // Loop through linked list of interfaces
-        temp_addr = interfaces;
-        while (temp_addr != NULL)
-        {
-            if (temp_addr->ifa_addr->sa_family == AF_INET) // internetwork only
-            {
-                NSString* name = [NSString stringWithUTF8String:temp_addr->ifa_name];
-                NSString* address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
-                NSLog(@"interface name: %@; address: %@", name, address);
-                
-                //check for loopback address
-                if (![[address substringToIndex:3] isEqualToString:@"127"]) {
-                    dev = [name UTF8String];
-                }
-            }
-            
-            temp_addr = temp_addr->ifa_next;
-        }
-    }
-    
-    // Free memory
-    freeifaddrs(interfaces);
-    
-    printf("Device: %s\n", dev);
-    
-    /* Find the properties for the device */
-    if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1){
-        fprintf(stderr, "Can't get netmask for device %s\n", dev);
-        net = 0;
-        mask = 0;
-    }
-    
-    /* Open the session*/
-    handle = pcap_open_live(dev, SNAP_LEN, 0, 100, errbuf);
-    if (handle == NULL) {
-        fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-        return;
-    }
-    /* Compile a filter */
-    if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1){
-        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return;
-    }
-    /* Apply a filter */
-    if (pcap_setfilter(handle, &fp) == -1){
-        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return;
-    }
     
     
     if ([_dataHandler getBolIsLoggedIn].boolValue) {
@@ -1561,93 +1500,9 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             
             int dport = ntohs(udp->uh_dport);
             int sport = ntohs(udp->uh_sport);
-            if (dport <= 11335 && dport >= 11235) {
-                
-                NSLog(@"Hon Packet");
-                [self incrementHonQPack];
-                NSLog(@"%d",[self honQPack]);
-            }
+            int len = ntohs(ip->ip_len);
             
-            if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) <= 736 && ntohs(ip->ip_len) >= 586) {
-                //checks wirelength 600-750
-                
-                // size_udp == wirelength - 34
-                // ip_len == size_udp + 20
-                // ip_len == wirelength - 14
-                
-                
-                NSLog(@"Dota Q Packet");
-                [self incrementDotaQPack];
-                NSLog(@"%d",[self dotaQPack]);
-            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 192) { //192 +14 = 206
-                if ([[self dota190Buffer] bufferValue] > 0 && [[self dota174Buffer] bufferValue] > 0) {
-                    NSLog(@"Dota 206 Packet");
-                    [self incrementDota206Pack];
-                    NSLog(@"%d",[self dota206Pack]);
-                }
-            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 176) { // 176 +14 = 190
-                if ([[self dota174Buffer] bufferValue] > 0) {
-                NSLog(@"Dota 190 Packet");
-                [self incrementDota190Pack];
-                NSLog(@"%d",[self dota190Pack]);
-                }
-            } else if (sport >= 27015 && sport <= 27020 && ntohs(ip->ip_len) == 160) { // 160 +14 = 174
-                NSLog(@"Dota 174 Packet");
-                [self incrementDota174Pack];
-                NSLog(@"%d",[self dota174Pack]);
-            }
-            
-            
-            if (sport >= 27015 || sport <= 28999) {
-                [self incrementDotaCPack];
-                NSLog(@"Dota C Packet");
-                NSLog(@"%d",[self dotaCPack]);
-            }
-            
-            if (dport == 27005 && ntohs(ip->ip_len) == 46 && sport >= 27000 && sport <= 28000) { // 46 +14 = 60
-                [self incrementcsgoQPack];
-                NSLog(@"CSGO 60 Packet");
-            }
-            if (dport == 27005 && ntohs(ip->ip_len) >= 100 && ntohs(ip->ip_len) <= 1200 && sport >= 27000 && sport <= 28000) { // 100 = ~100
-                [self incrementcsgoGamePack];
-                NSLog(@"CSGO Game Packet");
-            }
-            
-            
-            /*
-             *  OK, this packet is UDP.
-             */
-            
-            /* define/compute tcp header offset */
-            udp = (struct sniff_udp*)(packet + SIZE_ETHERNET + SIZE_UDP);
-            
-            printf("   Src port: %d\n", ntohs(udp->uh_sport));
-            printf("   Dst port: %d\n", ntohs(udp->uh_dport));
-            
-            /* define/compute udp payload (segment) offset */
-            payload = (u_char *)(packet + SIZE_ETHERNET + size_ip + SIZE_UDP);
-            
-            /* compute udp payload (segment) size */
-            size_payload = ntohs(ip->ip_len) - (size_ip + SIZE_UDP);
-            if (size_payload > ntohs(udp->uh_ulen))
-                size_payload = ntohs(udp->uh_ulen);
-            
-            /*
-             * Print payload data; it might be binary, so don't just
-             * treat it as a string.
-             */
-            if (size_payload > 0) {
-                printf("   Payload (%d bytes):\n", size_payload);
-                print_payload(payload, size_payload);
-            }
-            
-            
-            
-            
-            
-            
-            
-            
+            [self analyzePacketWithSport:sport Dport:dport andWlen:len];
             
             //--
 			return;
@@ -1811,7 +1666,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 // toggle on/off the pCap----------------------------------
 - (IBAction)toggle:(id)sender {
     if (!bolIsActive) {
-        [NSThread detachNewThreadSelector:@selector(toggleOn:) toTarget:self withObject:nil];
+        [_connectionsHandler monitorMeForEmail:_dataHandler.getEmail];
         NSLog(@"toggleOn");
     } else {
         [self toggleOff:nil];
@@ -1872,7 +1727,252 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     
 }
 
+- (void) startMonitor
+{
+    [NSThread detachNewThreadSelector:@selector(toggleOn:) toTarget:self withObject:nil];
+}
+
+- (void) setupCap
+{
+    
+    
+    //pCap vars
+    struct ifaddrs* interfaces = NULL;
+    struct ifaddrs* temp_addr = NULL;
+    
+    
+    
+    
+    // define the device!
+    
+    // retrieve the current interfaces - returns 0 on success
+    NSInteger success = getifaddrs(&interfaces);
+    if (success == 0)
+    {
+        // Loop through linked list of interfaces
+        temp_addr = interfaces;
+        while (temp_addr != NULL)
+        {
+            if (temp_addr->ifa_addr->sa_family == AF_INET) // internetwork only
+            {
+                NSString* name = [NSString stringWithUTF8String:temp_addr->ifa_name];
+                NSString* address = [NSString stringWithUTF8String:inet_ntoa(((struct sockaddr_in *)temp_addr->ifa_addr)->sin_addr)];
+                NSLog(@"interface name: %@; address: %@", name, address);
+                
+                //check for loopback address
+                if (![[address substringToIndex:3] isEqualToString:@"127"]) {
+                    dev = [name UTF8String];
+                }
+            }
+            
+            temp_addr = temp_addr->ifa_next;
+        }
+    }
+    
+    // Free memory
+    freeifaddrs(interfaces);
+    
+    printf("Device: %s\n", dev);
+    
+    /* Find the properties for the device */
+    if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1){
+        fprintf(stderr, "Can't get netmask for device %s\n", dev);
+        net = 0;
+        mask = 0;
+    }
+    
+    /* Open the session*/
+    handle = pcap_open_live(dev, SNAP_LEN, 0, 100, errbuf);
+    if (handle == NULL) {
+        fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
+        return;
+    }
+    char *filter_exp = [_currentFilter UTF8String];
+    NSLog(@"new filter: %s", filter_exp);
+    /* Compile a filter */
+    if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1){
+        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+        return;
+    }
+    /* Apply a filter */
+    if (pcap_setfilter(handle, &fp) == -1){
+        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+        return;
+    }
+    
+    
+}
+
+
+- (NSString *) monitorExtract:(int)val
+{
+    NSString *a = [_monitorString substringToIndex:val];
+    _monitorString = [_monitorString substringFromIndex:val];
+    return  a;
+}
+
+
+
+- (void) handleGame:(NSString *)gameString
+{
+    int game = [gameString substringToIndex:2].intValue;
+    gameString = [gameString substringFromIndex:2];
+    int cooldown = [gameString substringToIndex:2].intValue;
+    gameString = [gameString substringFromIndex:2];
+    int proclen = [gameString substringToIndex:4].intValue;
+    gameString = [gameString substringFromIndex:4];
+    NSString* proc = [gameString substringToIndex:proclen];
+    gameString = [gameString substringFromIndex:proclen];
+    int caplen = [gameString substringToIndex:4].intValue;
+    gameString = [gameString substringFromIndex:4];
+    NSString* capString = [gameString substringToIndex:caplen];
+    gameString = [gameString substringFromIndex:caplen];
+    
+    [_coolers setObject:[NSNumber numberWithInt:cooldown] forKey:[NSNumber numberWithInt:game]];
+    [_procs addObject:[[LVFCompartment alloc] initWithName:[NSNumber numberWithInt:game] andObject:proc]];
+    [self handleCap:capString];
+    
+    int numStats = [gameString substringToIndex:3].intValue;
+    gameString = [gameString substringFromIndex:3];
+    
+    for (int i = 0; i < numStats; i++) {
+        int statlen = [gameString substringToIndex:4].intValue;
+        gameString = [gameString substringFromIndex:4];
+        NSString *state = [gameString substringToIndex:statlen];
+        gameString = [gameString substringFromIndex:statlen];
+        [self handleState:state forGame:game andState:i];
+    }
+}
+
+- (void) handleState:(NSString *)stateString forGame:(int)game andState:(int)state
+{
+    int numOrs = [stateString substringToIndex:3].intValue;
+    stateString = [stateString substringFromIndex:3];
+    for (int i = 0; i < numOrs; i++) {
+        BOOL special = [stateString substringToIndex:1].intValue;
+        stateString = [stateString substringFromIndex:1];
+        int numCons = [stateString substringToIndex:3].intValue;
+        stateString = [stateString substringFromIndex:3];
+        NSMutableDictionary *conditions = [[NSMutableDictionary alloc] init];
+        for (int j = 0; j < numCons; j++) {
+            int numPacks = [stateString substringToIndex:3].intValue;
+            stateString = [stateString substringFromIndex:3];
+            int nameLen = [stateString substringToIndex:4].intValue;
+            stateString = [stateString substringFromIndex:4];
+            NSString* packName = [stateString substringToIndex:nameLen];
+            stateString = [stateString substringFromIndex:nameLen];
+            
+            [conditions setObject:[NSNumber numberWithInt:numPacks] forKey:packName];
+            
+            
+        }
+        LVFState *tmpStat = [[LVFState alloc] initWithConditions:conditions andGame:[NSNumber numberWithInt:game] andState:[NSNumber numberWithInt:state] forDelegate:self isSpecial:special];
+        [_states addObject:tmpStat];
+        
+    }
+}
+
+- (void) handleCap:(NSString*)capString
+{
+    int numCaps = [capString substringToIndex:3].intValue;
+    capString = [capString substringFromIndex:3];
+    for (int i = 0; i < numCaps; i++) {
+        
+        int nameLen = [capString substringToIndex:4].intValue;
+        capString = [capString substringFromIndex:4];
+        NSString *name = [capString substringToIndex:nameLen];
+        capString = [capString substringFromIndex:nameLen];
+        int buffSiz = [capString substringToIndex:2].intValue;
+        capString = [capString substringFromIndex:2];
+        int minSport = [capString substringToIndex:5].intValue;
+        capString = [capString substringFromIndex:5];
+        int maxSport = [capString substringToIndex:5].intValue;
+        capString = [capString substringFromIndex:5];
+        int minDport = [capString substringToIndex:5].intValue;
+        capString = [capString substringFromIndex:5];
+        int maxDport = [capString substringToIndex:5].intValue;
+        capString = [capString substringFromIndex:5];
+        int minWlen = [capString substringToIndex:4].intValue;
+        capString = [capString substringFromIndex:4];
+        int maxWlen = [capString substringToIndex:4].intValue;
+        capString = [capString substringFromIndex:4];
+        
+        LVFCapObj *capobj = [[LVFCapObj alloc] initWithDelegate:self andName:name andMinSport:minSport andMaxSport:maxSport andMinDport:minDport andMaxDport:maxDport andMinWlen:minWlen andMaxWlen:maxWlen andBuffSize:buffSiz];
+        
+        if ([[capString substringToIndex:2] isEqualToString:@"<<"]) {
+            capString = [capString substringFromIndex:2];
+            int numComps = [capString substringToIndex:3].intValue;
+            for (int j = 0; j<numComps; j++) {
+                
+                
+                int numPacks = [capString substringToIndex:3].intValue;
+                capString = [capString substringFromIndex:3];
+                int nLen = [capString substringToIndex:4].intValue;
+                capString = [capString substringFromIndex:4];
+                NSString *packName = [capString substringToIndex:nLen];
+                capString = [capString substringFromIndex:nLen];
+                
+                [capobj addComparisonForName:packName andValue:numPacks];
+                
+                
+            }
+        }
+        
+        [_capObjs addObject:capobj];
+        
+        
+    }
+    
+    
+    
+}
+
+- (void) analyzePacketWithSport:(int)sport Dport:(int)dport andWlen:(int)wlen
+{
+    for (LVFCapObj* obj in _capObjs) {
+        [obj checkPacketWithSport:sport andDport:dport andWlen:wlen];
+    }
+}
+
 - (IBAction)toggleOn:(id)sender {
+    
+    _capObjs = [[NSMutableArray alloc] init];
+    _buffers = [[NSMutableDictionary alloc] init];
+    _prebuffers = [[NSMutableDictionary alloc] init];
+    _states = [[NSMutableArray alloc] init];
+    _coolers = [[NSMutableDictionary alloc] init];
+    _procs = [[NSMutableArray alloc] init];
+    
+    int flen = [self monitorExtract:4].intValue;
+    _currentFilter = [self monitorExtract:flen];
+    _totalGames = [self monitorExtract:2].intValue;
+    int numGames = [self monitorExtract:3].intValue;
+    for (int i = 0; i<numGames; i++) {
+        int glen = [self monitorExtract:4].intValue;
+        NSString* game = [self monitorExtract:glen];
+        [self handleGame:game];
+    }
+    
+    _bolInGameArray = [[NSMutableArray alloc] init];
+    _bolOnlineArray = [[NSMutableArray alloc] init];
+    _bolpushArray = [[NSMutableArray alloc] init];
+    _bolInGameArrayLast = [[NSMutableArray alloc] init];
+    _bolOnlineArrayLast = [[NSMutableArray alloc] init];
+    _bolpushArrayLast = [[NSMutableArray alloc] init];
+    for (int j = 0; j<_totalGames ; j++) {
+        [_bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [_bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [_bolpushArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [_bolInGameArrayLast insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [_bolOnlineArrayLast insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+        [_bolpushArrayLast insertObject:[NSNumber numberWithBool:NO] atIndex:j];
+    }
+    
+    
+    
+    
+    
+    
     [_btnStatus2 setTitle:@"Status: Tracking"];
     printf("\nCapture started.\n");
     [self performSelectorOnMainThread:@selector(startTimer) withObject:nil waitUntilDone:false];
@@ -2047,125 +2147,79 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
                   [app localizedName] /*absoluteString*/];
     }
     
-    //NSLog(@"%@", output);
     
-    
-    
-    [_dotaQBuffer increment:dotaQPack];
-    [_dota174Buffer increment:dota174Pack];
-    [_dota190Buffer increment:dota190Pack];
-    [_dota206Buffer increment:dota206Pack];
-    [_dotaCBuffer increment:dotaCPack];
-    [_honQBuffer increment:honQPack];
-    [_csgoQBuffer increment:csgoQPack];
-    [_csgoGameBuffer increment:csgoGamePack];
-    
-    
-    dotaCPack = 0;
-    dotaQPack = 0;
-    dota174Pack = 0;
-    dota190Pack = 0;
-    dota206Pack = 0;
-    honQPack = 0;
-    csgoQPack = 0;
-    csgoGamePack = 0;
-    
-    //NSLog(@"<<<processes checked>>>");
-    
-    //-------------------check processes------------------
-    BOOL honRunning = false;
-    BOOL dotaRunning = false;
-    BOOL csgoRunning = false;
-    if ([output rangeOfString:@"Heroes"].location == NSNotFound || [output rangeOfString:@"Newerth"].location == NSNotFound) {
-        honRunning = false;
-        //NSLog(@"hon not running, false alarm");
-    } else {
-        honRunning = true;
-        //NSLog(@"hon running, probably true alarm");
-    }
-    if ([output rangeOfString:@"dota"].location == NSNotFound) {
-        dotaRunning = false;
-        //NSLog(@"dota not running, false alarm");
-    } else {
-        dotaRunning = true;
-        //NSLog(@"dota running, probably true alarm");
-    }
-    if ([output rangeOfString:@"csgo"].location == NSNotFound) {
-        csgoRunning = false;
-        //NSLog(@"csgo not running, false alarm");
-    } else {
-        csgoRunning = true;
-        //NSLog(@"csgo running, probably true alarm");
-    }
-
-
-    
-    // ---------------- HON handler ----------------------
-    NSLog(@"HoN");
-    if (_honQBuffer.bufferValue > 10 && honRunning) { //10 instead of 1 to prevent queue pops being detected while patching, not confirmed if it works
-        // user is in game
-        [self queuePopIfNotInGame:kHEROES_OF_NEWERTH];
-        [self inGame:kHEROES_OF_NEWERTH];
-    } else if (honRunning){
-        [self online:kHEROES_OF_NEWERTH];
-        //got no packets but it's on
-    } else {
-        // user is not in game
-        [self offline:kHEROES_OF_NEWERTH];
+    for (NSString* key in _prebuffers) {
+        
+        int buffOld = [[_prebuffers objectForKey:key] intValue];
+        LVFBuffer *buffNew = [_buffers objectForKey:key];
+        
+        [buffNew increment:buffOld];
+        [_buffers setObject:buffNew forKey:key];
+        [_prebuffers setObject:[NSNumber numberWithInt:0] forKey:key];
         
     }
-   
-    // -------------- HON handler end --------------------
     
-    
-    // ---------------- DOTA handler ----------------------
-    NSLog(@"DotA");
-    NSLog(@"dota running: %i", dotaRunning);
-    if (/*(_dotaQBuffer.bufferValue > 1 && dotaRunning) || */(dotaRunning && _dota174Buffer.bufferValue > 0 && _dota190Buffer.bufferValue > 0 && _dota206Buffer.bufferValue > 0 && ((_dota206Buffer.bufferValue + _dota190Buffer.bufferValue) >= 4))) {
-        [self queuePopIfNotInGame:kDOTA2];
-    } else if (_dotaCBuffer.bufferValue > 40 && dotaRunning) {
-        // user is in game
-        // this is not the queue pop, but the fact of being in a game
-        [self inGame:kDOTA2];
-    } else if (dotaRunning){
-        [self online:kDOTA2];
-        
-    } else {
-        // user is not in game
-        [self offline:kDOTA2];
+    for (int j = 0; j<_totalGames ; j++) {
+        [_bolInGameArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
+        [_bolOnlineArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
+        [_bolpushArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
     }
-    // -------------- DOTA handler end --------------------
     
-    
-    // ---------------- CSGO handler ----------------------
-    NSLog(@"CSGO");
-    NSLog(@"csgo running: %i", csgoRunning);
-    if (_csgoGameBuffer.bufferValue > 50 && csgoRunning) {
-        // user is in game
-        if (!_bolCSGOCD) {
-            [self queuePopIfNotInGame:kCS_GO];
+    for (LVFState* stat in _states) {
+        LVFState *aStat = [stat checkState];
+        if (aStat != NULL) {
+            if (aStat.state.intValue == kINGAME_FOR_LVFSTATE) {
+                [_bolInGameArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
+            } else if (aStat.state.intValue == kPUSH_FOR_LVFSTATE){
+                [_bolpushArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
+            }
         }
-        [self inGame:kCS_GO];
         
-        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
-        [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
-    } else if (csgoRunning && _csgoQBuffer.bufferValue >= 2) {
-        [self queuePopIfNotInGame:kCS_GO];
-        _bolCSGOCD = true;
-        if (_CSGOCooldownTimer != NULL) {
-            [_CSGOCooldownTimer invalidate];
-        }
-        _CSGOCooldownTimer = [NSTimer timerWithTimeInterval:30 target:self selector:@selector(resetCSGOCooldown) userInfo:nil repeats:NO];
-        [[NSRunLoop mainRunLoop] addTimer:_CSGOCooldownTimer forMode:NSDefaultRunLoopMode];
-        
-    } else if (csgoRunning){
-        [self online:kCS_GO];
-        
-    } else {
-        // user is not in game
-        [self offline:kCS_GO];
     }
-    // -------------- CSGO handler end --------------------
+    
+    for (LVFCompartment* comp in _procs) {
+        NSNumber *gameNum = (NSNumber *) comp.name;
+        NSString *procName = (NSString *) comp.heldObject;
+        if (!([output rangeOfString:procName].location == NSNotFound)) {
+            [_bolOnlineArray replaceObjectAtIndex:gameNum.intValue withObject:[NSNumber numberWithBool:YES]];
+        }
+        
+    }
+    
+    
+    for (int i = 0; i < _totalGames; i++) {
+        NSNumber *pusher = [_bolpushArray objectAtIndex:i];
+        NSNumber *online = [_bolOnlineArray objectAtIndex:i];
+        if (pusher.boolValue) {
+            if (online.boolValue) {
+                [self queuePopIfNotInGame:i];
+                [_bolpushArrayLast replaceObjectAtIndex:i withObject:[NSNumber numberWithBool:YES]];
+                NSNumber *cooldown = [_coolers objectForKey:[NSNumber numberWithInt:i]];
+                _bolSpecialCD = true;
+                if (_specialCooldownTimer != NULL) {
+                    [_specialCooldownTimer invalidate];
+                }
+                _specialCooldownTimer = [NSTimer timerWithTimeInterval:cooldown.intValue target:self selector:@selector(resetSpecialCD) userInfo:nil repeats:NO];
+                [[NSRunLoop mainRunLoop] addTimer:_specialCooldownTimer forMode:NSDefaultRunLoopMode];
+            } else {
+                [_bolpushArrayLast replaceObjectAtIndex:i withObject:[NSNumber numberWithBool:NO]];
+            }
+            
+        }
+    }
+        
+    for (int i = 0; i < _totalGames; i++) {
+        NSNumber *ingame = [_bolInGameArray objectAtIndex:i];
+        NSNumber *online = [_bolOnlineArray objectAtIndex:i];
+        if (ingame.boolValue && online.boolValue) {
+            [self inGame:i];
+        } else if (online.boolValue) {
+            [self online:i];
+        } else {
+            [self offline:i];
+        }
+        
+    }
     
     
     
@@ -2185,26 +2239,25 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 // handles offline state
 - (IBAction)offline:(int)game {
-    bool bolOnline = [[bolOnlineArray objectAtIndex:game] boolValue];
-    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
-    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
-     for (NSNumber *numberobject in bolInGameArray) {
+    for (NSNumber *numberobject in _bolInGameArray) {
         if (numberobject.boolValue == true) {
             return;
         }
     }
-    for (NSNumber *numberobject in bolOnlineArray) {
+    for (NSNumber *numberobject in _bolOnlineArray) {
         if (numberobject.boolValue == true) {
             return;
         }
     }
     NSLog(@"called method \"offline\"");
-    if (!bolOnline) {
+    NSNumber *onlineBefore = [_bolOnlineArrayLast objectAtIndex:game];
+    if (!onlineBefore.boolValue) {
         // do nothing if status was already offline, (initialized to offline)
     } else {
-        
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     }
+    [_bolOnlineArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
+    [_bolInGameArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     
     
 }
@@ -2215,9 +2268,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         NSLog(@"return1");
         return;
     }
-    bool bolWasInGame = [[bolInGameArray objectAtIndex:game] boolValue];
-    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
-    for (NSNumber *numberobject in bolInGameArray) {
+    bool bolWasInGame = [[_bolInGameArrayLast objectAtIndex:game] boolValue];
+    for (NSNumber *numberobject in _bolInGameArray) {
         if (numberobject.boolValue == true) {
             NSLog(@"return2");
             return;
@@ -2225,14 +2277,14 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     
     NSLog(@"called method \"online\"");
-    if ([[bolOnlineArray objectAtIndex:game] boolValue] && !bolWasInGame) {
+    if ([[_bolOnlineArrayLast objectAtIndex:game] boolValue] && !bolWasInGame) {
         // do nothing if status already online, (initialized to offline)
     } else {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kONLINE] andToken:[_dataHandler getToken]];
         
     }
-    [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
-    [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
+    [_bolOnlineArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+    [_bolInGameArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:NO]];
     
 }
 
@@ -2242,16 +2294,16 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     NSLog(@"called method \"ingame\"");
     
         
-    if([[bolInGameArray objectAtIndex:game] boolValue]){
+    if([[_bolInGameArrayLast objectAtIndex:game] boolValue]){
         //do nothing
         NSLog(@"already ingame- do nothing");
         
-    } else if(![[bolInGameArray objectAtIndex:game] boolValue]) {
+    } else if(![[_bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
-        [bolInGameArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
-        [bolOnlineArray replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
         NSLog(@"became ingame- softpushing");
     }
+    [_bolOnlineArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
+    [_bolInGameArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     _bolQueueCD = true;
     if (_queuePopCooldownTimer != NULL) {
         [_queuePopCooldownTimer invalidate];
@@ -2265,11 +2317,11 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         return;
     }
     NSLog(@"called method \"queuePop\"");
-    if([[bolInGameArray objectAtIndex:game] boolValue]){
+    if([[_bolInGameArray objectAtIndex:game] boolValue]){
         //do nothing
         NSLog(@"ingame- do nothing");
         
-    } else if(![[bolInGameArray objectAtIndex:game] boolValue]) {
+    } else if(![[_bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken] andEmail:[_dataHandler getEmail]];
         NSLog(@"ingame- pushing");
     }
@@ -2280,6 +2332,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     _queuePopCooldownTimer = [NSTimer timerWithTimeInterval:5 target:self selector:@selector(resetQueueCooldown) userInfo:nil repeats:NO];
     [[NSRunLoop mainRunLoop] addTimer:_queuePopCooldownTimer forMode:NSDefaultRunLoopMode];
     
+    
+    
+    
+    
 }
 
 - (void) resetQueueCooldown
@@ -2288,11 +2344,11 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     _bolQueueCD = false;
 }
 
-- (void) resetCSGOCooldown
+- (void) resetSpecialCD
 {
     
-    [_CSGOCooldownTimer invalidate];
-    _bolCSGOCD = false;
+    [_specialCooldownTimer invalidate];
+    _bolSpecialCD = false;
 }
 
 
@@ -2354,6 +2410,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     printf("Incrementing csgoGamePack");
     csgoGamePack++;
 }
+
+
 
 
 

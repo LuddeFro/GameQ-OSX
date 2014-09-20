@@ -129,6 +129,13 @@
         [appDel.txtEmail setStringValue:@""];
         return;
     }
+    if (returnString.length >= 5) {
+        if ([[returnString substringWithRange:NSMakeRange(0, 5)] isEqualToString:@"monme"])
+        {
+            appDel.monitorString = [returnString substringFromIndex:5];
+            [appDel startMonitor];
+        }
+    }
     if ([returnString isEqualToString:@"wrongsecret"])
     {
         [appDel enableButtons];
