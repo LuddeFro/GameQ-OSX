@@ -1501,7 +1501,7 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             int dport = ntohs(udp->uh_dport);
             int sport = ntohs(udp->uh_sport);
             int len = ntohs(ip->ip_len);
-            
+            len = len + 14; // to get full packet size
             [self analyzePacketWithSport:sport Dport:dport andWlen:len];
             
             //--
@@ -1787,6 +1787,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         return;
     }
+    NSLog(@"setting up cap");
     char *filter_exp = [_currentFilter UTF8String];
     NSLog(@"new filter: %s", filter_exp);
     /* Compile a filter */
@@ -1799,6 +1800,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
         return;
     }
+    NSLog(@"set up cap");
     
     
 }
@@ -1815,6 +1817,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) handleGame:(NSString *)gameString
 {
+    
+    NSLog(@"%@", gameString);
     int game = [gameString substringToIndex:2].intValue;
     gameString = [gameString substringFromIndex:2];
     int cooldown = [gameString substringToIndex:2].intValue;
@@ -1935,6 +1939,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 }
 
 - (IBAction)toggleOn:(id)sender {
+    NSLog(@"togglin On");
     
     _capObjs = [[NSMutableArray alloc] init];
     _buffers = [[NSMutableDictionary alloc] init];
@@ -1942,14 +1947,18 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     _states = [[NSMutableArray alloc] init];
     _coolers = [[NSMutableDictionary alloc] init];
     _procs = [[NSMutableArray alloc] init];
-    
+    NSLog(@"money: %@", _monitorString);
     int flen = [self monitorExtract:4].intValue;
     _currentFilter = [self monitorExtract:flen];
+    NSLog(@"new filly: %@", _currentFilter);
+    [self setupCap];
     _totalGames = [self monitorExtract:2].intValue;
-    int numGames = [self monitorExtract:3].intValue;
+    int numGames = [self monitorExtract:2].intValue;
     for (int i = 0; i<numGames; i++) {
         int glen = [self monitorExtract:4].intValue;
         NSString* game = [self monitorExtract:glen];
+        NSLog(@"kuk:  %@", game);
+        NSLog(@"kuk:  %@", _monitorString);
         [self handleGame:game];
     }
     

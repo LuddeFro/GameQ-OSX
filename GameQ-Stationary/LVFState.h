@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "LVFAppDelegate.h"
 
+@class LVFAppDelegate;
+
 @interface LVFState : NSObject
 
 
