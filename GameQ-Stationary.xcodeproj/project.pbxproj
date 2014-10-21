@@ -104,6 +104,7 @@
 		83960C811933401D00DD8818 /* HigherRed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HigherRed.png; sourceTree = "<group>"; };
 		83960C831933403C00DD8818 /* HighRed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HighRed.png; sourceTree = "<group>"; };
 		83CBD502193903F90075C1DE /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		83CE6F9619F6B28100E64970 /* libsystem_blocks.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsystem_blocks.dylib; path = usr/lib/system/libsystem_blocks.dylib; sourceTree = SDKROOT; };
 		83D074D0193B3FE20094DBC7 /* Qwhite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qwhite@2x.png"; sourceTree = "<group>"; };
 		83D074D1193B3FE20094DBC7 /* Qblack@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qblack@2x.png"; sourceTree = "<group>"; };
 		83D074D2193B3FE20094DBC7 /* Qblue@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Qblue@2x.png"; sourceTree = "<group>"; };
@@ -174,6 +175,7 @@
 		837423AF1818B25D000FCC76 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				83CE6F9619F6B28100E64970 /* libsystem_blocks.dylib */,
 				8337A8B21949CEE500D36057 /* IOKit.framework */,
 				8337A8B01949CEDE00D36057 /* CoreFoundation.framework */,
 				83CBD502193903F90075C1DE /* ServiceManagement.framework */,
@@ -503,6 +505,10 @@
 				GCC_PREFIX_HEADER = "GameQ-Stationary/GameQ-Stationary-Prefix.pch";
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				INFOPLIST_FILE = "GameQ-Stationary/GameQ-Stationary-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = "GameQ-Stationary";
 				PROVISIONING_PROFILE = "";
@@ -522,6 +528,10 @@
 				GCC_PREFIX_HEADER = "GameQ-Stationary/GameQ-Stationary-Prefix.pch";
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				INFOPLIST_FILE = "GameQ-Stationary/GameQ-Stationary-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				PRODUCT_NAME = "GameQ-Stationary";
 				PROVISIONING_PROFILE = "";

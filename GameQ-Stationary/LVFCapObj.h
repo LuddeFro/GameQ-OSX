@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Foundation/NSLock.h>
 #import "LVFAppDelegate.h"
 #import "LVFCompartment.h"
 #import "LVFBuffer.h"

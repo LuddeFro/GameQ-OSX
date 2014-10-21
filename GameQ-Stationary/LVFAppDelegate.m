@@ -1502,7 +1502,9 @@ static void got_packet(id self, const struct pcap_pkthdr *header,
             int sport = ntohs(udp->uh_sport);
             int len = ntohs(ip->ip_len);
             len = len + 14; // to get full packet size
+            NSLog(@"got packet and sending for analysis");
             [self analyzePacketWithSport:sport Dport:dport andWlen:len];
+            NSLog(@"analysis done");
             
             //--
 			return;
@@ -1818,7 +1820,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) handleGame:(NSString *)gameString
 {
     
-    NSLog(@"%@", gameString);
+    NSLog(@"gamestring: %@", gameString);
     int game = [gameString substringToIndex:2].intValue;
     gameString = [gameString substringFromIndex:2];
     int cooldown = [gameString substringToIndex:2].intValue;
@@ -1845,6 +1847,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         NSString *state = [gameString substringToIndex:statlen];
         gameString = [gameString substringFromIndex:statlen];
         [self handleState:state forGame:game andState:i];
+        NSLog(@"state: %@", state);
     }
 }
 
@@ -1878,62 +1881,78 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) handleCap:(NSString*)capString
 {
+    
+    NSLog(@"cap handlin': %@", capString);
     int numCaps = [capString substringToIndex:3].intValue;
+    NSLog(@"%d", numCaps);
     capString = [capString substringFromIndex:3];
     for (int i = 0; i < numCaps; i++) {
-        
+        NSLog(@"another cap licks the dust");
         int nameLen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
+        NSLog(@"%@", capString);
         NSString *name = [capString substringToIndex:nameLen];
         capString = [capString substringFromIndex:nameLen];
+        NSLog(@"%@", capString);
         int buffSiz = [capString substringToIndex:2].intValue;
         capString = [capString substringFromIndex:2];
+        NSLog(@"%@", capString);
         int minSport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
+        NSLog(@"%@", capString);
         int maxSport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
+        NSLog(@"%@", capString);
         int minDport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
+        NSLog(@"%@", capString);
         int maxDport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
+        NSLog(@"%@", capString);
         int minWlen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
+        NSLog(@"%@", capString);
         int maxWlen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
         
         LVFCapObj *capobj = [[LVFCapObj alloc] initWithDelegate:self andName:name andMinSport:minSport andMaxSport:maxSport andMinDport:minDport andMaxDport:maxDport andMinWlen:minWlen andMaxWlen:maxWlen andBuffSize:buffSiz];
-        
-        if ([[capString substringToIndex:2] isEqualToString:@"<<"]) {
-            capString = [capString substringFromIndex:2];
-            int numComps = [capString substringToIndex:3].intValue;
-            for (int j = 0; j<numComps; j++) {
-                
-                
-                int numPacks = [capString substringToIndex:3].intValue;
+        if (capString.length >= 2) {
+            if ([[capString substringToIndex:2] isEqualToString:@"<<"]) {
+                capString = [capString substringFromIndex:2];
+                int numComps = [capString substringToIndex:3].intValue;
                 capString = [capString substringFromIndex:3];
-                int nLen = [capString substringToIndex:4].intValue;
-                capString = [capString substringFromIndex:4];
-                NSString *packName = [capString substringToIndex:nLen];
-                capString = [capString substringFromIndex:nLen];
-                
-                [capobj addComparisonForName:packName andValue:numPacks];
-                
-                
+                for (int j = 0; j<numComps; j++) {
+                    
+                    
+                    int numPacks = [capString substringToIndex:3].intValue;
+                    capString = [capString substringFromIndex:3];
+                    int nLen = [capString substringToIndex:4].intValue;
+                    capString = [capString substringFromIndex:4];
+                    NSString *packName = [capString substringToIndex:nLen];
+                    capString = [capString substringFromIndex:nLen];
+                    
+                    [capobj addComparisonForName:packName andValue:numPacks];
+                    
+                    
+                }
             }
         }
         
+        NSLog(@"adding capobj");
         [_capObjs addObject:capobj];
         
         
     }
-    
+    NSLog(@"cap handled: %@", capString);
     
     
 }
 
 - (void) analyzePacketWithSport:(int)sport Dport:(int)dport andWlen:(int)wlen
 {
+    //NSLog(@"analyzing");
     for (LVFCapObj* obj in _capObjs) {
+        //NSLog(@"analyzing with capobj:::");
         [obj checkPacketWithSport:sport andDport:dport andWlen:wlen];
     }
 }
@@ -1968,7 +1987,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     _bolInGameArrayLast = [[NSMutableArray alloc] init];
     _bolOnlineArrayLast = [[NSMutableArray alloc] init];
     _bolpushArrayLast = [[NSMutableArray alloc] init];
-    for (int j = 0; j<_totalGames ; j++) {
+    for (int j = 0; j<=_totalGames ; j++) {
         [_bolInGameArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
         [_bolOnlineArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
         [_bolpushArray insertObject:[NSNumber numberWithBool:NO] atIndex:j];
@@ -2148,6 +2167,11 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)tack:(id)sender {
     
     NSLog(@"tick");
+    
+    
+    
+    
+    
     // get processes
     NSString *output = [NSString string];
     for (NSRunningApplication *app in
@@ -2157,24 +2181,31 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     
     
-    for (NSString* key in _prebuffers) {
-        
-        int buffOld = [[_prebuffers objectForKey:key] intValue];
-        LVFBuffer *buffNew = [_buffers objectForKey:key];
+    
+    
+    
+    NSMutableDictionary *tempPreBuff = [_prebuffers copy];
+    for (NSString* key in tempPreBuff) {
+        //NSLog(@"prebuff loop");
+        //NSLog(@"%@", key);
+        int buffOld = [[tempPreBuff objectForKey:key] intValue];
+        LVFBuffer* buffNew = [_buffers objectForKey:key];
         
         [buffNew increment:buffOld];
         [_buffers setObject:buffNew forKey:key];
+        NSLog(@"buffVal: %d key: %@", ((LVFBuffer*)[_buffers objectForKey:key]).bufferValue , key);
         [_prebuffers setObject:[NSNumber numberWithInt:0] forKey:key];
         
     }
     
-    for (int j = 0; j<_totalGames ; j++) {
+    for (int j = 0; j<=_totalGames ; j++) {
         [_bolInGameArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
         [_bolOnlineArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
         [_bolpushArray replaceObjectAtIndex:j withObject:[NSNumber numberWithBool:NO]];
     }
     
     for (LVFState* stat in _states) {
+        //NSLog(@"state: %@, game:%@, special:%d", stat.state, stat.game, stat.special);
         LVFState *aStat = [stat checkState];
         if (aStat != NULL) {
             if (aStat.state.intValue == kINGAME_FOR_LVFSTATE) {
@@ -2185,7 +2216,6 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         }
         
     }
-    
     for (LVFCompartment* comp in _procs) {
         NSNumber *gameNum = (NSNumber *) comp.name;
         NSString *procName = (NSString *) comp.heldObject;
@@ -2195,8 +2225,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         
     }
     
-    
-    for (int i = 0; i < _totalGames; i++) {
+    for (int i = 0; i <= _totalGames; i++) {
         NSNumber *pusher = [_bolpushArray objectAtIndex:i];
         NSNumber *online = [_bolOnlineArray objectAtIndex:i];
         if (pusher.boolValue) {
@@ -2216,20 +2245,22 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
             
         }
     }
-        
-    for (int i = 0; i < _totalGames; i++) {
+    //NSLog(@"totalgames:");
+    for (int i = 0; i <= _totalGames; i++) {
         NSNumber *ingame = [_bolInGameArray objectAtIndex:i];
         NSNumber *online = [_bolOnlineArray objectAtIndex:i];
         if (ingame.boolValue && online.boolValue) {
+            //NSLog(@"inng:");
             [self inGame:i];
         } else if (online.boolValue) {
+            //NSLog(@"onnl:");
             [self online:i];
         } else {
             [self offline:i];
+           // NSLog(@"offl:");
         }
         
     }
-    
     
     
     

@@ -8,6 +8,7 @@
 
 #import "LVFCapObj.h"
 
+
 @implementation LVFCapObj
 
 
@@ -15,25 +16,31 @@
 //increments prebuffers for name if true with comparisons and instance variables
 - (void) checkPacketWithSport:(int)sport andDport:(int)dport andWlen:(int)wlen
 {
-    
+    //NSLog(@"checkpacketwithsport...");
     for (NSString* key in _comparisons) {
         
         LVFBuffer *buffo = [_appDel.buffers objectForKey:key];
         int a = [[_comparisons objectForKey:key] intValue];
         
-        if (buffo.bufferValue < a) {
+        if (([buffo bufferValue] + [[_appDel.prebuffers objectForKey:key] intValue]) < a) {
+            NSLog(@"not meeting reqs, get reqt!");
             return;
         }
         // do stuff
     }
     
     if (sport <= _maxsport && sport >= _minsport && dport >= _mindport && dport <= _maxdport && wlen <= _maxwlen && wlen >= _minwlen) {
-        int previous = 0;
+        //NSLog(@"packet match...");
         if (!([_appDel.prebuffers objectForKey:_name] == nil)) {
-            previous = [[_appDel.prebuffers objectForKey:_name] intValue];
+            NSLock *aLock = [[NSLock alloc] init];
+            [aLock lock];
+            [_appDel.prebuffers setObject:[NSNumber numberWithInt:[[_appDel.prebuffers objectForKey:_name] intValue] + 1] forKey:_name];
+            [aLock unlock];
+        } else {
+            [_appDel.prebuffers setObject:[NSNumber numberWithInt:1] forKey:_name];
         }
-        previous++;
-        [_appDel.prebuffers setObject:[NSNumber numberWithInt:previous] forKey:_name];
+        
+        
         
     }
 }

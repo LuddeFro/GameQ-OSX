@@ -50,7 +50,9 @@
 
 - (void) increment:(int)value
 {
-    [array insertObject:[NSNumber numberWithInt:value] atIndex:intInc];
+    //NSLog(@"Incrementing %d", intInc);
+    //NSLog(@"%@, %@, %@, %@, %@", [array objectAtIndex:0], [array objectAtIndex:1], [array objectAtIndex:2], [array objectAtIndex:3], [array objectAtIndex:4]);
+    [array replaceObjectAtIndex:intInc withObject:[NSNumber numberWithInt:value]];
     
     if (intInc >= (_size-1)) {
         intInc = 0;
