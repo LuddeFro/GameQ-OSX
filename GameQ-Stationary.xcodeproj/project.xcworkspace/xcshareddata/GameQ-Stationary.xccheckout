@@ -14,7 +14,7 @@
 		<string>https://github.com/LuddeFro/GameQ-OSX.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>GameQ-Stationary.xcodeproj/project.xcworkspace</string>
+	<string>GameQ-Stationary.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>AD3573FFEDAE6ADF5BDD2833AF7FCB97FAE8D18A</key>

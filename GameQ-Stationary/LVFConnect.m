@@ -188,7 +188,14 @@
     }
     
     
-    
+    if ([returnString isEqualToString:@"newCapAv"]) {
+        if (appDel.bolIsActive) {
+            [appDel toggle:nil];
+            [appDel toggle:nil];
+        } else {
+            
+        }
+    }
     
     
     
