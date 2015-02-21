@@ -30,7 +30,7 @@
     }
     
     if (sport <= _maxsport && sport >= _minsport && dport >= _mindport && dport <= _maxdport && wlen <= _maxwlen && wlen >= _minwlen) {
-        //NSLog(@"packet match...");
+        //NSLog(@"packet match...%@", [self name]);
         if (!([_appDel.prebuffers objectForKey:_name] == nil)) {
             NSLock *aLock = [[NSLock alloc] init];
             [aLock lock];

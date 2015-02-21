@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define kGameQServerURL @"http://54.76.41.235/GameQ_Server_Code/"
+#define kGameQServerURL @"http://server.gameq.io/GameQ_Server_Code/"
 #define ServerURL kGameQServerURL;
 #define loginURL kGameQServerURL@"signing.php";
 #define registerURL kGameQServerURL@"regging.php";
@@ -25,6 +25,9 @@
 #define updateSecretURL kGameQServerURL@"updateSecret.php"
 #define versionURL kGameQServerURL@"versionControl.php"
 #define monitorMeURL kGameQServerURL@"monitorMe.php"
+#define checkPhonesURL kGameQServerURL@"hasPhones.php"
+#define quitURL kGameQServerURL@"quitting.php"
+
 #define kAPPID @"GameQ"
 #define kVersion @"1.0"
 #define kEmail @"EmailEmail"
@@ -36,6 +39,21 @@
 #define kUnique @"mfUAID"
 
 #define URL_ABOUT @"https://www.gameQ.io/"
+
+
+#define kNOGAME 0
+#define kHEROES_OF_NEWERTH 1
+#define kDOTA2 2
+#define kCS_GO 3
+#define REGISTER_URL @"https://www.gameq.com/register"
+#define kOFFLINE 0 //app running, but no game
+#define kONLINE 1 //game running
+#define kINGAME 2 //game running and in match
+#define kNOTTRACKING 3 //tracking toggled off
+#define kNotRunningGameQ 4 //self explanatory
+
+#define kINGAME_FOR_LVFSTATE 1
+#define kPUSH_FOR_LVFSTATE 0
 
 @interface LVFDefinitions : NSObject
 

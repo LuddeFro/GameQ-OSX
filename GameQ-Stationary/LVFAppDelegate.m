@@ -8,19 +8,8 @@
 
 #import "LVFAppDelegate.h"
 
-#define kNOGAME 0
-#define kHEROES_OF_NEWERTH 1
-#define kDOTA2 2
-#define kCS_GO 3
-#define REGISTER_URL @"https://www.gameq.com/register"
-#define kOFFLINE 0 //app running, but no game
-#define kONLINE 1 //game running
-#define kINGAME 2 //game running and in match
-#define kNOTTRACKING 3 //tracking toggled off
-#define kNotRunningGameQ 4 //self explanatory
 
-#define kINGAME_FOR_LVFSTATE 1
-#define kPUSH_FOR_LVFSTATE 0
+
 
 
 
@@ -422,6 +411,9 @@ unsigned char * main2()
     
     (void) IOObjectRelease(intfIterator);	// Release the iterator.
     
+    
+    
+
     return MACAddress;
 }
 
@@ -434,7 +426,7 @@ unsigned char * main2()
     
     //first init
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
-    
+    _wildCards = [[NSMutableDictionary alloc] init];
     
     
     
@@ -462,7 +454,7 @@ unsigned char * main2()
     
     
     
-    NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword:%@ \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], [_dataHandler getPass], [_dataHandler getDeviceID]);
+    NSLog(@"stored data:\r\nloggedin: %@\r\nemail: %@\r\ntoken: %@\r\npassword:%@ \r\ndeviceID:%@", [_dataHandler getBolIsLoggedIn], [_dataHandler getEmail], [_dataHandler getToken], @"like i'd tell you :P", [_dataHandler getDeviceID]);
     
     
     
@@ -1711,7 +1703,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [self clearBuffers];
     [_connectionsHandler UpdateStatusWithGame:kNOGAME andStatus:[NSNumber numberWithInt:kNOTTRACKING] andToken:[_dataHandler getToken]];
     printf("\nCapture complete.\n");
-    
+    pcap_freecode(&fp);
+    pcap_close(handle);
     
     
 }
@@ -1737,7 +1730,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) setupCap
 {
     
-    
+     
     //pCap vars
     struct ifaddrs* interfaces = NULL;
     struct ifaddrs* temp_addr = NULL;
@@ -1791,7 +1784,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     NSLog(@"setting up cap");
     char *filter_exp = [_currentFilter UTF8String];
-    NSLog(@"new filter: %s", filter_exp);
+    //NSLog(@"new filter: %s", filter_exp);
     /* Compile a filter */
     if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1){
         fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
@@ -1840,14 +1833,15 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     int numStats = [gameString substringToIndex:3].intValue;
     gameString = [gameString substringFromIndex:3];
-    
+    NSLog(@"%@", gameString);
     for (int i = 0; i < numStats; i++) {
+        NSLog(@"%@", gameString);
         int statlen = [gameString substringToIndex:4].intValue;
         gameString = [gameString substringFromIndex:4];
         NSString *state = [gameString substringToIndex:statlen];
         gameString = [gameString substringFromIndex:statlen];
         [self handleState:state forGame:game andState:i];
-        NSLog(@"state: %@", state);
+        //NSLog(@"state: %@", state);
     }
 }
 
@@ -1856,12 +1850,19 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     int numOrs = [stateString substringToIndex:3].intValue;
     stateString = [stateString substringFromIndex:3];
     for (int i = 0; i < numOrs; i++) {
+        
         BOOL special = [stateString substringToIndex:1].intValue;
         stateString = [stateString substringFromIndex:1];
         int numCons = [stateString substringToIndex:3].intValue;
         stateString = [stateString substringFromIndex:3];
         NSMutableDictionary *conditions = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *waits = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary *nots = [[NSMutableDictionary alloc] init];
         for (int j = 0; j < numCons; j++) {
+            BOOL bolnot = [stateString substringToIndex:1].boolValue;
+            stateString = [stateString substringFromIndex:1];
+            int waittime = [stateString substringToIndex:2].intValue;
+            stateString = [stateString substringFromIndex:2];
             int numPacks = [stateString substringToIndex:3].intValue;
             stateString = [stateString substringFromIndex:3];
             int nameLen = [stateString substringToIndex:4].intValue;
@@ -1870,10 +1871,12 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
             stateString = [stateString substringFromIndex:nameLen];
             
             [conditions setObject:[NSNumber numberWithInt:numPacks] forKey:packName];
+            [waits setObject:[NSNumber numberWithInt:waittime] forKey:packName];
+            [nots setObject:[NSNumber numberWithBool:bolnot] forKey:packName];
             
             
         }
-        LVFState *tmpStat = [[LVFState alloc] initWithConditions:conditions andGame:[NSNumber numberWithInt:game] andState:[NSNumber numberWithInt:state] forDelegate:self isSpecial:special];
+        LVFState *tmpStat = [[LVFState alloc] initWithConditions:conditions andWaitTimes:waits andNots:nots andGame:[NSNumber numberWithInt:game] andState:[NSNumber numberWithInt:state] forDelegate:self isSpecial:special];
         [_states addObject:tmpStat];
         
     }
@@ -1882,36 +1885,36 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (void) handleCap:(NSString*)capString
 {
     
-    NSLog(@"cap handlin': %@", capString);
+    NSLog(@"cap handlin':");
     int numCaps = [capString substringToIndex:3].intValue;
-    NSLog(@"%d", numCaps);
+    //NSLog(@"%d", numCaps);
     capString = [capString substringFromIndex:3];
     for (int i = 0; i < numCaps; i++) {
-        NSLog(@"another cap licks the dust");
+        //NSLog(@"another cap licks the dust");
         int nameLen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         NSString *name = [capString substringToIndex:nameLen];
         capString = [capString substringFromIndex:nameLen];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int buffSiz = [capString substringToIndex:2].intValue;
         capString = [capString substringFromIndex:2];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int minSport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int maxSport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int minDport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int maxDport = [capString substringToIndex:5].intValue;
         capString = [capString substringFromIndex:5];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int minWlen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
-        NSLog(@"%@", capString);
+        //NSLog(@"%@", capString);
         int maxWlen = [capString substringToIndex:4].intValue;
         capString = [capString substringFromIndex:4];
         
@@ -1943,7 +1946,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         
         
     }
-    NSLog(@"cap handled: %@", capString);
+    NSLog(@"cap handled" );
     
     
 }
@@ -1966,18 +1969,18 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     _states = [[NSMutableArray alloc] init];
     _coolers = [[NSMutableDictionary alloc] init];
     _procs = [[NSMutableArray alloc] init];
-    NSLog(@"money: %@", _monitorString);
+    //NSLog(@"money: %@", _monitorString);
     int flen = [self monitorExtract:4].intValue;
     _currentFilter = [self monitorExtract:flen];
-    NSLog(@"new filly: %@", _currentFilter);
+    //NSLog(@"new filly: %@", _currentFilter);
     [self setupCap];
     _totalGames = [self monitorExtract:2].intValue;
     int numGames = [self monitorExtract:2].intValue;
     for (int i = 0; i<numGames; i++) {
         int glen = [self monitorExtract:4].intValue;
         NSString* game = [self monitorExtract:glen];
-        NSLog(@"kuk:  %@", game);
-        NSLog(@"kuk:  %@", _monitorString);
+        //NSLog(@"kuk:  %@", game);
+        //NSLog(@"kuk:  %@", _monitorString);
         [self handleGame:game];
     }
     
@@ -2007,6 +2010,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     [btnToggleActive setTitle:@"Stop Monitoring"];
     printf("\nCapture started.\n");
     [self.statusBar setImage:[NSImage imageNamed:@"Qblue"]];
+    //TODO
     pcap_loop(handle, num_packets, got_packet, self);
 }
 
@@ -2077,8 +2081,18 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) setConnected
 {
-    NSLog(@"%s", main2());
     unsigned char * tag = main2();
+    
+    NSMutableString * result = [[NSMutableString alloc] init];
+    ///    convert  --   char[] -> Nsstring in Hex format
+    
+    for (int i=0; i<6; i++) {
+        [result appendString:[NSString stringWithFormat:@"%02x",tag[i]]];
+    }
+    
+    NSLog(@"result :%@",result);
+    
+    
     NSString *tmpTag = [NSString stringWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x",tag[0],tag[1],tag[2],tag[3],tag[4],tag[5]];
     
     if (![[_dataHandler getFirstLog] isEqualToString:@"banana"]) {
@@ -2090,11 +2104,11 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     NSString *myTag = [NSString stringWithFormat:@"mac:%@:%@:%@",_dataHandler.getEmail, _dataHandler.getUniqueID, tmpTag];
     [_dataHandler setToken:myTag];
-    NSLog(@"%@", tmpTag);
-    NSLog(@"set token: %@", myTag);
+    //NSLog(@"%@", tmpTag);
+    //NSLog(@"set token: %@", myTag);
     
     [_connectionsHandler.gqConnect postNow:[NSString stringWithFormat:@"token=%@&deviceName=%@&email=%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]] to:updateTokenURL];
-    NSLog(@"token posted with token:%@ devName:%@ and email:%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]);
+    //NSLog(@"token posted with token:%@ devName:%@ and email:%@", [_dataHandler getToken], [_dataHandler getDeviceID], [_dataHandler getEmail]);
     [btnLog setTitle:@"Change user"];
     [btnToggleActive setEnabled:true];
     bolLoggedIn = YES;
@@ -2115,6 +2129,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     // following tells the server the client is online but no games have been launched
     [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[_dataHandler getToken]];
     [self setupLoggedIn];
+    [_connectionsHandler checkPhones:_dataHandler.getEmail];
     
     
     
@@ -2156,9 +2171,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 // quits the app
 - (IBAction)quit:(id)sender {
-    [self toggleOff:(nil)];
-    pcap_freecode(&fp);
-	pcap_close(handle);
+    if (bolIsActive) {
+        [self toggleOff:(nil)];
+    }
+    [_connectionsHandler quitPostFromToken:[_dataHandler getToken]];
     exit(0);
     
 }
@@ -2166,7 +2182,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 //what happens on tack? (quick timer)
 - (IBAction)tack:(id)sender {
     
-    NSLog(@"tick");
+    //NSLog(@"tick");
     
     
     
@@ -2185,9 +2201,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     
     
     NSMutableDictionary *tempPreBuff = [_prebuffers copy];
+    NSLog(@"prebuff loop");
     for (NSString* key in tempPreBuff) {
         //NSLog(@"prebuff loop");
-        //NSLog(@"%@", key);
+        NSLog(@"%@", key);
         int buffOld = [[tempPreBuff objectForKey:key] intValue];
         LVFBuffer* buffNew = [_buffers objectForKey:key];
         
@@ -2205,17 +2222,33 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     }
     
     for (LVFState* stat in _states) {
-        //NSLog(@"state: %@, game:%@, special:%d", stat.state, stat.game, stat.special);
+        NSLog(@"state: %@, game:%@, special:%d", stat.state, stat.game, stat.special);
         LVFState *aStat = [stat checkState];
         if (aStat != NULL) {
+            NSLog(@"state not null");
             if (aStat.state.intValue == kINGAME_FOR_LVFSTATE) {
+                NSLog(@"setting ingame");
                 [_bolInGameArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
             } else if (aStat.state.intValue == kPUSH_FOR_LVFSTATE){
+                NSLog(@"setting online");
                 [_bolpushArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
             }
         }
         
     }
+    for (NSNumber* key in _wildCards) {
+        LVFState* aStat = [_wildCards objectForKey:key];
+        NSLog(@"state not null");
+        if (aStat.state.intValue == kINGAME_FOR_LVFSTATE) {
+            NSLog(@"setting ingame from wild");
+            [_bolInGameArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
+        } else if (aStat.state.intValue == kPUSH_FOR_LVFSTATE){
+            NSLog(@"setting online from wild");
+            [_bolpushArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
+        }
+    }
+    
+    
     for (LVFCompartment* comp in _procs) {
         NSNumber *gameNum = (NSNumber *) comp.name;
         NSString *procName = (NSString *) comp.heldObject;
@@ -2228,8 +2261,10 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
     for (int i = 0; i <= _totalGames; i++) {
         NSNumber *pusher = [_bolpushArray objectAtIndex:i];
         NSNumber *online = [_bolOnlineArray objectAtIndex:i];
+        NSLog(@"will it push?");
         if (pusher.boolValue) {
             if (online.boolValue) {
+                NSLog(@"pushing %d", i);
                 [self queuePopIfNotInGame:i];
                 [_bolpushArrayLast replaceObjectAtIndex:i withObject:[NSNumber numberWithBool:YES]];
                 NSNumber *cooldown = [_coolers objectForKey:[NSNumber numberWithInt:i]];
@@ -2289,7 +2324,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
             return;
         }
     }
-    NSLog(@"called method \"offline\"");
+    //NSLog(@"called method \"offline\"");
     NSNumber *onlineBefore = [_bolOnlineArrayLast objectAtIndex:game];
     if (!onlineBefore.boolValue) {
         // do nothing if status was already offline, (initialized to offline)
@@ -2305,7 +2340,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 //called whenever online status is detected
 - (IBAction)online:(int)game {
     if (_bolQueueCD) {
-        NSLog(@"return1");
+        //NSLog(@"return1");
         return;
     }
     bool bolWasInGame = [[_bolInGameArrayLast objectAtIndex:game] boolValue];
@@ -2316,7 +2351,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         }
     }
     
-    NSLog(@"called method \"online\"");
+    //NSLog(@"called method \"online\"");
     if ([[_bolOnlineArrayLast objectAtIndex:game] boolValue] && !bolWasInGame) {
         // do nothing if status already online, (initialized to offline)
     } else {
@@ -2331,16 +2366,16 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 //executes every quick timer user is in a match
 - (IBAction)inGame:(int)game {
     
-    NSLog(@"called method \"ingame\"");
+   // NSLog(@"called method \"ingame\"");
     
         
     if([[_bolInGameArrayLast objectAtIndex:game] boolValue]){
         //do nothing
-        NSLog(@"already ingame- do nothing");
+        //NSLog(@"already ingame- do nothing");
         
     } else if(![[_bolInGameArray objectAtIndex:game] boolValue]) {
         [_connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:game] andStatus:[NSNumber numberWithInt:kINGAME] andToken:[_dataHandler getToken]];
-        NSLog(@"became ingame- softpushing");
+        //NSLog(@"became ingame- softpushing");
     }
     [_bolOnlineArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
     [_bolInGameArrayLast replaceObjectAtIndex:game withObject:[NSNumber numberWithBool:YES]];
@@ -2353,17 +2388,18 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 }
 
 - (IBAction)queuePopIfNotInGame:(int)game {
+    NSLog(@"pushing?");
     if (_bolQueueCD) {
         return;
     }
-    NSLog(@"called method \"queuePop\"");
-    if([[_bolInGameArray objectAtIndex:game] boolValue]){
+    NSLog(@"pushing????");
+    //NSLog(@"called method \"queuePop\"");
+    if([[_bolInGameArrayLast objectAtIndex:game] boolValue]){
         //do nothing
-        NSLog(@"ingame- do nothing");
-        
-    } else if(![[_bolInGameArray objectAtIndex:game] boolValue]) {
+        NSLog(@"push- aborted, already in game");
+    } else if(![[_bolInGameArrayLast objectAtIndex:game] boolValue]) {
         [_connectionsHandler pushNotificationForGame:[NSNumber numberWithInt:game] andToken:[_dataHandler getToken] andEmail:[_dataHandler getEmail]];
-        NSLog(@"ingame- pushing");
+        NSLog(@"pushing!");
     }
     _bolQueueCD = true;
     if (_queuePopCooldownTimer != NULL) {
@@ -2412,42 +2448,42 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 //increment methods used to alter variables from within libPCap function "got_packet"
 - (IBAction)incrementHonQPack {
-    printf("Incrementing HonQPack");
+    //printf("Incrementing HonQPack");
     honQPack++;
 }
 
 - (IBAction)incrementDotaQPack {
-    printf("Incrementing DotaQPack");
+    //printf("Incrementing DotaQPack");
     dotaQPack++;
 }
 
 - (IBAction)incrementDota174Pack {
-    printf("Incrementing Dota174Pack");
+    //printf("Incrementing Dota174Pack");
     dota174Pack++;
 }
 
 - (IBAction)incrementDota190Pack {
-    printf("Incrementing Dota190Pack");
+    //printf("Incrementing Dota190Pack");
     dota190Pack++;
 }
 
 - (IBAction)incrementDota206Pack {
-    printf("Incrementing Dota206Pack");
+    //printf("Incrementing Dota206Pack");
     dota206Pack++;
 }
 
 - (IBAction)incrementDotaCPack {
-    printf("Incrementing DotaCPack");
+    //printf("Incrementing DotaCPack");
     dotaCPack++;
 }
 
 - (IBAction)incrementcsgoQPack {
-    printf("Incrementing csgoQPack");
+    //printf("Incrementing csgoQPack");
     csgoQPack++;
 }
 
 - (IBAction)incrementcsgoGamePack {
-    printf("Incrementing csgoGamePack");
+    //printf("Incrementing csgoGamePack");
     csgoGamePack++;
 }
 

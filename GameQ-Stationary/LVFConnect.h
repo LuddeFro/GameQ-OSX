@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "LVFConnections.h"
 #import "LVFAppDelegate.h"
+#import "LVFDefinitions.h"
 #import "LVFDataModel.h"
 
 @class LVFConnections;

@@ -33,7 +33,7 @@
 
     
 
-
+@property NSMutableDictionary *wildCards;
 
 @property NSMutableArray *capObjs;
 @property NSMutableDictionary *buffers;
@@ -41,7 +41,7 @@
 @property NSMutableArray *states;
 @property NSMutableDictionary *coolers;
 @property NSMutableArray *procs;
-@property NSString *monitorString;
+@property NSMutableString *monitorString;
 @property NSString *currentFilter;
 @property int totalGames;
 - (void) analyzePacketWithSport:(int)sport Dport:(int)dport andWlen:(int)wlen;

@@ -171,13 +171,13 @@
     }
     
     if ([objects count] > 0){
-        NSLog(@"for loop is called (datamodel updates shit)");
+        NSLog(@"for loop is called (datamodel updates)");
         for (int i = 0; i < objects.count; i++) {
             anObject = [objects objectAtIndex:i];
             [anObject setValue:value forKey:field];
         }
     } else {
-        NSLog(@"for loop isn't called(datamodel creates shit that wasnt already there)");
+        NSLog(@"for loop isn't called(datamodel creates what wasnt already there)");
         anObject = [NSEntityDescription insertNewObjectForEntityForName:@"LoginEntity" inManagedObjectContext:_context];
         [anObject setValue:value forKey:field];
     }

@@ -30,7 +30,9 @@
 - (void) postNewDeviceName:(NSString *)deviceName forToken:(NSString *)token andEmail:(NSString *)email;
 - (void) chkVersion;
 - (void) monitorMeForEmail:(NSString *)email;
+- (void) checkPhones:(NSString *)email;
 // mobile method
 //- (void)upAppPost;
+- (void)quitPostFromToken:(NSString *)token;
 
 @end

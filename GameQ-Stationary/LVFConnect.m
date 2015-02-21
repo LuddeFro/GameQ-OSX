@@ -91,7 +91,7 @@
     NSLog(@"received data length:%lu", (unsigned long)[returnData length]);
     NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
     NSLog(@"%@", returnString);
-    NSLog(@"return string above");
+    //NSLog(@"return string above");
     
     
     
@@ -130,9 +130,18 @@
         return;
     }
     if (returnString.length >= 5) {
-        if ([[returnString substringWithRange:NSMakeRange(0, 5)] isEqualToString:@"monme"])
+        if ([[returnString substringWithRange:NSMakeRange(0, 5)] isEqualToString:@"jlkjb"]) // monme
         {
-            appDel.monitorString = [returnString substringFromIndex:5];
+            [appDel.connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[appDel.dataHandler getToken]];
+            NSString *monStr = [returnString substringFromIndex:5];
+            NSString *builder = @"";
+            for (int jj = 0; jj < monStr.length; jj++) {
+                int c = [monStr characterAtIndex:jj];
+                c += 3;
+                builder = [NSString stringWithFormat:@"%@%c", builder, c];
+            }
+            appDel.monitorString = builder;
+            //NSLog(@"builder: %@", builder);
             [appDel startMonitor];
         }
     }
@@ -158,11 +167,11 @@
     
     if ([returnString isEqualToString:@"signing upmailerr"])
     {
-        [appDel.txtPassword setStringValue:@""];
-        [appDel setupLogin];
         NSString *msgString = [[NSString alloc] init];
-        msgString = @"Welcome to GameQ, you can sign in immediately";
+        msgString = @"Welcome to GameQ, you have been signed in with your new account! If you wish to pause queue monitoring or access settings, you can do so from the menu bar.";
         [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", msgString] runModal];
+        [appDel setConnected];
+        return;
     }
     if ([returnString isEqualToString:@"signing upmailerrno"])
     {
@@ -196,6 +205,12 @@
             
         }
     }
+    if ([returnString isEqualToString:@"hasPhone"]) {
+        return;
+    }
+    if ([returnString isEqualToString:@"noPhone"]) {
+        [[NSAlert alertWithMessageText:@"Welcome to GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Welcome to the GameQ family! Congratulations on successfully installing and registering for the GameQ service. We see that you have yet to connect a phone to this account. To do so, and start saving time with GameQ, download the app to your smartphone from the App Store or Google Play."] runModal];
+    }
     
     
     
@@ -203,6 +218,16 @@
     if ([returnString isEqualToString:@"sign in success"])
     {
         [appDel setConnected];
+        return;
+    }
+    
+    // if sign in failed
+    if ([returnString isEqualToString:@"lockedsign in failed"])
+    {
+        [[NSAlert alertWithMessageText:@"Account locked" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"You're account has been temporarily locked due to too many unsuccessful sign in attempts. This lock will last up to two hours or until you reset your password"] runModal];
+        [appDel setDisconnected];
+        [appDel.txtPassword setStringValue:@""];
+        
         return;
     }
     

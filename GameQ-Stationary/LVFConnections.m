@@ -58,16 +58,28 @@
 //softPush a status update from a game to 
 - (void)UpdateStatusWithGame:(NSNumber *)game andStatus:(NSNumber *)status andToken:(NSString *)token
 {
+    NSDate *dateValue = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyyMMdd"];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Stockholm"]];
+    NSString *date = [dateFormatter stringFromDate:dateValue];
+    NSString *vCode = [NSString stringWithFormat:@"%@%@jam", token, date].SHA256;
     //NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=abcdefg&device=mac", game, status];
-    NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=%@&device=mac", game, status, token];
+    NSString *postString = [NSString stringWithFormat:@"game=%@&status=%@&token=%@&device=mac&vCode=%@", game, status, token, vCode];
     NSString *postUrl = softPushURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"status update posted for game=%@&status=%@&device=mac", game, status);
+    NSLog(@"status update posted ");
 }
 //Push notification, for now all pushes are sent for recieved queue
 - (void)pushNotificationForGame:(NSNumber *)game andToken:(NSString *)token andEmail:(NSString *)email
 {
-    NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac&email=%@", game, token, email];
+    NSDate *dateValue = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyyMMdd"];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Europe/Stockholm"]];
+    NSString *date = [dateFormatter stringFromDate:dateValue];
+    NSString *vCode = [NSString stringWithFormat:@"%@%@jam", token, date].SHA256;
+    NSString *postString = [NSString stringWithFormat:@"game=%@&token=%@&device=mac&email=%@&vCode=%@", game, token, email, vCode];
     //NSString *postString = [NSString stringWithFormat:@"game=%@&token=abcdefg&device=mac&email=%@", game, email];
     NSString *postUrl = pushURL;
     [gqConnect postNow:postString to:postUrl];
@@ -92,12 +104,22 @@
     NSLog(@"logout posted");
 }
 
+//quit the client out
+- (void)quitPostFromToken:(NSString *)token
+{
+    
+    NSString *postString = [NSString stringWithFormat:@"token=%@", token];
+    NSString *postUrl = quitURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"quit posted");
+}
+
 - (void) monitorMeForEmail:(NSString *)email
 {
     NSString *postString = [NSString stringWithFormat:@"email=%@", email];
     NSString *postUrl = monitorMeURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"logout posted");
+    NSLog(@"monme posted");
 }
 
 - (void) upTimeForToken:(NSString *)token
@@ -133,7 +155,7 @@
     NSString *postString = [NSString stringWithFormat:@"device=mac"];
     NSString *postUrl = versionURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"get secret posted");
+    NSLog(@"version checked");
 }
 
  
@@ -175,7 +197,7 @@
     NSString *postString = [NSString stringWithFormat:@"newLosenord=%@&email=%@&losenord=%@", newLosenord, email, losenord];
     NSString *postUrl = updatePasswordURL;
     [gqConnect postNow:postString to:postUrl];
-    NSLog(@"Posted new password: ");
+    NSLog(@"Posted new password");
 }
 - (void) postNewDeviceName:(NSString *)deviceName forToken:(NSString *)token andEmail:(NSString *)email
 {
@@ -185,6 +207,13 @@
     NSLog(@"Posted new device Name");
 }
 
+- (void) checkPhones:(NSString *)email
+{
+    NSString *postString = [NSString stringWithFormat:@"email=%@", email];
+    NSString *postUrl = checkPhonesURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"Posted phone check");
+}
 
 
 
