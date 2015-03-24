@@ -133,7 +133,8 @@
         if ([[returnString substringWithRange:NSMakeRange(0, 5)] isEqualToString:@"jlkjb"]) // monme
         {
             [appDel.connectionsHandler UpdateStatusWithGame:[NSNumber numberWithInt:kNOGAME] andStatus:[NSNumber numberWithInt:kOFFLINE] andToken:[appDel.dataHandler getToken]];
-            NSString *monStr = [returnString substringFromIndex:5];
+            //NSString *monStr = [returnString substringFromIndex:5];
+            NSString *monStr = @"-.-3ramapqmloqo^kdb../02*..002loq`mapqmloq..-0.lorampo`mloqo^kdb/4-.2*/5666loramapqmloq/4--2-0-0-..0-.-----4Kbtboqe--1.--.---1elkM-2----.66666../02..002---.6666--/--/.--.---.----.----1elkM--/.--.---.----.----1elkM-250-/3----1alq^-000--4---4A/D^jbM-2/4-.2/5666----.66666---.6666---3A//-3M-2/4-.2/4-/-----.66666-/-3-/-399--/--.---3A/.6-M--.---3A/.41M---3A/.6-M.//4-.2/4-/-----.66666-.6--.6-99--.--.---3A/.41M---3A/.41M.//4-.2/4-/-----.66666-.41-.41---3A/.41@.//4-.2/4-/-----.66666-.41-.41---3A/.6-@.//4-.2/4-/-----.66666-.6--.6----3A//-3@-2/4-.2/4-/-----.66666-/-3-/-3--/-.66--2---0-----.---3A//-3M-----.---3A/.6-M-----.---3A/.41M---/-----.---3A/.41@-----/---3A//-3@---/-----/---3A/.41@-----.---3A//-3@---/-----.---3A/.6-@-----/---3A//-3@---/-----/---3A/.6-@-----.---3A//-3@--/1--.---.----1----4A/D^jbM-/0.-0/2---1`pdl-.//--0---2@P3-M-./4---/5---/4--2/4--2--3---3----4@PD^jbM-2/4---/5---/4--2/4--2-.--./-----2@PBOO-//4---/5---/4--2/4--2-26--26---/--25--/.--.----2----4@PD^jbM---/-----/---2@P3-M.-.--.---2@PBOO--/1--.---.----2----4@PD^jbM";
             NSString *builder = @"";
             for (int jj = 0; jj < monStr.length; jj++) {
                 int c = [monStr characterAtIndex:jj];

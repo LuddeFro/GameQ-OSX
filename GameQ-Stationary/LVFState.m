@@ -32,23 +32,29 @@
 //checks if this state is active, returns self if it is, otherwise null
 - (LVFState *) checkState
 {
+    NSLog(@"checking state");
     int precount = _counter;
     _counter++;
     [_reports setObject:[NSNumber numberWithBool:true] forKey:[NSNumber numberWithInt:precount]];
     
     
-    
+    NSLog(@"checking special");
     if (_special) {
+        NSLog(@"special");
         if (_appDel.bolSpecialCD) {
+            NSLog(@"specialcd");
             return NULL;
         }
     }
     BOOL haswait = false;
     int longestwait = 0;
+    int numconis = 0;
     for (NSString* key in _conditions) {
+        NSLog(@"condition number: %d", numconis);
         int wait = ((NSNumber *)[_waitTimes objectForKey:key]).intValue;
         BOOL notting = ((NSNumber *)[_nots objectForKey:key]).boolValue;
         if (wait > 0) {
+            NSLog(@"waiting condition");
             NSMutableDictionary* tempDic = [[NSMutableDictionary alloc] init];
             [tempDic setObject:key forKey:@"name"];
             [tempDic setObject:[_waitTimes objectForKey:key] forKey:@"wait"];
@@ -61,12 +67,12 @@
                 
             }
             haswait = true;
-            [tempDic setObject:[NSNumber numberWithInt:((LVFBuffer *)[_appDel.buffers objectForKey:key]).bufferValue] forKey:@"numpacks"];
+            [tempDic setObject:[_conditions objectForKey:key] forKey:@"numpacks"];
             [tempDic setObject:[NSNumber numberWithInt:precount] forKey:@"reportID"];
             [self performSelectorInBackground:@selector(checkUnwrapperForFuture:) withObject:tempDic];
             haswait = true;
         } else {
-            
+            NSLog(@"nonwaiting condition");
             int a = [[_conditions objectForKey:key] intValue];
             LVFBuffer *buffo = [_appDel.buffers objectForKey:key];
             if (notting) {
@@ -92,7 +98,9 @@
 
 -(void) checkUnwrapperForFuture:(NSMutableDictionary *)tempDic
 {
+    NSLog(@"sleeps");
     sleep(((NSNumber *)[tempDic objectForKey:@"wait"]).intValue);
+    NSLog(@"wakes");
     NSString* name = [tempDic objectForKey:@"name"];
     BOOL bolnots = ((NSNumber *)[tempDic objectForKey:@"nots"]).boolValue;
     int numpacks = ((NSNumber *)[tempDic objectForKey:@"numpacks"]).intValue;
@@ -106,21 +114,28 @@
 {
     int a = numPacks;
     LVFBuffer *buffo = [_appDel.buffers objectForKey:key];
+    [_reports setObject:[NSNumber numberWithBool:true] forKey:[NSNumber numberWithInt:reportID]];
     if (notted) {
+        NSLog(@"notted");
         if (buffo.bufferValue >= a) {
+            NSLog(@"wont report because %d >= %d", buffo.bufferValue, a);
             [_reports setObject:[NSNumber numberWithBool:false] forKey:[NSNumber numberWithInt:reportID]];
         }
     } else {
+        
         if (buffo.bufferValue < a) {
+            NSLog(@"wont report because %d < %d", buffo.bufferValue, a);
             [_reports setObject:[NSNumber numberWithBool:false] forKey:[NSNumber numberWithInt:reportID]];
         }
     }
     if (reporting) {
         if (((NSNumber*)[_reports objectForKey:[NSNumber numberWithInt:reportID]]).boolValue) {
             //no errors found
+            NSLog(@"reporting success");
             [_appDel.wildCards setObject:self forKey:[NSNumber numberWithInt:reportID]];
         } else {
             //a condition didn't match
+            NSLog(@"reporting failure");
             [_appDel.wildCards removeObjectForKey:[NSNumber numberWithInt:reportID]];
         }
     }

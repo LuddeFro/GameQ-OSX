@@ -27,6 +27,7 @@
 #define monitorMeURL kGameQServerURL@"monitorMe.php"
 #define checkPhonesURL kGameQServerURL@"hasPhones.php"
 #define quitURL kGameQServerURL@"quitting.php"
+#define reportURL kGameQServerURL@"report.php"
 
 #define kAPPID @"GameQ"
 #define kVersion @"1.0"

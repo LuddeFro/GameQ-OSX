@@ -149,6 +149,13 @@
 
 
 
+- (void)sendMissReport:(NSString *)report forGame:(int)game
+{
+    NSString *postString = [NSString stringWithFormat:@"report=%@&game=%d", report, game];
+    NSString *postUrl = reportURL;
+    [gqConnect postNow:postString to:postUrl];
+    NSLog(@"report sent for game %d", game);
+}
 
 - (void) chkVersion
 {

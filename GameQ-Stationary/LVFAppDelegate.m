@@ -428,7 +428,9 @@ unsigned char * main2()
     _dataHandler = [[LVFDataModel alloc] initWithAppDelegate:self];
     _wildCards = [[NSMutableDictionary alloc] init];
     
-    
+    _packetLog = [[NSMutableArray alloc] initWithCapacity:201];
+    _outputFormatter = [[NSDateFormatter alloc] init];
+    [_outputFormatter setDateFormat:@"mm:ss"];
     
     NSLog(@"%@", [_dataHandler getDeviceID]);
     if ([_dataHandler getDeviceID] == NULL) {
@@ -1693,6 +1695,8 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 }
 
 - (IBAction)toggleOff:(id)sender {
+    
+    [_btnReportMiss setHidden:false];
     [btnToggleActive setTitle:@"Start Monitoring"];
     [self.statusBar setImage:[NSImage imageNamed:@"Qblack"]];
     [_btnStatus2 setTitle:@"Status: Not Tracking"];
@@ -1841,7 +1845,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         NSString *state = [gameString substringToIndex:statlen];
         gameString = [gameString substringFromIndex:statlen];
         [self handleState:state forGame:game andState:i];
-        //NSLog(@"state: %@", state);
+        NSLog(@"state: %@", state);
     }
 }
 
@@ -1861,7 +1865,9 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
         for (int j = 0; j < numCons; j++) {
             BOOL bolnot = [stateString substringToIndex:1].boolValue;
             stateString = [stateString substringFromIndex:1];
+            if (bolnot) NSLog(@"nots");
             int waittime = [stateString substringToIndex:2].intValue;
+            NSLog(@"wait = %d", waittime);
             stateString = [stateString substringFromIndex:2];
             int numPacks = [stateString substringToIndex:3].intValue;
             stateString = [stateString substringFromIndex:3];
@@ -1953,6 +1959,13 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 - (void) analyzePacketWithSport:(int)sport Dport:(int)dport andWlen:(int)wlen
 {
+    
+    NSDate * now = [NSDate date];
+    NSString *arrayString = [NSString stringWithFormat:@"t: %@, s: %d, d: %d, l: %d", [_outputFormatter stringFromDate:now], sport, dport, wlen];
+    [_packetLog insertObject:arrayString atIndex:0];
+    if (_packetLog.count > 200) {
+        [_packetLog removeLastObject];
+    }
     //NSLog(@"analyzing");
     for (LVFCapObj* obj in _capObjs) {
         //NSLog(@"analyzing with capobj:::");
@@ -1963,6 +1976,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)toggleOn:(id)sender {
     NSLog(@"togglin On");
     
+    [_btnReportMiss setHidden:false];
     _capObjs = [[NSMutableArray alloc] init];
     _buffers = [[NSMutableDictionary alloc] init];
     _prebuffers = [[NSMutableDictionary alloc] init];
@@ -2246,6 +2260,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
             NSLog(@"setting online from wild");
             [_bolpushArray replaceObjectAtIndex:aStat.game.intValue withObject:[NSNumber numberWithBool:YES]];
         }
+        [_wildCards removeObjectForKey:key];
     }
     
     
@@ -2390,6 +2405,7 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 - (IBAction)queuePopIfNotInGame:(int)game {
     NSLog(@"pushing?");
     if (_bolQueueCD) {
+        NSLog(@"bolQueueCD");
         return;
     }
     NSLog(@"pushing????");
@@ -2665,4 +2681,17 @@ void print_hex_ascii_line(const u_char *payload, int len, int offset)
 
 
 
+- (IBAction)reportMiss:(id)sender {
+    int game = 0;
+    for (int i = 0; i<_bolOnlineArray.count; i++) {
+        if (((NSNumber*)[_bolOnlineArray objectAtIndex:i]).boolValue)
+        {
+            game = i;
+        }
+    }
+    NSLog(@"%@", _packetLog);
+    [_connectionsHandler sendMissReport:[NSString stringWithFormat:@"%@", _packetLog]  forGame:game];
+    [[NSAlert alertWithMessageText:@"GameQ" defaultButton:@"OK" alternateButton:nil otherButton:nil informativeTextWithFormat:@"Thank you for reporting your missed queue pop and helping us improve the GameQ service!"] runModal];
+    
+}
 @end

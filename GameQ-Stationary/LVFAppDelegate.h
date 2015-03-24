@@ -56,6 +56,10 @@
 @property (strong, nonatomic) NSTimer *specialCooldownTimer;
 
 
+@property NSMutableArray *packetLog;
+@property NSDateFormatter *outputFormatter;
+@property (strong) IBOutlet NSMenuItem *btnReportMiss;
+- (IBAction)reportMiss:(id)sender;
 
 
 

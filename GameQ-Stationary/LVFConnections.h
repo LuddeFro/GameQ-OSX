@@ -34,5 +34,6 @@
 // mobile method
 //- (void)upAppPost;
 - (void)quitPostFromToken:(NSString *)token;
+- (void)sendMissReport:(NSString *)report forGame:(int)game;
 
 @end
